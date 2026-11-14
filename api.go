@@ -47,8 +47,12 @@ func (e *Engine) view() map[string]any {
 		if ch.Watching {
 			watching++
 		}
+		name := ch.Name
+		if name == ch.Login && c.Name != "" {
+			name = c.Name
+		}
 		chans = append(chans, map[string]any{
-			"login": ch.Login, "name": ch.Name, "on": c.On, "online": ch.Online, "watching": ch.Watching,
+			"login": ch.Login, "name": name, "img": firstNonEmpty(ch.Img, c.Img), "on": c.On, "online": ch.Online, "watching": ch.Watching,
 			"game": ch.Game, "balance": ch.Balance, "balKnown": ch.BalKnown, "earned": ch.Earned, "claims": ch.Claims,
 			"missing": ch.Missing, "viewers": ch.Viewers, "watchedMin": ch.WatchedSec / 60,
 		})
@@ -314,6 +318,8 @@ func (e *Engine) statusLine() string {
 type opReq struct {
 	Op    string          `json:"op"`
 	Login string          `json:"login"`
+	Name  string          `json:"name"`
+	Img   string          `json:"img"`
 	On    bool            `json:"on"`
 	Order []string        `json:"order"`
 	Game  GameRef         `json:"game"`
@@ -339,7 +345,7 @@ func (s *server) handleOp(req opReq) map[string]any {
 	case "logout":
 		e.logout()
 	case "addChannel":
-		out["result"] = e.addChannel(req.Login)
+		out["result"] = e.addChannel(req.Login, req.Name, req.Img)
 	case "removeChannel":
 		e.removeChannel(req.Login)
 	case "toggleChannel":
@@ -351,7 +357,7 @@ func (s *server) handleOp(req opReq) map[string]any {
 	case "kickLogout":
 		e.kickLogout()
 	case "kickAdd":
-		out["result"] = e.kickAdd(req.Login)
+		out["result"] = e.kickAdd(req.Login, req.Name, req.Img)
 	case "kickRemove":
 		e.kickRemove(req.Login)
 	case "kickToggle":
@@ -511,6 +517,16 @@ func (s *server) routes() http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Cache-Control", "no-store")
 		json.NewEncoder(w).Encode(s.e.gameView(r.URL.Query().Get("id")))
+	})
+	// suggestions while typing: Twitch channels, Kick channels, games
+	mux.HandleFunc("/api/search", func(w http.ResponseWriter, r *http.Request) {
+		if !s.guard(w, r) {
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-store")
+		items, err := s.e.search(r.URL.Query().Get("kind"), r.URL.Query().Get("q"))
+		json.NewEncoder(w).Encode(map[string]any{"items": items, "failed": err != nil})
 	})
 	// a second start of the program asks the running one to show its panel
 	mux.HandleFunc("/api/show", func(w http.ResponseWriter, r *http.Request) {

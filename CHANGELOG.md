@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0
+- Simpler navigation: two sections, **Drops** (Drop campaigns, Queue, Tracked games) and **Points** (Twitch, Kick).
+- Tracked games: search for any game and track it, also one that has no campaign right now.
+- Channel avatars on the Twitch and Kick lists.
+- Suggestions while typing a channel name (Twitch and Kick), so you pick the right one.
+- Games in the queue and on the tracked list start folded; click a row to see its campaigns and rewards.
+
 ## 0.5.2
 - Fixed: after an update the open panel could stay on "Downloading…" with "No connection" although the app had already updated and restarted. The new version now takes over the address of the old one, so the panel reloads by itself.
 - The panel says clearly that the update is done ("Updated to version X") and, while downloading, that the app will restart by itself.

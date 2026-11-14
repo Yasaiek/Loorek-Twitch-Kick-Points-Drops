@@ -216,7 +216,30 @@ input[type=number] { width: 70px; text-align: center; }
 .tag.ok { color: var(--ok); } .tag.warn { color: var(--warn); } .tag.run { color: var(--accent); }
 .qitem { flex-direction: column; align-items: stretch; gap: 0; padding: 12px 14px; }
 .qitem .top { display: flex; align-items: center; gap: 12px; }
-.qitem .body { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.qitem .body { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: none; }
+.qitem.open .body { display: block; animation: fade .25s; }
+.qitem .top.fold { cursor: pointer; }
+.icon.chev svg { transition: transform .25s var(--ease); }
+.qitem.open .icon.chev svg { transform: rotate(180deg); }
+.seg { display: inline-flex; align-self: flex-start; gap: 3px; padding: 3px; background: var(--card); border: 1px solid var(--line); border-radius: 9px; }
+.seg button { appearance: none; border: 0; background: none; color: var(--sub); font: inherit; padding: 6px 14px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background .15s, color .15s; }
+.seg button:hover { color: var(--text); }
+.seg button.on { background: var(--card-3); color: var(--text); font-weight: 600; }
+.seg b { font-size: 11.5px; font-weight: 600; color: var(--accent); background: rgba(96,205,255,.12); border-radius: 99px; padding: 0 7px; }
+.pane { display: none; flex-direction: column; gap: 12px; }
+.pane.on { display: flex; animation: tabIn .3s var(--ease); }
+.pane-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pane-head p { margin: 0; color: var(--sub); }
+.avw { position: relative; flex-shrink: 0; display: grid; }
+.ava { width: 34px; height: 34px; border-radius: 50%; background: var(--card-3); border: 1px solid var(--line-2); overflow: hidden; display: grid; place-items: center; font: 600 13px var(--display); color: var(--sub); text-transform: uppercase; flex-shrink: 0; }
+.ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avw .dot { position: absolute; right: -2px; bottom: -2px; width: 12px; height: 12px; border: 2px solid var(--card-2); }
+.ac { position: relative; flex: 1; min-width: 0; }
+.ac-menu { position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 25; background: var(--card-2); border: 1px solid var(--line-2); border-radius: 10px; padding: 5px; box-shadow: 0 18px 50px rgba(0,0,0,.6); max-height: 340px; overflow: auto; animation: rise .2s var(--ease); }
+.ac-item { display: flex; align-items: center; gap: 10px; width: 100%; appearance: none; border: 0; background: none; color: var(--text); font: inherit; text-align: left; padding: 6px 8px; border-radius: 7px; cursor: pointer; }
+.ac-item:hover, .ac-item.sel { background: rgba(255,255,255,.07); }
+.ac-item.has { opacity: .55; }
+.ac-note { color: var(--dim); padding: 10px; text-align: center; }
 .farm { position: relative; overflow: hidden; background: linear-gradient(120deg, rgba(96,205,255,.13), rgba(143,123,255,.07) 60%, transparent), var(--card); border-color: rgba(96,205,255,.35); }
 .farm .top { display: flex; gap: 14px; align-items: center; }
 .farm .big { font: 600 18px/1.3 var(--display); }
@@ -286,10 +309,8 @@ select:focus { border-color: var(--accent); }
 <aside>
   <div class="brand"><img src="icon.png" alt=""><strong>Loorek</strong></div>
   <button class="nav on" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span data-i="nav.home"></span></button>
-  <button class="nav" data-tab="points"><i class="svc" data-svc="twitch"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg></i><span>Twitch</span></button>
-  <button class="nav" data-tab="kick"><i class="svc" data-svc="kick"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m10 8.5 5.5 3.5-5.5 3.5z"/></svg></i><span>Kick</span><b id="nKick" hidden></b></button>
-  <button class="nav" data-tab="camps"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span data-i="nav.camps"></span></button>
-  <button class="nav" data-tab="queue"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-i="nav.queue"></span><b id="nQueue" hidden></b></button>
+  <button class="nav" data-tab="drops"><svg viewBox="0 0 24 24"><path d="M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM3 7h18v4H3zM12 7v14M12 7c-1.5-4-6-4-6-1.5S9 7 12 7zm0 0c1.5-4 6-4 6-1.5S15 7 12 7z"/></svg><span data-i="nav.drops"></span><b id="nQueue" hidden></b></button>
+  <button class="nav" data-tab="points"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg><span data-i="nav.points"></span><b id="nPts" hidden></b></button>
   <button class="nav" data-tab="log"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14.5 3v5H19M9 13h7M9 17h7"/></svg><span data-i="nav.log"></span></button>
   <button class="nav" data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><span data-i="nav.settings"></span></button>
   <div class="rail-foot"><span id="pill" class="pill">…</span><div class="who" id="who"></div></div>
@@ -309,73 +330,93 @@ select:focus { border-color: var(--accent); }
     <div class="card"><div class="card-head"><h2 data-i="home.recent"></h2><a href="#" id="toLog" data-i="home.allLog"></a></div><div class="log" id="logShort"></div></div>
   </section>
 
+  <section class="tab" id="tab-drops">
+    <div class="head"><div><h1 data-i="nav.drops"></h1><p data-i="drops.sub"></p></div></div>
+    <div class="seg" data-seg="drops">
+      <button type="button" class="on" data-sub="camps"><span data-i="nav.camps"></span></button>
+      <button type="button" data-sub="queue"><span data-i="nav.queue"></span><b id="nQueue2" hidden></b></button>
+      <button type="button" data-sub="tracked"><span data-i="nav.tracked"></span><b id="nTrack" hidden></b></button>
+    </div>
+    <div class="pane on" id="sub-camps">
+      <div class="pane-head"><p data-i="camps.sub"></p></div>
+      <div class="toolbar"><input type="text" id="campSearch" data-ip="camps.searchPh" autocomplete="off" spellcheck="false"><button class="btn" id="refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/></svg><span data-i="refresh"></span></button><span class="sub" id="campInfo"></span></div>
+      <div class="grid" id="campList"></div>
+    </div>
+    <div class="pane" id="sub-queue">
+      <div class="pane-head"><p data-i="queue.sub"></p></div>
+      <div class="cols">
+        <div class="stack">
+          <div class="card farm" id="farm" hidden></div>
+          <div class="card"><div class="card-head"><h2 data-i="nav.queue"></h2><span class="sub" data-i="queue.hint"></span></div><div class="list" id="queueList"></div></div>
+        </div>
+        <div class="card">
+          <label class="row"><span><span data-i="set.drops"></span><small data-i="set.dropsHint"></small></span><input type="checkbox" class="sw" data-set="dropsOn"></label>
+          <label class="row"><span><span data-i="set.autoClaim"></span><small data-i="set.autoClaimHint"></small></span><input type="checkbox" class="sw" data-set="autoClaim"></label>
+          <label class="row"><span data-i="set.stall"></span><span class="num"><input type="number" min="5" max="120" data-set="stallMin"> min</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="pane" id="sub-tracked">
+      <div class="pane-head"><p data-i="track.sub"></p></div>
+      <div class="card">
+        <div class="card-head"><h2 data-i="nav.tracked"></h2><span class="sub" data-i="track.hint"></span></div>
+        <div style="display:flex;margin-bottom:10px"><input type="text" id="trackInput" data-ip="track.addPh" autocomplete="off" spellcheck="false"></div>
+        <div class="list" id="trackList"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="tab" id="tab-points">
-    <div class="head"><div><h1><i class="svc" data-svc="twitch"></i><span data-i="tw.title"></span></h1><p data-i="tw.sub"></p></div></div>
-    <div class="cols">
-      <div class="card">
-        <div class="card-head"><h2 data-i="ch.title"></h2><span class="sub" data-i="ch.hint"></span></div>
-        <form id="addForm" style="display:flex;gap:8px;margin-bottom:10px"><input type="text" id="addInput" data-ip="ch.addPh" autocomplete="off" spellcheck="false"><button class="btn" type="submit" data-i="add"></button></form>
-        <div class="list" id="chanList"></div>
-      </div>
-      <div class="card">
-        <label class="row"><span><span data-i="set.points"></span><small data-i="set.pointsHint"></small></span><input type="checkbox" class="sw" data-set="pointsOn"></label>
-        <label class="row"><span><span data-i="set.chat"></span><small id="chatNote"></small></span><input type="checkbox" class="sw" data-set="chatOn"></label>
-        <label class="row"><span><span data-i="set.rotate"></span><small data-i="set.rotateHint"></small></span><span class="num"><input type="number" min="0" max="720" data-set="rotateMin"> min</span></label>
+    <div class="head"><div><h1 data-i="nav.points"></h1><p data-i="points.sub"></p></div></div>
+    <div class="seg" data-seg="points">
+      <button type="button" class="on" data-sub="twitch"><i class="svc" data-svc="twitch"></i><span>Twitch</span><b id="nTw" hidden></b></button>
+      <button type="button" data-sub="kick"><i class="svc" data-svc="kick"></i><span>Kick</span><b id="nKick" hidden></b></button>
+    </div>
+    <div class="pane on" id="sub-twitch">
+      <div class="pane-head"><p data-i="tw.sub"></p></div>
+      <div class="cols">
+        <div class="card">
+          <div class="card-head"><h2 data-i="ch.title"></h2><span class="sub" data-i="ch.hint"></span></div>
+          <form id="addForm" style="display:flex;gap:8px;margin-bottom:10px"><input type="text" id="addInput" data-ip="ch.addPh" autocomplete="off" spellcheck="false"><button class="btn" type="submit" data-i="add"></button></form>
+          <div class="list" id="chanList"></div>
+        </div>
+        <div class="card">
+          <label class="row"><span><span data-i="set.points"></span><small data-i="set.pointsHint"></small></span><input type="checkbox" class="sw" data-set="pointsOn"></label>
+          <label class="row"><span><span data-i="set.chat"></span><small id="chatNote"></small></span><input type="checkbox" class="sw" data-set="chatOn"></label>
+          <label class="row"><span><span data-i="set.rotate"></span><small data-i="set.rotateHint"></small></span><span class="num"><input type="number" min="0" max="720" data-set="rotateMin"> min</span></label>
+        </div>
       </div>
     </div>
-  </section>
-
-  <section class="tab" id="tab-kick">
-    <div class="head"><div><h1><i class="svc" data-svc="kick"></i><span data-i="kick.title"></span></h1><p data-i="kick.sub"></p></div><span class="pill" id="kickPill"></span></div>
-    <div class="card" id="kickLogin" hidden>
-      <h2><i class="svc" data-svc="kick"></i><span data-i="kick.connect"></span></h2>
-      <div id="kickIdle">
-        <p class="sub" style="margin:8px 0 12px" data-i="kick.connectSub"></p>
-        <button class="btn primary" id="kickLoginBtn" data-i="kick.loginBtn"></button>
+    <div class="pane" id="sub-kick">
+      <div class="pane-head"><p data-i="kick.sub"></p><span class="pill" id="kickPill"></span></div>
+      <div class="card" id="kickLogin" hidden>
+        <h2><i class="svc" data-svc="kick"></i><span data-i="kick.connect"></span></h2>
+        <div id="kickIdle">
+          <p class="sub" style="margin:8px 0 12px" data-i="kick.connectSub"></p>
+          <button class="btn primary" id="kickLoginBtn" data-i="kick.loginBtn"></button>
+        </div>
+        <div id="kickWait" hidden>
+          <div class="waitrow"><div class="spin"></div><span data-i="kick.waiting"></span></div>
+          <p class="sub" style="margin:8px 0 0" data-i="kick.waitHint"></p>
+          <button class="btn ghost small" id="kickLoginCancel" style="margin-top:10px" data-i="cancel"></button>
+        </div>
+        <div class="note" id="kickNote" hidden></div>
+        <details class="alt"><summary data-i="kick.manual"></summary><div>
+          <p class="sub" style="margin:0 0 10px" data-ih="kick.manualHow"></p>
+          <form id="kickTokenForm" style="display:flex;gap:8px"><input type="text" id="kickTokenInput" data-ip="kick.keyPh" autocomplete="off" spellcheck="false"><button class="btn" type="submit" data-i="kick.connectBtn"></button></form>
+        </div></details>
       </div>
-      <div id="kickWait" hidden>
-        <div class="waitrow"><div class="spin"></div><span data-i="kick.waiting"></span></div>
-        <p class="sub" style="margin:8px 0 0" data-i="kick.waitHint"></p>
-        <button class="btn ghost small" id="kickLoginCancel" style="margin-top:10px" data-i="cancel"></button>
-      </div>
-      <div class="note" id="kickNote" hidden></div>
-      <details class="alt"><summary data-i="kick.manual"></summary><div>
-        <p class="sub" style="margin:0 0 10px" data-ih="kick.manualHow"></p>
-        <form id="kickTokenForm" style="display:flex;gap:8px"><input type="text" id="kickTokenInput" data-ip="kick.keyPh" autocomplete="off" spellcheck="false"><button class="btn" type="submit" data-i="kick.connectBtn"></button></form>
-      </div></details>
-    </div>
-    <div class="cols" id="kickMain" hidden>
-      <div class="card">
-        <div class="card-head"><h2 data-i="ch.title"></h2><span class="sub" data-i="ch.hint"></span></div>
-        <form id="kickAddForm" style="display:flex;gap:8px;margin-bottom:10px"><input type="text" id="kickAddInput" data-ip="kick.addPh" autocomplete="off" spellcheck="false"><button class="btn" type="submit" data-i="add"></button></form>
-        <div class="list" id="kickList"></div>
-      </div>
-      <div class="card">
-        <label class="row"><span><span data-i="kick.collect"></span><small id="kickState">–</small></span><input type="checkbox" class="sw" data-set="kickOn"></label>
-        <label class="row"><span><span data-i="kick.max"></span><small data-i="kick.maxHint"></small></span><span class="num"><input type="number" min="1" max="5" data-set="kickMax"></span></label>
-        <div class="row"><span><span data-i="kick.account"></span><small id="kickUser">–</small></span><button class="btn small" id="kickLogout" data-i="kick.disconnect"></button></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="tab" id="tab-camps">
-    <div class="head"><div><h1 data-i="nav.camps"></h1><p data-i="camps.sub"></p></div></div>
-    <div class="toolbar"><input type="text" id="campSearch" data-ip="camps.searchPh" autocomplete="off" spellcheck="false"><button class="btn" id="refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/></svg><span data-i="refresh"></span></button><span class="sub" id="campInfo"></span></div>
-    <div class="grid" id="campList"></div>
-  </section>
-
-  <section class="tab" id="tab-queue">
-    <div class="head"><div><h1 data-i="nav.queue"></h1><p data-i="queue.sub"></p></div></div>
-    <div class="cols">
-      <div class="stack">
-        <div class="card farm" id="farm" hidden></div>
-        <div class="card"><div class="card-head"><h2 data-i="nav.queue"></h2><span class="sub" data-i="queue.hint"></span></div><div class="list" id="queueList"></div></div>
-        <div class="card"><div class="card-head"><h2 data-i="track.title"></h2><span class="sub" data-i="track.hint"></span></div><div class="list" id="trackList"></div></div>
-      </div>
-      <div class="card">
-        <label class="row"><span><span data-i="set.drops"></span><small data-i="set.dropsHint"></small></span><input type="checkbox" class="sw" data-set="dropsOn"></label>
-        <label class="row"><span><span data-i="set.autoClaim"></span><small data-i="set.autoClaimHint"></small></span><input type="checkbox" class="sw" data-set="autoClaim"></label>
-        <label class="row"><span data-i="set.stall"></span><span class="num"><input type="number" min="5" max="120" data-set="stallMin"> min</span></label>
+      <div class="cols" id="kickMain" hidden>
+        <div class="card">
+          <div class="card-head"><h2 data-i="ch.title"></h2><span class="sub" data-i="ch.hint"></span></div>
+          <form id="kickAddForm" style="display:flex;gap:8px;margin-bottom:10px"><input type="text" id="kickAddInput" data-ip="kick.addPh" autocomplete="off" spellcheck="false"><button class="btn" type="submit" data-i="add"></button></form>
+          <div class="list" id="kickList"></div>
+        </div>
+        <div class="card">
+          <label class="row"><span><span data-i="kick.collect"></span><small id="kickState">–</small></span><input type="checkbox" class="sw" data-set="kickOn"></label>
+          <label class="row"><span><span data-i="kick.max"></span><small data-i="kick.maxHint"></small></span><span class="num"><input type="number" min="1" max="5" data-set="kickMax"></span></label>
+          <div class="row"><span><span data-i="kick.account"></span><small id="kickUser">–</small></span><button class="btn small" id="kickLogout" data-i="kick.disconnect"></button></div>
+        </div>
       </div>
     </div>
   </section>
@@ -519,6 +560,7 @@ async function setLang(code) {
 const fmt = (n) => Number(n || 0).toLocaleString(LOC);
 let VER = '', langBusy = false, fails = 0, doneShown = false;
 let S = null, pending = 0, dragging = false, detailId = '', detail = null;
+const unfolded = new Set(); // queue and tracked rows the user opened
 const seen = { chan: new Set(), kick: new Set(), camp: new Set(), queue: new Set(), track: new Set() };
 const sigs = {};
 
@@ -558,7 +600,19 @@ function showTab(name) {
   try { localStorage.setItem('tab', name); } catch (e) {}
 }
 navs.forEach((b) => { b.onclick = () => showTab(b.dataset.tab); });
-try { const t = localStorage.getItem('tab'); if (t && $('tab-' + t)) showTab(t); } catch (e) {}
+// Drops and Points are sections with their own tabs inside
+function showSub(tab, sub) {
+  document.querySelectorAll(`.seg[data-seg="${tab}"] button`).forEach((b) => b.classList.toggle('on', b.dataset.sub === sub));
+  document.querySelectorAll(`#tab-${tab} > .pane`).forEach((n) => n.classList.toggle('on', n.id === 'sub-' + sub));
+  try { localStorage.setItem('sub:' + tab, sub); } catch (e) {}
+}
+document.querySelectorAll('.seg button').forEach((b) => { b.onclick = () => showSub(b.parentNode.dataset.seg, b.dataset.sub); });
+try {
+  const moved = { camps: ['drops', 'camps'], queue: ['drops', 'queue'], kick: ['points', 'kick'] }; // tabs of versions before 0.6
+  for (const tab of ['drops', 'points']) { const v = localStorage.getItem('sub:' + tab); if (v && $('sub-' + v)) showSub(tab, v); }
+  const t = localStorage.getItem('tab');
+  if (moved[t]) { showSub(...moved[t]); showTab(moved[t][0]); } else if (t && $('tab-' + t)) showTab(t);
+} catch (e) {}
 $('toLog').onclick = (ev) => { ev.preventDefault(); showTab('log'); };
 
 const shown = {};
@@ -577,6 +631,52 @@ const when = (ms) => new Date(ms).toLocaleString(LOC, { day: 'numeric', month: '
 const mins = (m) => { m = Math.max(0, Math.round(m)); const h = Math.floor(m / 60); return h ? tr('dur.hm', { h, m: m % 60 }) : tr('dur.m', { m }); };
 function left(ms) { const d = ms - Date.now(); if (d <= 0) return tr('left.ended'); const h = Math.floor(d / 3600000), days = Math.floor(h / 24); return days >= 1 ? tr('left.d', { d: days, h: h % 24 }) : h >= 1 ? tr('left.h', { h, m: Math.floor(d / 60000) % 60 }) : tr('left.m', { m: Math.max(1, Math.floor(d / 60000)) }); }
 function upTime(sec) { const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60; return h ? tr('dur.hm', { h, m }) : tr('dur.m', { m }); }
+
+function avatar(img, name) {
+  const letter = (name || '?').slice(0, 1), a = el('span', 'ava', img ? '' : letter);
+  if (img) { const i = new Image(); i.alt = ''; i.referrerPolicy = 'no-referrer'; i.draggable = false; i.onerror = () => { i.remove(); a.textContent = letter; }; i.src = img; a.append(i); }
+  return a;
+}
+// suggestions while typing: kind is twitch | kick | game; pick(item) is called with the chosen one
+function suggest(input, kind, pick, has) {
+  const wrap = el('div', 'ac'); input.parentNode.insertBefore(wrap, input); wrap.append(input);
+  const menu = el('div', 'ac-menu'); menu.hidden = true; wrap.append(menu);
+  let items = [], sel = -1, timer = 0, seq = 0;
+  const close = () => { menu.hidden = true; sel = -1; };
+  const choose = (it) => { close(); items = []; seq++; input.value = ''; pick(it); };
+  const mark = () => [...menu.querySelectorAll('.ac-item')].forEach((n, i) => { n.classList.toggle('sel', i === sel); if (i === sel) n.scrollIntoView({ block: 'nearest' }); });
+  const draw = (note) => {
+    menu.textContent = ''; menu.hidden = false;
+    if (note) { menu.append(el('div', 'ac-note', note)); return; }
+    for (const it of items) {
+      const on = has(it), b = el('button', 'ac-item' + (on ? ' has' : '')); b.type = 'button';
+      const t = el('div', 'txt'); t.append(el('div', 'nm', it.name));
+      const sub = kind === 'game' ? [on ? tr('ac.tracked') : ''] : [it.login, it.followers ? tr('ac.followers', { n: fmt(it.followers) }) : '', on ? tr('ac.onList') : ''];
+      const line = sub.filter(Boolean).join(' · '); if (line) t.append(el('div', 'sb', line));
+      b.append(kind === 'game' ? art(it.art) : avatar(it.img, it.name), t); if (it.live) b.append(el('span', 'pill run', tr('ac.live')));
+      b.onmousedown = (ev) => ev.preventDefault(); b.onclick = () => choose(it);
+      menu.append(b);
+    }
+    mark();
+  };
+  const run = async () => {
+    const q = input.value.trim(), my = ++seq;
+    if (q.length < 2) { items = []; close(); return; }
+    if (!items.length) draw(tr('ac.searching'));
+    try { const r = await api('/api/search?kind=' + kind + '&q=' + encodeURIComponent(q)); if (my !== seq) return; items = r.items || []; sel = -1; draw(items.length ? '' : tr(r.failed ? 'ac.failed' : 'ac.none')); }
+    catch (e) { if (my === seq) close(); }
+  };
+  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 260); });
+  input.addEventListener('focus', () => { if (items.length && input.value.trim().length >= 2) draw(''); });
+  input.addEventListener('blur', () => setTimeout(close, 150));
+  input.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') { if (!menu.hidden) ev.stopPropagation(); close(); return; }
+    if (menu.hidden || !items.length) { if (ev.key === 'Enter' && kind === 'game') ev.preventDefault(); return; }
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); sel = Math.min(items.length - 1, sel + 1); mark(); }
+    else if (ev.key === 'ArrowUp') { ev.preventDefault(); sel = Math.max(-1, sel - 1); mark(); }
+    else if (ev.key === 'Enter') { if (sel >= 0) { ev.preventDefault(); choose(items[sel]); } else if (kind === 'game') { ev.preventDefault(); choose(items[0]); } else { clearTimeout(timer); seq++; close(); } }
+  });
+}
 
 function sortable(list, onDone) {
   let drag = null;
@@ -651,7 +751,8 @@ function chanList(list, sig, chans, seenSet, toggleOp, removeOp, emptyText) {
     if (c.balKnown) countTo(b, sig + ':' + c.login, c.balance); else b.textContent = '–';
     const sw = el('input', 'sw'); sw.type = 'checkbox'; sw.checked = c.on; sw.title = tr('chn.toggle'); sw.onchange = () => op({ op: toggleOp, login: c.login, on: sw.checked });
     const del = iconBtn('icon', 'x', tr('chn.remove')); del.onclick = () => op({ op: removeOp, login: c.login });
-    it.append(el('span', 'pos rank', i + 1), el('span', 'dot' + (c.watching ? ' watch' : c.online && c.on ? ' on' : '')), txt, w, pts, sw, del);
+    const av = el('span', 'avw'); av.append(avatar(c.img, c.name), el('span', 'dot' + (c.watching ? ' watch' : c.online && c.on ? ' on' : '')));
+    it.append(el('span', 'pos rank', i + 1), av, txt, w, pts, sw, del);
     list.append(it);
   });
 }
@@ -759,6 +860,8 @@ function render() {
   $('kickState').textContent = kick.state === 'blocked' ? tr('kick.blockedHint') : tr('kick.session', { n: fmt(kick.earned) });
   $('kickUser').textContent = kick.user || tr('kick.connected');
   const nk = $('nKick'); nk.hidden = !kick.watching; nk.textContent = kick.watching;
+  const ntw = $('nTw'); ntw.hidden = !watching.length; ntw.textContent = watching.length;
+  const np = $('nPts'), nAll = watching.length + (kick.watching || 0); np.hidden = !nAll; np.textContent = nAll;
   const kw = kick.channels.filter((c) => c.watching);
   const kShow = kick.state === 'ok' || kick.state === 'blocked';
   const kh = $('kickHome'); kh.hidden = !kShow;
@@ -798,13 +901,17 @@ function render() {
   }
 
   // queue + tracked, with every campaign and reward spelled out
-  const nq = $('nQueue'); nq.hidden = !s.drops.queue.length; nq.textContent = s.drops.queue.length;
+  for (const id of ['nQueue', 'nQueue2']) { const nq = $(id); nq.hidden = !s.drops.queue.length; nq.textContent = s.drops.queue.length; }
+  const nt = $('nTrack'); nt.hidden = !s.drops.tracked.length; nt.textContent = s.drops.tracked.length;
   const qitem = (g, i, set, tracked) => {
     const it = el('div', 'item qitem'); it.dataset.key = g.id; enter(it, set, g.id, i);
     const top = el('div', 'top');
     const txt = el('div', 'txt'); txt.append(el('div', 'nm', g.name));
     const total = g.camps.reduce((n, c) => n + (c.active ? c.left : 0), 0);
-    txt.append(el('div', 'sb', g.farming ? tr('q.watching', { ch: g.channel }) : g.status === 'nocamp' ? tr('q.waitCamp') : g.status === 'ready' ? tr('q.left', { t: mins(total) }) : g.end ? tr('camps.until', { when: when(g.end) }) : ''));
+    const active = g.camps.filter((c) => c.active);
+    const all = active.reduce((n, c) => n + c.drops.length, 0), got = active.reduce((n, c) => n + c.drops.filter((d) => d.claimed).length, 0);
+    const line = g.farming ? tr('q.watching', { ch: g.channel }) : g.status === 'nocamp' ? tr('q.waitCamp') : g.status === 'ready' ? tr('q.left', { t: mins(total) }) : g.end ? tr('camps.until', { when: when(g.end) }) : '';
+    txt.append(el('div', 'sb', [line, all ? tr('q.rewards', { a: got, b: all }) : ''].filter(Boolean).join(' · ')));
     let [label, cls] = stOf(g.status);
     if (g.farming) { label = tr('stt.watching'); cls = 'run'; } else if (g.status === 'ready' && g.note === 'nostreams') { label = tr('stt.nostreams'); cls = 'wait'; } else if (g.status === 'ready' && !s.settings.dropsOn) { label = tr('stt.off'); }
     const pill = el(g.status === 'nolink' && g.link ? 'a' : 'span', 'pill ' + cls, label);
@@ -812,14 +919,19 @@ function render() {
     const del = iconBtn('icon', 'x', tracked ? tr('q.untrack') : tr('q.remove'));
     const ref = { id: g.id, slug: g.slug, name: g.name, art: g.art };
     del.onclick = () => op({ op: tracked ? 'trackToggle' : 'queueToggle', game: ref });
-    top.append(tracked ? el('span', 'pos star', '★') : el('span', 'pos', i + 1), art(g.art), txt, pill, del);
+    top.append(tracked ? el('span', 'pos star', '★') : el('span', 'pos', i + 1), art(g.art), txt, pill);
     it.append(top);
-    const active = g.camps.filter((c) => c.active);
-    if (active.length) {
+    if (active.length) { // campaigns and rewards stay folded until the row is clicked
       const body = el('div', 'body'); const liveDrop = g.farming ? liveDropOf(active, cur) : '';
       for (const c of active) body.append(campBlock(c, liveDrop));
       it.append(body);
+      const key = (tracked ? 't:' : 'q:') + g.id, chev = iconBtn('icon chev', 'chev', tr('q.details'));
+      const flip = () => { if (unfolded.has(key)) unfolded.delete(key); else unfolded.add(key); it.classList.toggle('open', unfolded.has(key)); };
+      it.classList.toggle('open', unfolded.has(key)); top.classList.add('fold');
+      top.onclick = (ev) => { if (!ev.target.closest('a, .icon:not(.chev)')) flip(); };
+      top.append(chev);
     }
+    top.append(del);
     if (!tracked) it.draggable = true;
     return it;
   };
@@ -854,6 +966,11 @@ document.querySelectorAll('[data-set]').forEach((inp) => { inp.onchange = () => 
 $('addForm').onsubmit = async (ev) => { ev.preventDefault(); const v = $('addInput').value.trim(); if (!v) return; const r = await op({ op: 'addChannel', login: v }); if (!r) return; if (r.result === 'ok') { $('addInput').value = ''; toast(tr('toast.added')); } else toast(tr(r.result === 'dup' ? 'toast.dup' : 'toast.badName')); };
 $('kickAddForm').onsubmit = async (ev) => { ev.preventDefault(); const v = $('kickAddInput').value.trim(); if (!v) return; const r = await op({ op: 'kickAdd', login: v }); if (!r) return; if (r.result === 'ok') { $('kickAddInput').value = ''; toast(tr('toast.added')); } else toast(tr(r.result === 'dup' ? 'toast.dup' : 'toast.badName')); };
 $('kickTokenForm').onsubmit = async (ev) => { ev.preventDefault(); const v = $('kickTokenInput').value.trim(); if (!v) return; const r = await op({ op: 'kickToken', login: v }); if (r && r.result === 'bad') toast(tr('toast.badKickKey')); else { $('kickTokenInput').value = ''; toast(tr('toast.checkingKey')); } };
+const addPicked = (addOp) => async (it) => { const r = await op({ op: addOp, login: it.login, name: it.name, img: it.img }); if (r) toast(tr(r.result === 'ok' ? 'toast.added' : r.result === 'dup' ? 'toast.dup' : 'toast.badName')); };
+suggest($('addInput'), 'twitch', addPicked('addChannel'), (it) => !!S && S.points.channels.some((c) => c.login === it.login));
+suggest($('kickAddInput'), 'kick', addPicked('kickAdd'), (it) => !!S && S.kick.channels.some((c) => c.login === it.login));
+const isTracked = (it) => !!S && S.drops.tracked.some((g) => g.id === it.id);
+suggest($('trackInput'), 'game', async (it) => { if (isTracked(it)) { toast(tr('ac.tracked')); return; } const r = await op({ op: 'trackToggle', game: { id: it.id, slug: it.slug, name: it.name, art: it.art } }); if (r) toast(tr('toast.tracked', { name: it.name })); }, isTracked);
 $('kickLogout').onclick = () => op({ op: 'kickLogout' });
 $('campSearch').oninput = () => render();
 $('refresh').onclick = () => { op({ op: 'refresh' }); toast(tr('toast.refreshing')); };

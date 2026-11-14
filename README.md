@@ -31,7 +31,7 @@
 
 1. Download **Loorek.exe** and run it. There is no installer; the icon appears in the tray next to the clock and the panel opens.
 2. Click **Sign in**. A separate sign-in window opens with Twitch – sign in as usual and the window closes by itself. The same goes for Kick on its tab.
-3. Add channels (order = priority) and pick games on the *Drop campaigns* tab.
+3. Add channels under **Points** (order = priority; start typing and pick the channel from the suggestions) and pick games under **Drops → Drop campaigns**. Under **Drops → Tracked games** you can search for any game and have it farmed as soon as a campaign appears.
 
 Windows may warn about an unknown publisher, because the file is not code-signed. Every release is built from this source by [GitHub Actions](.github/workflows/release.yml).
 

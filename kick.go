@@ -34,6 +34,7 @@ var (
 
 type kickChan struct {
 	Login, Name          string
+	Img                  string
 	ID, UserID, StreamID int64
 	Online, Missing      bool
 	Watching             bool
@@ -361,7 +362,14 @@ func (k *Kick) step(now time.Time) {
 			if i > 0 {
 				time.Sleep(iv(700 * time.Millisecond)) // be gentle: one channel at a time
 			}
-			if stop := k.info(ch, token, now); stop {
+			stop := k.info(ch, token, now)
+			k.mu.Lock()
+			login, name, img := ch.Login, ch.Name, ch.Img
+			k.mu.Unlock()
+			k.e.mu.Lock()
+			k.e.rememberFace(k.e.set.KickChannels, login, name, img)
+			k.e.mu.Unlock()
+			if stop {
 				return
 			}
 		}
@@ -471,6 +479,9 @@ func (k *Kick) info(ch *kickChan, token string, now time.Time) bool {
 	}
 	if n := str(dig(v, "user", "username")); n != "" {
 		ch.Name = n
+	}
+	if img := firstNonEmpty(str(dig(v, "user", "profile_pic")), str(dig(v, "user", "profilePic"))); img != "" {
+		ch.Img = img
 	}
 	ls := dig(v, "livestream")
 	if d := dig(ls, "data"); d != nil && dig(ls, "id") == nil {
@@ -651,7 +662,11 @@ func (k *Kick) view() map[string]any {
 		if ch.Watching {
 			watching++
 		}
-		chans = append(chans, map[string]any{"login": ch.Login, "name": ch.Name, "on": c.On, "online": ch.Online, "watching": ch.Watching,
+		name := ch.Name
+		if name == ch.Login && c.Name != "" {
+			name = c.Name
+		}
+		chans = append(chans, map[string]any{"login": ch.Login, "name": name, "img": firstNonEmpty(ch.Img, c.Img), "on": c.On, "online": ch.Online, "watching": ch.Watching,
 			"game": ch.Category, "balance": ch.Points, "balKnown": ch.PtsKnown, "earned": ch.Earned, "missing": ch.Missing, "watchedMin": ch.WatchedSec / 60})
 	}
 	state := k.state
@@ -690,7 +705,8 @@ func (e *Engine) kickLogout() {
 	e.log.Info("L.kickOut")
 }
 
-func (e *Engine) kickAdd(raw string) string {
+func (e *Engine) kickAdd(raw, name, img string) string {
+	name, img = face(name, img)
 	s := strings.TrimSpace(strings.ToLower(raw))
 	if i := strings.Index(s, "kick.com/"); i >= 0 {
 		s = s[i+len("kick.com/"):]
@@ -713,7 +729,7 @@ func (e *Engine) kickAdd(raw string) string {
 			return "dup"
 		}
 	}
-	e.set.KickChannels = append(e.set.KickChannels, ChanCfg{Login: s, On: true})
+	e.set.KickChannels = append(e.set.KickChannels, ChanCfg{Login: s, On: true, Name: name, Img: img})
 	e.saveSettings()
 	e.kick.mu.Lock()
 	e.kick.nextInfo = time.Time{}

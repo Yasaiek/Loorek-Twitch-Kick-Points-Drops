@@ -288,6 +288,59 @@ func (c *Client) gql(ops ...gqlOp) ([]map[string]any, error) {
 	return nil, lastErr
 }
 
+// gqlQuery sends one plain (not persisted) query. Used for the searches behind the suggestions,
+// which have no persisted operation in this client.
+func (c *Client) gqlQuery(query string, vars map[string]any) (map[string]any, error) {
+	token, _, _, _ := c.auth()
+	if token == "" {
+		return nil, errAuth
+	}
+	data, err := c.gqlQueryAs(query, vars, token)
+	if err != nil && !errors.Is(err, errAuth) {
+		data, err = c.gqlQueryAs(query, vars, "") // these searches are public: try once more without the session
+	}
+	return data, err
+}
+
+func (c *Client) gqlQueryAs(query string, vars map[string]any, token string) (map[string]any, error) {
+	payload, _ := json.Marshal(map[string]any{"query": query, "variables": vars})
+	req, _ := http.NewRequest("POST", c.ep.GQL, bytes.NewReader(payload))
+	c.baseHeaders(req)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Origin", "https://www.twitch.tv")
+	req.Header.Set("Referer", "https://www.twitch.tv")
+	if token != "" {
+		req.Header.Set("Authorization", "OAuth "+token)
+	}
+	hc := &http.Client{Timeout: 8 * time.Second}
+	res, err := hc.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+	raw, _ := io.ReadAll(io.LimitReader(res.Body, 4<<20))
+	if res.StatusCode == 401 {
+		return nil, errAuth
+	}
+	var one map[string]any
+	if json.Unmarshal(raw, &one) != nil {
+		var arr []map[string]any // some gateways answer with a one-element list
+		if json.Unmarshal(raw, &arr) != nil || len(arr) == 0 {
+			return nil, fmt.Errorf("gql query: HTTP %d, unreadable answer", res.StatusCode)
+		}
+		one = arr[0]
+	}
+	data, _ := one["data"].(map[string]any)
+	if data == nil {
+		msg := str(one["message"])
+		if errs := list(one["errors"]); len(errs) > 0 {
+			msg = str(dig(errs[0], "message"))
+		}
+		return nil, fmt.Errorf("gql query: HTTP %d %s", res.StatusCode, msg)
+	}
+	return data, nil
+}
+
 // gqlOne is gql for a single operation.
 func (c *Client) gqlOne(name string, vars map[string]any) (map[string]any, error) {
 	out, err := c.gql(gqlOp{name, vars})

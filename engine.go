@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var version = "0.5.2" // a variable so that test builds can override it
+var version = "0.6.0" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -27,6 +27,8 @@ type GameRef struct {
 type ChanCfg struct {
 	Login string `json:"login"`
 	On    bool   `json:"on"`
+	Name  string `json:"name,omitempty"` // display name and avatar as last seen: shown before the first answer arrives
+	Img   string `json:"img,omitempty"`
 }
 
 type Settings struct {
@@ -63,6 +65,7 @@ type AuthFile struct {
 // chanRT is the live state of one channel (a points channel from the list, or the channel drops are farmed on).
 type chanRT struct {
 	Login, ID, Name string
+	Img             string
 	Missing         bool
 	Online          bool
 	StreamID        string
@@ -417,6 +420,12 @@ func (e *Engine) applyStream(ch *chanRT, user any) {
 	if n := str(dig(user, "displayName")); n != "" {
 		ch.Name = n
 	}
+	if img := str(dig(user, "profileImageURL")); img != "" {
+		ch.Img = img
+	}
+	if e.chans[ch.Login] == ch {
+		e.rememberFace(e.set.Channels, ch.Login, ch.Name, ch.Img)
+	}
 	stream := dig(user, "stream")
 	was := ch.Online
 	if stream == nil {
@@ -703,11 +712,45 @@ func (e *Engine) refreshBalances(now time.Time) {
 
 // ---- operations from the panel ----
 
-func (e *Engine) addChannel(raw string) string {
+// rememberFace keeps a channel's display name and avatar in the settings, so that the list shows them
+// right after a start and for channels that are switched off. Call with e.mu held.
+func (e *Engine) rememberFace(list []ChanCfg, login, name, img string) {
+	for i := range list {
+		c := &list[i]
+		if c.Login != login {
+			continue
+		}
+		if (name != "" && name != login && c.Name != name) || (img != "" && c.Img != img) {
+			if name != "" && name != login {
+				c.Name = name
+			}
+			if img != "" {
+				c.Img = img
+			}
+			e.saveSettings()
+		}
+		return
+	}
+}
+
+// face cleans what the panel passes along with a channel picked from the suggestions.
+func face(name, img string) (string, string) {
+	name = strings.TrimSpace(name)
+	if len(name) > 60 {
+		name = ""
+	}
+	if !strings.HasPrefix(img, "https://") || len(img) > 400 {
+		img = ""
+	}
+	return name, img
+}
+
+func (e *Engine) addChannel(raw, name, img string) string {
 	login := normLogin(raw)
 	if login == "" {
 		return "bad"
 	}
+	name, img = face(name, img)
 	e.mu.Lock()
 	for _, c := range e.set.Channels {
 		if c.Login == login {
@@ -715,7 +758,7 @@ func (e *Engine) addChannel(raw string) string {
 			return "dup"
 		}
 	}
-	e.set.Channels = append(e.set.Channels, ChanCfg{Login: login, On: true})
+	e.set.Channels = append(e.set.Channels, ChanCfg{Login: login, On: true, Name: name, Img: img})
 	e.rt(login)
 	e.saveSettings()
 	e.nextOnline, e.nextBalances = time.Time{}, time.Now().Add(iv(3*time.Second))

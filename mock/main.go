@@ -250,7 +250,7 @@ func handleOp(name string, v map[string]any) (any, string) {
 		if ch.Live {
 			stream = map[string]any{"id": "st-" + ch.Login, "viewersCount": ch.Viewers}
 		}
-		return map[string]any{"user": map[string]any{"id": ch.ID, "displayName": ch.Name, "stream": stream,
+		return map[string]any{"user": map[string]any{"id": ch.ID, "displayName": ch.Name, "stream": stream, "profileImageURL": base + "/art/user-" + ch.Login + ".png",
 			"broadcastSettings": map[string]any{"title": "t", "game": gameJSON(ch.GameID)}}}, ""
 	case "ChannelPointsContext":
 		ch := channels[s("channelLogin")]
@@ -415,6 +415,39 @@ func main() {
 		defer mu.Unlock()
 		gqlCount++
 		var out []any
+		if q, _ := ops[0]["query"].(string); q != "" && len(ops) == 1 { // a plain query: the searches behind the suggestions
+			vars, _ := ops[0]["variables"].(map[string]any)
+			word := strings.ToLower(fmt.Sprint(vars["q"]))
+			edges := []any{}
+			if strings.Contains(q, "searchUsers") {
+				for _, ch := range channels {
+					if strings.Contains(ch.Login, word) {
+						var stream any
+						if ch.Live {
+							stream = map[string]any{"id": "s" + ch.ID}
+						}
+						edges = append(edges, map[string]any{"node": map[string]any{"id": ch.ID, "login": ch.Login, "displayName": ch.Name,
+							"profileImageURL": base + "/art/user-" + ch.Login + ".png", "stream": stream, "followers": map[string]any{"totalCount": 1000 * len(ch.Login)}}})
+					}
+				}
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(map[string]any{"data": map[string]any{"searchUsers": map[string]any{"edges": edges}}})
+				return
+			}
+			all := []game{}
+			for _, g := range games {
+				all = append(all, *g)
+			}
+			all = append(all, game{"g77", "Nowhere Kings", "nowhere-kings"}, game{"g78", "Nowhere Kings II", "nowhere-kings-ii"})
+			for _, g := range all {
+				if strings.Contains(strings.ToLower(g.Name), word) {
+					edges = append(edges, map[string]any{"node": map[string]any{"id": g.ID, "name": g.Name, "displayName": g.Name, "slug": g.Slug, "boxArtURL": base + "/art/" + g.ID + "-144x192.jpg"}})
+				}
+			}
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]any{"data": map[string]any{"searchCategories": map[string]any{"edges": edges}}})
+			return
+		}
 		for _, op := range ops {
 			name, _ := op["operationName"].(string)
 			vars, _ := op["variables"].(map[string]any)
@@ -538,6 +571,20 @@ func main() {
 			w.WriteHeader(404)
 		}
 	})
+	mux.HandleFunc("/kick/api/search", func(w http.ResponseWriter, r *http.Request) {
+		word := strings.ToLower(r.URL.Query().Get("searched_word"))
+		mu.Lock()
+		defer mu.Unlock()
+		out := []any{}
+		for _, ch := range kchans {
+			if strings.Contains(ch.Slug, word) {
+				out = append(out, map[string]any{"id": ch.ID, "slug": ch.Slug, "isLive": ch.Live, "followersCount": 4200,
+					"user": map[string]any{"id": ch.UserID, "username": ch.Name, "profilePic": base + "/art/kuser-" + ch.Slug + ".png"}})
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]any{"channels": out, "categories": []any{}})
+	})
 	mux.HandleFunc("/kick/api/v1/user", func(w http.ResponseWriter, r *http.Request) {
 		if !kauth(r) {
 			w.WriteHeader(401)
@@ -568,7 +615,7 @@ func main() {
 		if ch.Live {
 			ls = map[string]any{"id": ch.StreamID, "is_live": true, "categories": []any{map[string]any{"name": "Just Chatting"}}}
 		}
-		json.NewEncoder(w).Encode(map[string]any{"id": ch.ID, "user_id": ch.UserID, "slug": ch.Slug, "user": map[string]any{"id": ch.UserID, "username": ch.Name}, "livestream": ls})
+		json.NewEncoder(w).Encode(map[string]any{"id": ch.ID, "user_id": ch.UserID, "slug": ch.Slug, "user": map[string]any{"id": ch.UserID, "username": ch.Name, "profile_pic": base + "/art/kuser-" + ch.Slug + ".png"}, "livestream": ls})
 	})
 	mux.HandleFunc("/kickws/viewer/v1/token", func(w http.ResponseWriter, r *http.Request) {
 		if !kauth(r) || r.Header.Get("X-Chatroom") == "" {
