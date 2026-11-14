@@ -1,0 +1,6 @@
+/data/
+*.exe
+*.exe.old
+*.exe.new
+/Loorek
+/version.json

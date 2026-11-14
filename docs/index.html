@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loorek – Twitch &amp; Kick channel points and Twitch Drops in the background</title>
+<meta name="description" content="Loorek is a small Windows tray app that collects Twitch and Kick channel points and farms Twitch Drops in the background. No browser, no video.">
+<meta property="og:title" content="Loorek – channel points and drops, collected while you play">
+<meta property="og:description" content="A small Windows tray app for Twitch and Kick channel points and Twitch Drops. No browser, no video.">
+<meta property="og:image" content="https://yasaiek.github.io/Loorek-Twitch-Kick-Points-Drops/img/home.png">
+<meta property="og:type" content="website">
+<link rel="icon" href="img/favicon.png">
+<style>
+:root { --bg: #0a0b10; --panel: #12141c; --panel-2: #181b26; --line: rgba(255,255,255,.08); --line-2: rgba(255,255,255,.14); --text: #f2f4f8; --sub: #a3a9b8; --dim: #6f7586; --mint: #8af5d6; --sky: #36b4f2; --ease: cubic-bezier(.2,.8,.2,1); }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Noto Sans", "Hiragino Sans", "Microsoft YaHei", sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: -20% -10% auto -10%; height: 760px; background: radial-gradient(520px 320px at 22% 30%, rgba(54,180,242,.16), transparent 70%), radial-gradient(520px 340px at 78% 20%, rgba(138,245,214,.12), transparent 70%); pointer-events: none; z-index: 0; }
+a { color: inherit; }
+.wrap { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+header { display: flex; align-items: center; gap: 12px; padding: 20px 0; }
+header img { width: 36px; height: 36px; border-radius: 9px; }
+header strong { font-size: 18px; letter-spacing: -.2px; margin-right: auto; }
+header a { color: var(--sub); text-decoration: none; font-size: 14px; }
+header a:hover { color: var(--text); }
+select { font: inherit; font-size: 14px; color: var(--text); background: var(--panel); border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 10px; outline: none; }
+.hero { padding: 56px 0 30px; text-align: center; }
+.eyebrow { display: inline-block; font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--mint); border: 1px solid rgba(138,245,214,.3); background: rgba(138,245,214,.07); border-radius: 99px; padding: 4px 13px; }
+h1 { font-size: clamp(34px, 5.4vw, 58px); line-height: 1.08; letter-spacing: -.03em; margin: 20px auto 16px; max-width: 880px; font-weight: 700; text-wrap: balance; }
+.lead { color: var(--sub); font-size: clamp(16px, 1.6vw, 19px); max-width: 720px; margin: 0 auto; text-wrap: pretty; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 30px 0 10px; }
+.btn { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; font-weight: 600; border-radius: 11px; padding: 13px 22px; border: 1px solid var(--line-2); background: var(--panel); transition: transform .2s var(--ease), box-shadow .2s, background .2s; }
+.btn:hover { transform: translateY(-2px); background: var(--panel-2); }
+.btn.primary { color: #06222b; border: 0; background: linear-gradient(135deg, var(--mint), var(--sky)); box-shadow: 0 10px 34px -10px rgba(54,180,242,.6); }
+.btn.primary:hover { box-shadow: 0 14px 40px -10px rgba(54,180,242,.8); }
+.btn svg { width: 18px; height: 18px; }
+.count { color: var(--dim); font-size: 13.5px; min-height: 20px; }
+.shot { margin: 34px auto 0; border-radius: 14px; border: 1px solid var(--line-2); overflow: hidden; box-shadow: 0 40px 120px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.03); background: #0b0c12; }
+.shot img { display: block; width: 100%; height: auto; }
+.thumbs { display: flex; gap: 10px; justify-content: center; margin: 16px 0 0; flex-wrap: wrap; }
+.thumbs button { appearance: none; padding: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: none; cursor: pointer; width: 118px; opacity: .55; transition: opacity .2s, border-color .2s, transform .2s var(--ease); }
+.thumbs button:hover { opacity: .9; transform: translateY(-2px); }
+.thumbs button.on { opacity: 1; border-color: var(--sky); }
+.thumbs img { display: block; width: 100%; }
+section { padding: 70px 0 0; }
+h2 { font-size: clamp(24px, 3vw, 34px); letter-spacing: -.02em; margin: 0 0 26px; text-align: center; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; transition: border-color .25s, transform .25s var(--ease); }
+.card:hover { border-color: var(--line-2); transform: translateY(-3px); }
+.card .ic { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, rgba(138,245,214,.16), rgba(54,180,242,.16)); margin-bottom: 14px; }
+.card .ic svg { width: 20px; height: 20px; fill: none; stroke: var(--mint); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.card h3 { margin: 0 0 6px; font-size: 17px; }
+.card p { margin: 0; color: var(--sub); font-size: 14.5px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; counter-reset: s; }
+.step { position: relative; padding: 22px 22px 22px 70px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+.step::before { counter-increment: s; content: counter(s); position: absolute; left: 22px; top: 22px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #06222b; background: linear-gradient(135deg, var(--mint), var(--sky)); }
+.step h3 { margin: 2px 0 6px; font-size: 17px; }
+.step p { margin: 0; color: var(--sub); font-size: 14.5px; }
+.faq { max-width: 760px; margin: 0 auto; }
+details { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); margin-bottom: 10px; transition: border-color .2s; }
+details[open] { border-color: var(--line-2); }
+summary { cursor: pointer; list-style: none; padding: 16px 48px 16px 20px; font-weight: 600; position: relative; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; right: 20px; top: 12px; font-size: 22px; font-weight: 400; color: var(--sub); transition: transform .25s var(--ease); }
+details[open] summary::after { transform: rotate(45deg); }
+details p { margin: 0; padding: 0 20px 18px; color: var(--sub); font-size: 15px; }
+footer { margin: 80px 0 0; padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; text-align: center; }
+.rv { opacity: 0; transform: translateY(16px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.rv.in { opacity: 1; transform: none; }
+@media (max-width: 860px) { .grid, .steps { grid-template-columns: 1fr; } .hero { padding-top: 30px; } .thumbs button { width: 84px; } header a.gh { display: none; } }
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <img src="img/icon.png" alt="">
+  <strong>Loorek</strong>
+  <a class="gh" href="https://github.com/Yasaiek/Loorek-Twitch-Kick-Points-Drops" data-i="gh">Source on GitHub</a>
+  <select id="lang" aria-label="Language"></select>
+</header>
+
+<div class="hero">
+  <span class="eyebrow" data-i="eyebrow">Windows · free · open source · beta</span>
+  <h1 data-i="h1">Channel points and drops, collected while you play.</h1>
+  <p class="lead" data-i="lead">Loorek is a small Windows app that lives in the tray. It keeps you present on Twitch and Kick streams, claims bonuses and farms Twitch Drops – without a browser tab and without playing video.</p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/Yasaiek/Loorek-Twitch-Kick-Points-Drops/releases/latest/download/Loorek.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg><span data-i="dl">Download for Windows</span></a>
+    <a class="btn" href="https://github.com/Yasaiek/Loorek-Twitch-Kick-Points-Drops"><span data-i="gh">Source on GitHub</span></a>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="shot"><img id="big" src="img/home.png" alt="Loorek panel" width="1650" height="1140"></div>
+  <div class="thumbs" id="thumbs"></div>
+</div>
+
+<section>
+  <div class="grid">
+    <div class="card rv"><div class="ic"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg></div><h3 data-i="f1t">Twitch channel points</h3><p data-i="f1">Watches up to two channels at once – all that Twitch counts – and claims every bonus for you.</p></div>
+    <div class="card rv"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m10 8.5 5.5 3.5-5.5 3.5z"/></svg></div><h3 data-i="f2t">Kick channel points</h3><p data-i="f2">Collects points on the Kick channels you pick, on as many at once as you set.</p></div>
+    <div class="card rv"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13M12 7c-1.5-3.5-6-3.5-5 0M12 7c1.5-3.5 6-3.5 5 0"/></svg></div><h3 data-i="f3t">Twitch Drops</h3><p data-i="f3">Queue games, see every campaign and reward, and let Loorek watch, switch streams and claim.</p></div>
+    <div class="card rv"><div class="ic"><svg viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></svg></div><h3 data-i="f4t">No browser, no video</h3><p data-i="f4">It only reports to the service that you are watching. A fraction of what one browser tab needs.</p></div>
+    <div class="card rv"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3 5 6v5.5c0 4.3 2.9 7.6 7 9.5 4.1-1.9 7-5.2 7-9.5V6z"/><path d="m9 12 2.2 2.2L15.2 10"/></svg></div><h3 data-i="f5t">Stays out of your games</h3><p data-i="f5">An ordinary desktop program that never touches other processes, so anti-cheat has nothing to react to.</p></div>
+    <div class="card rv"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/></svg></div><h3 data-i="f6t">Updates itself</h3><p data-i="f6">New versions come from GitHub releases, are checked against their SHA-256 and swapped in automatically.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2 data-i="howT">How it works</h2>
+  <div class="steps">
+    <div class="step rv"><h3 data-i="s1t">Run Loorek.exe</h3><p data-i="s1">One file, no installer. It lands in the tray next to the clock.</p></div>
+    <div class="step rv"><h3 data-i="s2t">Sign in once</h3><p data-i="s2">A separate sign-in window opens for Twitch and Kick. Your everyday browser profile is never touched.</p></div>
+    <div class="step rv"><h3 data-i="s3t">Pick channels and games</h3><p data-i="s3">Order is priority. Close the panel – everything keeps running in the background.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2 data-i="faqT">Questions</h2>
+  <div class="faq">
+    <details name="faq"><summary data-i="q1">Is it allowed?</summary><p data-i="a1">No. Automated watching is against the terms of service of Twitch and Kick. You use Loorek at your own risk.</p></details>
+    <details name="faq"><summary data-i="q2">Where does my session go?</summary><p data-i="a2">Nowhere. It is stored in the data folder next to the program and is sent only to Twitch and Kick themselves.</p></details>
+    <details name="faq"><summary data-i="q3">Why only two Twitch channels?</summary><p data-i="a3">Twitch credits watch time on at most two streams at once. More would earn nothing.</p></details>
+    <details name="faq"><summary data-i="q4">Windows warns about an unknown publisher.</summary><p data-i="a4">The file is not code-signed. The source is public and every release is built from it by GitHub Actions.</p></details>
+    <details name="faq"><summary data-i="q5">Which languages does it speak?</summary><p id="langList"></p></details>
+  </div>
+</section>
+
+<footer><span data-i="foot">Loorek is not affiliated with Twitch or Kick. MIT licence.</span></footer>
+</div>
+
+<script src="i18n.js"></script>
+<script>
+const REPO = 'Yasaiek/Loorek-Twitch-Kick-Points-Drops';
+const sel = document.getElementById('lang');
+for (const c in SITE_LANGS) { const o = document.createElement('option'); o.value = c; o.textContent = SITE_LANGS[c]; sel.append(o); }
+document.getElementById('langList').textContent = Object.values(SITE_LANGS).join(' · ');
+let downloads = null, lang = 'en';
+function pick() {
+  try { const s = localStorage.getItem('lang'); if (s && SITE[s]) return s; } catch (e) {}
+  for (const l of navigator.languages || [navigator.language || 'en']) {
+    const t = l.toLowerCase(); if (t.startsWith('pt')) return 'pt_BR'; if (t.startsWith('zh')) return 'zh_CN';
+    const b = t.split('-')[0]; if (SITE[b]) return b;
+  }
+  return 'en';
+}
+function showCount() { document.getElementById('count').textContent = downloads ? downloads.toLocaleString(lang.replace('_', '-')) + ' ' + (SITE[lang].dls || SITE.en.dls) : ''; }
+function apply(l) {
+  lang = l; const d = SITE[l]; document.documentElement.lang = l.replace('_', '-'); sel.value = l; document.title = d.title || SITE.en.title;
+  document.querySelectorAll('[data-i]').forEach((n) => { const v = d[n.dataset.i] || SITE.en[n.dataset.i]; if (v) n.textContent = v; });
+  showCount();
+}
+sel.onchange = () => { try { localStorage.setItem('lang', sel.value); } catch (e) {} apply(sel.value); };
+apply(pick());
+
+const shots = ['home', 'points', 'kick', 'camps', 'queue'], big = document.getElementById('big'), thumbs = document.getElementById('thumbs');
+shots.forEach((n, i) => { const b = document.createElement('button'); b.type = 'button'; if (!i) b.className = 'on'; const im = document.createElement('img'); im.src = 'img/' + n + '.png'; im.alt = ''; im.loading = 'lazy'; b.append(im);
+  b.onclick = () => { big.src = 'img/' + n + '.png'; thumbs.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); }; thumbs.append(b); });
+
+const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
+document.querySelectorAll('.rv').forEach((n, i) => { n.style.transitionDelay = (i % 3) * 70 + 'ms'; io.observe(n); });
+
+fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=100').then((r) => r.ok ? r.json() : []).then((rs) => {
+  let n = 0; for (const r of rs) for (const a of r.assets || []) if (a.name === 'Loorek.exe') n += a.download_count || 0;
+  downloads = n; showCount();
+}).catch(() => {});
+</script>
+</body>
+</html>
