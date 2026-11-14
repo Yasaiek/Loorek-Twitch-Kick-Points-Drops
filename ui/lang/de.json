@@ -57,6 +57,7 @@
 "kick.connected": "verbunden",
 "kick.watchingNow": "Schaue: {list}",
 "inSession": "in dieser Sitzung",
+"kick.waitHint": "Falls das Anmeldeformular nicht erscheint, klicke oben rechts auf der Seite auf „Anmelden“.",
 "camps.sub": "Klicke Spiele in der Reihenfolge an, in der sie gefarmt werden sollen. Rechtsklick = Spiel verfolgen ★. Das Symbol ⓘ zeigt genau, was es zu holen gibt.",
 "camps.searchPh": "Spiel suchen…",
 "refresh": "Aktualisieren",

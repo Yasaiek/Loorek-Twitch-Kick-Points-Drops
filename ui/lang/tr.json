@@ -57,6 +57,7 @@
 "kick.connected": "bağlı",
 "kick.watchingNow": "İzliyorum: {list}",
 "inSession": "bu oturumda",
+"kick.waitHint": "Giriş formu görünmezse sayfanın sağ üst köşesindeki “Giriş yap” düğmesine tıkla.",
 "camps.sub": "Oyunlara, kasılmalarını istediğin sırayla tıkla. Sağ tık = oyunu takip et ★. ⓘ simgesi tam olarak ne kazanılabileceğini gösterir.",
 "camps.searchPh": "Oyun ara…",
 "refresh": "Yenile",

@@ -57,6 +57,7 @@
 "kick.connected": "connected",
 "kick.watchingNow": "Watching: {list}",
 "inSession": "this session",
+"kick.waitHint": "If the sign-in form does not appear, click \"Log in\" in the top right corner of the page.",
 "camps.sub": "Click games in the order they should be farmed. Right click = track the game ★. The ⓘ icon shows exactly what can be earned.",
 "camps.searchPh": "Search games…",
 "refresh": "Refresh",

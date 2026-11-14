@@ -57,6 +57,7 @@
 "kick.connected": "connecté",
 "kick.watchingNow": "Je regarde : {list}",
 "inSession": "cette session",
+"kick.waitHint": "Si le formulaire de connexion n'apparaît pas, clique sur « Se connecter » en haut à droite de la page.",
 "camps.sub": "Clique sur les jeux dans l'ordre où ils doivent être farmés. Clic droit = suivre le jeu ★. L'icône ⓘ montre exactement ce qu'il y a à gagner.",
 "camps.searchPh": "Chercher un jeu…",
 "refresh": "Actualiser",

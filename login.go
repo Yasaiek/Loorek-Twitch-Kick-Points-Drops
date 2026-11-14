@@ -482,6 +482,7 @@ func (e *Engine) kickLogin() {
 			e.kick.auto = false
 			e.kick.mu.Unlock()
 		}()
+		go lw.openForm(host, `[data-testid="login"]`)
 		try := func(tok, how string) string {
 			if e.kickSetToken(tok) != "ok" {
 				return "bad"
@@ -535,6 +536,36 @@ func (e *Engine) kickLogin() {
 			return
 		}
 	}()
+}
+
+// openForm presses the site's own "log in" button once the page has loaded, so the sign-in form is what the
+// user sees first (Kick has no address that opens it). Nothing else on the page is touched.
+func (lw *loginWin) openForm(host, selector string) {
+	js := `(()=>{const b=[...document.querySelectorAll(` + strconv.Quote(selector) + `)].find(x=>x.offsetParent!==null);if(!b)return false;b.click();return true})()`
+	for i := 0; i < 25 && !lw.isClosed(); i++ {
+		time.Sleep(time.Second)
+		lw.mu.Lock()
+		target := ""
+		for id, u := range lw.pages {
+			if hostMatches(u, host) {
+				target = id
+			}
+		}
+		lw.mu.Unlock()
+		if target == "" {
+			continue
+		}
+		res, err := lw.c.call("Target.attachToTarget", map[string]any{"targetId": target, "flatten": true}, "")
+		if err != nil {
+			continue
+		}
+		sid := str(dig(res, "sessionId"))
+		out, _ := lw.c.call("Runtime.evaluate", map[string]any{"expression": js, "returnByValue": true}, sid)
+		lw.c.call("Target.detachFromTarget", map[string]any{"sessionId": sid}, "")
+		if boolean(dig(out, "result", "value")) {
+			return
+		}
+	}
 }
 
 // sniffAuth reloads the site's tab once and returns the Authorization key its own requests carry.

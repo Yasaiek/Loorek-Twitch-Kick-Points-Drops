@@ -57,6 +57,7 @@
 "kick.connected": "已连接",
 "kick.watchingNow": "正在观看: {list}",
 "inSession": "本次会话",
+"kick.waitHint": "如果没有出现登录表单，请点击页面右上角的“登录”。",
 "camps.sub": "按你想要挂取的顺序点击游戏。右键 = 关注游戏 ★。ⓘ 图标会显示具体能获得什么。",
 "camps.searchPh": "搜索游戏…",
 "refresh": "刷新",

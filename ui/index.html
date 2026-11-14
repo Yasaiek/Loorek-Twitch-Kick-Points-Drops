@@ -153,17 +153,44 @@ input[type=number] { width: 70px; text-align: center; }
 .pos.rank { background: var(--card-3); color: var(--sub); border: 1px solid var(--line-2); }
 .empty { color: var(--dim); text-align: center; padding: 18px 8px; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
 .gcard { position: relative; display: flex; gap: 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 11px; cursor: pointer; transition: border-color .2s, transform .2s var(--ease), background .2s; }
 .gcard:hover { border-color: var(--line-2); transform: translateY(-2px); background: var(--card-2); }
 .gcard.q { border-color: rgba(96,205,255,.45); background: linear-gradient(100deg, rgba(96,205,255,.1), var(--card) 65%); }
 .gcard.done { opacity: .6; }
-.gcard .add { width: 26px; height: 26px; border-radius: 50%; border: 1px dashed #3d3d44; color: var(--dim); display: grid; place-items: center; flex-shrink: 0; transition: all .25s var(--ease); }
-.gcard:hover .add { border-color: var(--accent); color: var(--accent); transform: rotate(90deg); }
+.icon svg, .ib svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; display: block; }
+.btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; margin-right: 6px; }
+.gacts { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.gacts .col2 { display: flex; flex-direction: column; gap: 6px; }
+.ib { appearance: none; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--card-2); color: var(--sub); display: grid; place-items: center; cursor: pointer; padding: 0; transition: background .15s, color .15s, border-color .15s, transform .2s var(--ease); }
+.ib:hover { color: var(--text); border-color: var(--accent); background: var(--card-3); }
+.ib:active { transform: scale(.92); }
+.ib.star.on { color: var(--warn); border-color: rgba(245,200,76,.5); background: rgba(245,200,76,.1); }
+.ib.star.on svg { fill: currentColor; }
+.ib.add { width: 38px; height: 38px; border-radius: 50%; border-width: 1.5px; color: var(--text); }
+.ib.add svg { width: 18px; height: 18px; stroke-width: 2.2; }
+.ib.add:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.ib.add.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font: 700 15px var(--display); animation: pop .35s var(--ease); }
+.lang { position: relative; display: inline-block; text-align: left; }
+.lang-btn { appearance: none; display: flex; align-items: center; gap: 8px; font: inherit; color: var(--text); background: #0f0f11; border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+.lang-btn:hover { border-color: var(--accent); }
+.lang-btn > svg { width: 12px; height: 12px; fill: none; stroke: var(--sub); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s var(--ease); }
+.lang.open .lang-btn > svg { transform: rotate(180deg); }
+.flag { width: 21px; height: 15px; border-radius: 3px; overflow: hidden; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(255,255,255,.16); display: block; }
+.flag svg { width: 100%; height: 100%; display: block; }
+.flag.globe { box-shadow: none; display: grid; place-items: center; color: var(--sub); }
+.flag.globe svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.lang-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 40; min-width: 236px; max-height: 330px; overflow: auto; background: var(--card-2); border: 1px solid var(--line-2); border-radius: 10px; padding: 5px; box-shadow: 0 18px 50px rgba(0,0,0,.6); animation: rise .2s var(--ease); }
+.lang.up .lang-menu { top: auto; bottom: calc(100% + 6px); }
+.lang-item { display: flex; align-items: center; gap: 10px; width: 100%; appearance: none; border: 0; background: none; color: var(--text); font: inherit; text-align: left; padding: 7px 9px; border-radius: 7px; cursor: pointer; }
+.lang-item:hover { background: rgba(255,255,255,.07); }
+.lang-item.on { background: rgba(96,205,255,.13); color: var(--accent); }
+.gate-card { position: relative; }
+.gate-lang { position: absolute; top: 12px; right: 12px; }
+.gate-lang .lang-btn { background: none; padding: 5px 8px; }
+.gate-lang .lang-name { display: none; }
 .gcard .pos { animation: pop .35s var(--ease); }
 @keyframes pop { from { transform: scale(.3); opacity: 0; } 60% { transform: scale(1.18); } }
-.gcard .info { position: absolute; top: 5px; right: 5px; opacity: .55; }
-.gcard:hover .info { opacity: 1; color: var(--accent); }
 .star-mark { color: var(--warn); font-size: 13px; margin-right: 3px; }
 .toolbar { display: flex; gap: 8px; align-items: center; }
 .toolbar input { max-width: 340px; }
@@ -308,6 +335,7 @@ select:focus { border-color: var(--accent); }
       </div>
       <div id="kickWait" hidden>
         <div class="waitrow"><div class="spin"></div><span data-i="kick.waiting"></span></div>
+        <p class="sub" style="margin:8px 0 0" data-i="kick.waitHint"></p>
         <button class="btn ghost small" id="kickLoginCancel" style="margin-top:10px" data-i="cancel"></button>
       </div>
       <div class="note" id="kickNote" hidden></div>
@@ -332,7 +360,7 @@ select:focus { border-color: var(--accent); }
 
   <section class="tab" id="tab-camps">
     <div class="head"><div><h1 data-i="nav.camps"></h1><p data-i="camps.sub"></p></div></div>
-    <div class="toolbar"><input type="text" id="campSearch" data-ip="camps.searchPh" autocomplete="off" spellcheck="false"><button class="btn" id="refresh">⟳ <span data-i="refresh"></span></button><span class="sub" id="campInfo"></span></div>
+    <div class="toolbar"><input type="text" id="campSearch" data-ip="camps.searchPh" autocomplete="off" spellcheck="false"><button class="btn" id="refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/></svg><span data-i="refresh"></span></button><span class="sub" id="campInfo"></span></div>
     <div class="grid" id="campList"></div>
   </section>
 
@@ -365,7 +393,7 @@ select:focus { border-color: var(--accent); }
     <div class="card">
       <label class="row"><span><span data-i="set.autostart"></span><small data-i="set.autostartHint"></small></span><input type="checkbox" class="sw" data-set="autostart"></label>
       <label class="row"><span><span data-i="set.openOnStart"></span><small data-i="set.openHint"></small></span><input type="checkbox" class="sw" data-set="openOnStart"></label>
-      <div class="row"><span data-i="set.lang"></span><select id="langSel"></select></div>
+      <div class="row"><span data-i="set.lang"></span><div class="lang" id="langSet"></div></div>
     </div>
     <div class="card">
       <div class="row"><span>Loorek <span id="ver"></span><small id="updNote">–</small></span><span style="display:flex;gap:8px"><button class="btn small primary" id="updInstall" hidden data-i="upd.install"></button><button class="btn small" id="updCheck" data-i="upd.check"></button></span></div>
@@ -382,6 +410,7 @@ select:focus { border-color: var(--accent); }
 
 <div id="gate" hidden>
   <div class="gate-card">
+    <div class="lang gate-lang" id="langGate"></div>
     <img src="icon.png" alt="">
     <div id="gateOut">
       <h1><i class="svc" data-svc="twitch"></i><span data-i="gate.title"></span></h1>
@@ -422,15 +451,66 @@ const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls)
 let T = {}, LANG = '', LOC = 'en-US';
 const tr = (k, v) => { let x = T[k]; if (x == null) return k; if (v) for (const n in v) x = x.split('{' + n + '}').join(v[n]); return x; };
 const LANG_NAMES = { en: 'English', pl: 'Polski', de: 'Deutsch', fr: 'Français', es: 'Español', it: 'Italiano', pt_BR: 'Português (Brasil)', ru: 'Русский', uk: 'Українська', tr: 'Türkçe', ja: '日本語', zh_CN: '简体中文' };
+const SVGNS = 'http://www.w3.org/2000/svg';
+const ICONS = {
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r=".6" fill="currentColor"/>',
+  star: '<path d="m12 3.2 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1-5.4-3-5.4 3 1.1-6.1-4.5-4.3 6.1-.8z"/>',
+  chev: '<path d="m6 9 6 6 6-6"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/>',
+};
+function ico(name) { const v = document.createElementNS(SVGNS, 'svg'); v.setAttribute('viewBox', '0 0 24 24'); v.innerHTML = ICONS[name]; return v; }
+function iconBtn(cls, name, title) { const b = el('button', cls); b.type = 'button'; b.append(ico(name)); if (title) b.title = title; return b; }
+// flags are drawn here (plain national flags, simplified for 21x15)
+const starPts = (cx, cy, R, rot) => { let p = ''; for (let i = 0; i < 10; i++) { const a = (rot || -90) * Math.PI / 180 + i * Math.PI / 5, r = i % 2 ? R * .4 : R; p += (cx + r * Math.cos(a)).toFixed(2) + ',' + (cy + r * Math.sin(a)).toFixed(2) + ' '; } return p; };
+const bands = (cols, vertical) => cols.map((c, i) => vertical ? `<rect x="${21 / cols.length * i}" width="${21 / cols.length + .1}" height="15" fill="${c}"/>` : `<rect y="${15 / cols.length * i}" width="21" height="${15 / cols.length + .1}" fill="${c}"/>`).join('');
+const FLAGS = {
+  en: '<rect width="21" height="15" fill="#012169"/><path d="M0 0 21 15M21 0 0 15" stroke="#fff" stroke-width="3"/><path d="M0 0 21 15M21 0 0 15" stroke="#c8102e" stroke-width="1.1"/><path d="M10.5 0v15M0 7.5h21" stroke="#fff" stroke-width="5"/><path d="M10.5 0v15M0 7.5h21" stroke="#c8102e" stroke-width="3"/>',
+  pl: bands(['#fff', '#dc143c']),
+  de: bands(['#000', '#dd0000', '#ffce00']),
+  fr: bands(['#0055a4', '#fff', '#ef4135'], true),
+  es: '<rect width="21" height="15" fill="#aa151b"/><rect y="3.75" width="21" height="7.5" fill="#f1bf00"/>',
+  it: bands(['#009246', '#fff', '#ce2b37'], true),
+  pt_BR: '<rect width="21" height="15" fill="#009c3b"/><path d="M10.5 1.7 19 7.5l-8.5 5.8L2 7.5z" fill="#ffdf00"/><circle cx="10.5" cy="7.5" r="3.2" fill="#002776"/>',
+  ru: bands(['#fff', '#0039a6', '#d52b1e']),
+  uk: bands(['#0057b7', '#ffd700']),
+  tr: `<rect width="21" height="15" fill="#e30a17"/><circle cx="7.6" cy="7.5" r="3.75" fill="#fff"/><circle cx="8.55" cy="7.5" r="3" fill="#e30a17"/><polygon points="${starPts(11.9, 7.5, 1.9, -18)}" fill="#fff"/>`,
+  ja: '<rect width="21" height="15" fill="#fff"/><circle cx="10.5" cy="7.5" r="4.5" fill="#bc002d"/>',
+  zh_CN: `<rect width="21" height="15" fill="#de2910"/><polygon points="${starPts(3.6, 3.9, 2.3)}" fill="#ffde00"/>` + [[7.1, 1.5], [8.5, 2.9], [8.5, 5], [7.1, 6.4]].map((c) => `<polygon points="${starPts(c[0], c[1], .75)}" fill="#ffde00"/>`).join(''),
+};
+function flagEl(code) {
+  const f = el('span', 'flag' + (FLAGS[code] ? '' : ' globe'));
+  if (FLAGS[code]) { const v = document.createElementNS(SVGNS, 'svg'); v.setAttribute('viewBox', '0 0 21 15'); v.innerHTML = FLAGS[code]; f.append(v); } else f.append(ico('globe'));
+  return f;
+}
+// language picker: a button with the current flag, and a list with every language
+const langPickers = [];
+function mountLang(root, up) {
+  const btn = el('button', 'lang-btn'); btn.type = 'button'; const menu = el('div', 'lang-menu'); menu.hidden = true; if (up) root.classList.add('up');
+  const close = () => { menu.hidden = true; root.classList.remove('open'); };
+  btn.onclick = (ev) => { ev.stopPropagation(); const open = menu.hidden; langPickers.forEach((p) => p.close()); if (open) { menu.hidden = false; root.classList.add('open'); } };
+  document.addEventListener('click', (ev) => { if (!root.contains(ev.target)) close(); });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') close(); });
+  root.append(btn, menu); langPickers.push({ root, btn, menu, close });
+}
+function syncLang() {
+  const pref = S && S.settings.lang && LANG_NAMES[S.settings.lang] ? S.settings.lang : 'auto';
+  for (const p of langPickers) {
+    p.btn.replaceChildren(flagEl(LANG), el('span', 'lang-name', LANG_NAMES[LANG] || ''), ico('chev')); p.btn.title = tr('set.lang');
+    p.menu.textContent = '';
+    for (const c of ['auto', ...Object.keys(LANG_NAMES)]) {
+      const it = el('button', 'lang-item' + (c === pref ? ' on' : '')); it.type = 'button'; it.append(flagEl(c), el('span', '', c === 'auto' ? tr('set.langAuto') : LANG_NAMES[c]));
+      it.onclick = () => { p.close(); op({ op: 'settings', patch: { lang: c } }); }; p.menu.append(it);
+    }
+  }
+}
 function applyStatic() {
   document.documentElement.lang = LANG.replace('_', '-');
   document.querySelectorAll('[data-i]').forEach((n) => { n.textContent = tr(n.dataset.i); });
   document.querySelectorAll('[data-ih]').forEach((n) => { n.innerHTML = tr(n.dataset.ih); });
   document.querySelectorAll('[data-ip]').forEach((n) => { n.placeholder = tr(n.dataset.ip); });
-  const sel = $('langSel'), cur = sel.value; sel.textContent = '';
-  const o0 = el('option', '', tr('set.langAuto')); o0.value = 'auto'; sel.append(o0);
-  for (const c in LANG_NAMES) { const o = el('option', '', LANG_NAMES[c]); o.value = c; sel.append(o); }
-  sel.value = cur || 'auto';
+  syncLang();
 }
 async function setLang(code) {
   try { const r = await fetch('lang/' + code + '.json', { cache: 'no-store' }); T = await r.json(); } catch (e) { return false; }
@@ -570,7 +650,7 @@ function chanList(list, sig, chans, seenSet, toggleOp, removeOp, emptyText) {
     const pts = el('div', 'col'); const b = el('b'); pts.append(b, el('span', c.earned ? 'plus' : '', c.earned ? '+' + fmt(c.earned) : tr('chn.points')));
     if (c.balKnown) countTo(b, sig + ':' + c.login, c.balance); else b.textContent = '–';
     const sw = el('input', 'sw'); sw.type = 'checkbox'; sw.checked = c.on; sw.title = tr('chn.toggle'); sw.onchange = () => op({ op: toggleOp, login: c.login, on: sw.checked });
-    const del = el('button', 'icon', '✕'); del.title = tr('chn.remove'); del.onclick = () => op({ op: removeOp, login: c.login });
+    const del = iconBtn('icon', 'x', tr('chn.remove')); del.onclick = () => op({ op: removeOp, login: c.login });
     it.append(el('span', 'pos rank', i + 1), el('span', 'dot' + (c.watching ? ' watch' : c.online && c.on ? ' on' : '')), txt, w, pts, sw, del);
     list.append(it);
   });
@@ -594,7 +674,7 @@ function renderDetail() {
   const g = detail, cur = S && S.drops.current;
   if (!changed('detail', [g, cur])) return;
   const head = $('drHead'), body = $('drBody'), foot = $('drFoot'); head.textContent = ''; body.textContent = ''; foot.textContent = '';
-  const x = el('button', 'icon', '✕'); x.onclick = closeDetail; x.title = tr('close');
+  const x = iconBtn('icon', 'x', tr('close')); x.onclick = closeDetail;
   if (!g) { head.append(el('div', 'txt', tr('loading')), x); return; }
   const t = el('div', 'txt'); t.append(el('h2', '', g.name));
   const total = g.camps.reduce((n, c) => n + (c.active ? c.left : 0), 0);
@@ -637,7 +717,7 @@ function render() {
   else { pill.className = 'pill wait'; pill.textContent = tr('pill.wait'); }
 
   if (!pending) document.querySelectorAll('[data-set]').forEach((inp) => { const v = s.settings[inp.dataset.set]; if (inp.type === 'checkbox') inp.checked = !!v; else if (document.activeElement !== inp) inp.value = v; });
-  if (!pending && document.activeElement !== $('langSel')) $('langSel').value = s.settings.lang && LANG_NAMES[s.settings.lang] ? s.settings.lang : 'auto';
+  if (changed('langPref', [s.settings.lang, LANG])) syncLang();
   const u = s.update || {};
   $('updNote').textContent = u.state === 'downloading' ? tr('upd.downloading', { v: u.latest }) : u.state === 'available' ? tr('upd.avail', { v: u.latest }) : u.state === 'checking' ? tr('upd.checking') : u.state === 'failed' ? tr('upd.failed') : u.state === 'current' ? tr('upd.current') : tr('upd.never');
   $('updInstall').hidden = u.state !== 'available';
@@ -679,13 +759,15 @@ function render() {
   $('kickUser').textContent = kick.user || tr('kick.connected');
   const nk = $('nKick'); nk.hidden = !kick.watching; nk.textContent = kick.watching;
   const kw = kick.channels.filter((c) => c.watching);
-  const kh = $('kickHome'); kh.hidden = !kw.length;
-  if (kw.length && changed('kickHome', [kw.map((c) => c.name), kick.earned])) {
+  const kShow = kick.state === 'ok' || kick.state === 'blocked';
+  const kh = $('kickHome'); kh.hidden = !kShow;
+  if (kShow && changed('kickHome', [kw.map((c) => c.name), kick.earned, kick.state])) {
     kh.textContent = ''; const row = el('div', 'top'); row.style.cssText = 'display:flex;align-items:center;gap:12px';
     const ks = el('div', 'sub', tr('kick.title')); ks.prepend(svcEl('kick'));
-    const t = el('div', 'txt'); t.append(ks, el('div', 'nm', tr('kick.watchingNow', { list: kw.map((c) => c.name).join(', ') })));
-    const eq = el('div', 'eq'); eq.append(el('i'), el('i'), el('i'));
-    const pts = el('div', 'col'); pts.append(el('b', '', '+' + fmt(kick.earned)), el('span', '', tr('inSession'))); row.append(t, pts, eq); kh.append(row);
+    const t = el('div', 'txt'); t.append(ks, el('div', 'nm', kw.length ? tr('kick.watchingNow', { list: kw.map((c) => c.name).join(', ') }) : kick.state === 'blocked' ? tr('kst.blocked') : tr('slot.waitLive')));
+    const pts = el('div', 'col'); pts.append(el('b', '', '+' + fmt(kick.earned)), el('span', '', tr('inSession'))); row.append(t, pts);
+    if (kw.length) { const eq = el('div', 'eq'); eq.append(el('i'), el('i'), el('i')); row.append(eq); }
+    kh.append(row);
   }
 
   // campaigns
@@ -698,14 +780,18 @@ function render() {
     else if (!games.length) list.append(el('div', 'empty', q ? tr('camps.noMatch') : tr('camps.none')));
     games.forEach((g, i) => {
       const it = el('div', 'gcard' + (g.queued ? ' q' : '') + (g.status === 'done' ? ' done' : '')); enter(it, seen.camp, g.id, i);
-      const txt = el('div', 'txt'); const nm = el('div', 'nm'); if (g.tracked) nm.append(el('span', 'star-mark', '★')); nm.append(g.name); txt.append(nm);
+      const txt = el('div', 'txt'); txt.append(el('div', 'nm', g.name));
       txt.append(el('div', 'sb', g.camps > 1 ? tr('det.many', { n: g.camps }) : g.camp));
       txt.append(el('div', 'sb', g.status === 'done' ? tr('camps.allDone') : g.upcoming ? tr('camp.start', { when: when(g.start) }) : tr('camps.until', { when: when(g.end) }) + ' · ' + left(g.end)));
-      const info = el('button', 'icon info', 'ⓘ'); info.title = tr('camps.infoTip'); info.onclick = (ev) => { ev.stopPropagation(); openDetail(g.id); };
-      it.append(art(g.art, true), txt, g.queued ? el('span', 'pos', g.queued) : el('span', 'add', '+'), info);
       const ref = { id: g.id, slug: g.slug, name: g.name, art: g.art };
+      const track = () => op({ op: 'trackToggle', game: ref }).then(() => toast(tr(g.tracked ? 'toast.untracked' : 'toast.tracked', { name: g.name })));
+      const info = iconBtn('ib', 'info', tr('camps.infoTip')); info.onclick = (ev) => { ev.stopPropagation(); openDetail(g.id); };
+      const star = iconBtn('ib star' + (g.tracked ? ' on' : ''), 'star', g.tracked ? tr('q.untrack') : tr('det.track')); star.onclick = (ev) => { ev.stopPropagation(); track(); };
+      const add = el('button', 'ib add' + (g.queued ? ' on' : '')); add.type = 'button'; add.title = g.queued ? tr('q.remove') : tr('det.queue'); if (g.queued) add.textContent = g.queued; else add.append(ico('plus'));
+      const col = el('div', 'col2'); col.append(info, star); const acts = el('div', 'gacts'); acts.append(col, add);
+      it.append(art(g.art, true), txt, acts);
       it.onclick = () => op({ op: 'queueToggle', game: ref });
-      it.oncontextmenu = (ev) => { ev.preventDefault(); op({ op: 'trackToggle', game: ref }).then(() => toast(tr(g.tracked ? 'toast.untracked' : 'toast.tracked', { name: g.name }))); };
+      it.oncontextmenu = (ev) => { ev.preventDefault(); track(); };
       list.append(it);
     });
   }
@@ -722,7 +808,7 @@ function render() {
     if (g.farming) { label = tr('stt.watching'); cls = 'run'; } else if (g.status === 'ready' && g.note === 'nostreams') { label = tr('stt.nostreams'); cls = 'wait'; } else if (g.status === 'ready' && !s.settings.dropsOn) { label = tr('stt.off'); }
     const pill = el(g.status === 'nolink' && g.link ? 'a' : 'span', 'pill ' + cls, label);
     if (g.status === 'nolink' && g.link) { pill.href = g.link; pill.target = '_blank'; pill.title = tr('q.linkTip'); }
-    const del = el('button', 'icon', '✕'); del.title = tracked ? tr('q.untrack') : tr('q.remove');
+    const del = iconBtn('icon', 'x', tracked ? tr('q.untrack') : tr('q.remove'));
     const ref = { id: g.id, slug: g.slug, name: g.name, art: g.art };
     del.onclick = () => op({ op: tracked ? 'trackToggle' : 'queueToggle', game: ref });
     top.append(tracked ? el('span', 'pos star', '★') : el('span', 'pos', i + 1), art(g.art), txt, pill, del);
@@ -776,7 +862,8 @@ $('kickLoginBtn').onclick = () => op({ op: 'kickLogin' });
 $('kickLoginCancel').onclick = () => op({ op: 'kickLoginCancel' });
 $('tokenForm').onsubmit = async (ev) => { ev.preventDefault(); const v = $('tokenInput').value.trim(); if (!v) return; const r = await op({ op: 'token', login: v }); if (r && r.result === 'bad') toast(tr('toast.noToken')); else $('tokenInput').value = ''; };
 $('logout').onclick = () => op({ op: 'logout' });
-$('langSel').onchange = () => op({ op: 'settings', patch: { lang: $('langSel').value } });
+mountLang($('langSet'));
+mountLang($('langGate'));
 $('updCheck').onclick = () => { op({ op: 'updateCheck' }); };
 $('updInstall').onclick = () => op({ op: 'updateInstall' });
 $('clearLog').onclick = () => op({ op: 'clearLog' });

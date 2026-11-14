@@ -88,6 +88,64 @@ func addCh(login, gameID string, live bool, viewers int, drops ...string) {
 	channels[login] = &channel{ID: "id-" + login, Login: login, Name: strings.ToUpper(login[:1]) + login[1:], Live: live, GameID: gameID, Viewers: viewers, Balance: 1000, Drops: drops}
 }
 
+// demoReal swaps the test data for a showcase set: real game titles with their covers (files in MOCK_ART_DIR)
+// and real channel names. Used only for screenshots.
+func demoReal() {
+	games = map[string]*game{
+		"g0": {"g0", "Just Chatting", "just-chatting"}, "g23": {"g23", "Cyberpunk 2077", "cyberpunk-2077"}, "g27": {"g27", "Sea of Thieves", "sea-of-thieves"},
+		"g26": {"g26", "Rainbow Six Siege", "rainbow-six-siege"}, "g24": {"g24", "Delta Force", "delta-force"}, "g21": {"g21", "Apex Legends", "apex-legends"},
+		"g25": {"g25", "Genshin Impact", "genshin-impact"}, "g22": {"g22", "Crimson Desert", "crimson-desert"},
+	}
+	many := func(prefix string, n int, req func(i int) int) []*drop {
+		var out []*drop
+		for i := 1; i <= n; i++ {
+			id := fmt.Sprintf("%s%d", prefix, i)
+			out = append(out, &drop{ID: id, Name: fmt.Sprintf("Reward %d", i), Req: req(i), Benefit: id})
+		}
+		return out
+	}
+	sot := many("sot", 7, func(i int) int {
+		if i < 3 {
+			return 30
+		}
+		return 60
+	})
+	sot[2].Name = "Face, Meet Palm Emote"
+	for _, d := range sot[:2] {
+		d.Cur, d.Claimed, d.Touched = float64(d.Req), true, true
+		awarded[d.Benefit] = time.Now().Add(-time.Hour)
+	}
+	sot[2].Cur, sot[2].Touched = 12, true
+	camps = []*campaign{
+		{ID: "R3", Name: "Quadra Paintjobs", GameID: "g23", Linked: true, Drops: []*drop{{ID: "cp1", Name: "Quadra Paintjobs", Req: 120, Benefit: "cp1", Cur: 47, Touched: true}}},
+		{ID: "R8", Name: "Twitch Drops", GameID: "g27", Linked: true, Drops: sot},
+		{ID: "R7", Name: "Twitch Drops", GameID: "g26", Linked: true, Drops: many("r6", 6, func(int) int { return 60 })},
+		{ID: "R4", Name: "Delta Force Drops", GameID: "g24", Linked: false, Drops: many("df", 2, func(int) int { return 60 })},
+		{ID: "R1", Name: "Apex Legends | Godzilla", GameID: "g21", Linked: true, Drops: many("ax", 1, func(int) int { return 60 })},
+		{ID: "R6", Name: "V7.2 Genshin Impact Drops", GameID: "g25", Linked: true, Drops: many("gi", 1, func(int) int { return 60 })},
+		{ID: "R2", Name: "Crimson Desert DLC Week 2", GameID: "g22", Linked: true, Drops: many("cd", 1, func(int) int { return 60 })},
+	}
+	channels = map[string]*channel{}
+	add := func(login, name, gameID string, live bool, viewers, balance int, drops ...string) {
+		addCh(login, gameID, live, viewers, drops...)
+		channels[login].Name, channels[login].Balance = name, balance
+	}
+	add("cdprojektred", "CDPROJEKTRED", "g23", true, 4800, 0, "R3")
+	add("seaofthieves", "SeaOfThieves", "g27", true, 1900, 0, "R8")
+	add("rainbow6", "Rainbow6", "g26", true, 6400, 0, "R7")
+	add("h2p_gucio", "H2P_Gucio", "g0", true, 6200, 48210)
+	add("xayoo_", "xayoo_", "g0", true, 9100, 12750)
+	add("izakooo", "IzakOOO", "g0", false, 0, 8340)
+	add("ewroon", "EWROON", "g0", true, 3900, 27600)
+	add("pago3", "PAGO3", "g0", false, 0, 1920)
+	kchans = map[string]*kch{
+		"delordione": {ID: 501, UserID: 601, StreamID: 9001, Slug: "delordione", Name: "delordione", Live: true, Points: 3480},
+		"azdus":      {ID: 502, UserID: 602, StreamID: 9002, Slug: "azdus", Name: "Azdus", Live: true, Points: 1210},
+		"demonzz1":   {ID: 503, UserID: 603, Slug: "demonzz1", Name: "demonzz1", Live: false, Points: 640},
+		"pajalock":   {ID: 504, UserID: 604, StreamID: 9004, Slug: "pajalock", Name: "pajalock", Live: true, Points: 90},
+	}
+}
+
 func chByID(id string) *channel {
 	for _, c := range channels {
 		if c.ID == id {
@@ -327,6 +385,9 @@ func main() {
 	addCh("gamma", "g2", false, 0)
 	addCh("delta", "g1", true, 900, "c1")
 	addCh("epsilon", "g1", true, 200, "c1")
+	if os.Getenv("MOCK_DEMO") == "real" {
+		demoReal()
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/oauth2/validate", func(w http.ResponseWriter, r *http.Request) {
@@ -461,8 +522,8 @@ func main() {
 		switch r.URL.Path {
 		case "/kick/":
 			fmt.Fprint(w, `<!doctype html><title>Kick (mock)</title><body style="font:16px system-ui;background:#0b0e0f;color:#fff;padding:40px">
-<h2>Kick (mock)</h2><button id=b style="padding:10px 18px">Log In</button>
-<script>const go=()=>{location.href='/kick/dologin'};document.getElementById('b').onclick=go;setTimeout(go,2500)</script>`)
+<h2>Kick (mock)</h2><button data-testid="login" style="display:none">hidden twin</button><button id=b data-testid="login" style="padding:10px 18px">Log In</button>
+<script>const go=()=>{location.href='/kick/dologin'};document.getElementById('b').onclick=go</script>`)
 		case "/kick/dologin":
 			val := "1234%7Ckicktokenkicktokenkicktoken"
 			if kmode == "hdr" {
@@ -590,6 +651,21 @@ func main() {
 			http.SetCookie(w, &http.Cookie{Name: "unique_id", Value: "mockdevice0123456789abcdef012345"})
 			fmt.Fprint(w, "<html>twitch mock</html>")
 			return
+		}
+		if dir := os.Getenv("MOCK_ART_DIR"); dir != "" && strings.HasPrefix(r.URL.Path, "/art/") {
+			name := strings.TrimPrefix(r.URL.Path, "/art/")
+			if i := strings.LastIndex(name, "-"); i > 0 && strings.HasSuffix(name, ".jpg") {
+				name = name[:i]
+			}
+			name = strings.TrimSuffix(name, ".png")
+			if g := games[name]; g != nil {
+				name = g.Slug
+			}
+			if raw, err := os.ReadFile(dir + "/" + name + ".png"); err == nil && !strings.Contains(name, "/") {
+				w.Header().Set("Content-Type", "image/png")
+				w.Write(raw)
+				return
+			}
 		}
 		if strings.HasPrefix(r.URL.Path, "/art/") {
 			w.Header().Set("Content-Type", "image/svg+xml")

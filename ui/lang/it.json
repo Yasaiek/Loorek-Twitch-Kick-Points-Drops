@@ -57,6 +57,7 @@
 "kick.connected": "collegato",
 "kick.watchingNow": "Sto guardando: {list}",
 "inSession": "in questa sessione",
+"kick.waitHint": "Se il modulo di accesso non compare, clicca su «Accedi» in alto a destra nella pagina.",
 "camps.sub": "Clicca i giochi nell'ordine in cui vanno farmati. Tasto destro = segui il gioco ★. L'icona ⓘ mostra esattamente cosa si può ottenere.",
 "camps.searchPh": "Cerca gioco…",
 "refresh": "Aggiorna",
