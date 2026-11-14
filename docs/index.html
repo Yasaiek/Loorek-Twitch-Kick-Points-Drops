@@ -77,24 +77,16 @@ h1.done .w { animation: word .8s var(--ease) forwards, sheen 7s linear 1s infini
 @keyframes nudge { 50% { transform: translateY(3px); } }
 .count { color: var(--dim); font-size: 13.5px; min-height: 20px; font-variant-numeric: tabular-nums; }
 /* the app window in the hero */
-.stage { perspective: 1600px; margin: 34px auto 0; animation: rise 1.1s var(--ease) .65s both; }
-.shot { position: relative; border-radius: 16px; padding: 1px; background: conic-gradient(from var(--ang), rgba(138,245,214,.9), rgba(54,180,242,.15) 25%, rgba(143,123,255,.9) 50%, rgba(54,180,242,.15) 75%, rgba(138,245,214,.9)); animation: spin 9s linear infinite; box-shadow: 0 50px 140px -30px rgba(0,0,0,.95), 0 0 90px -30px rgba(54,180,242,.5); transition: transform .25s var(--ease); transform-style: preserve-3d; will-change: transform; }
+.stage { margin: 34px auto 0; animation: rise 1.1s var(--ease) .65s both; }
+.shot { position: relative; border-radius: 16px; padding: 1px; text-align: left; background: conic-gradient(from var(--ang), rgba(138,245,214,.9), rgba(54,180,242,.15) 25%, rgba(143,123,255,.9) 50%, rgba(54,180,242,.15) 75%, rgba(138,245,214,.9)); animation: spin 9s linear infinite; box-shadow: 0 50px 140px -30px rgba(0,0,0,.95), 0 0 90px -30px rgba(54,180,242,.5); }
 @keyframes spin { to { --ang: 360deg; } }
 .shot .frame { border-radius: 15px; overflow: hidden; background: #0b0b0d; }
 .chrome { display: flex; align-items: center; gap: 7px; padding: 10px 14px; background: #0b0b0d; border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--sub); }
 .chrome i { width: 10px; height: 10px; border-radius: 50%; background: #2a2d38; }
 .chrome img { width: 16px; height: 16px; border-radius: 4px; margin-left: 6px; }
-.views { position: relative; aspect-ratio: 1650 / 1140; background: #0a0a0b; }
-.views img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transform: scale(1.02); transition: opacity .7s var(--ease), transform .9s var(--ease); }
-.views img.on { opacity: 1; transform: none; }
-.thumbs { display: flex; gap: 10px; justify-content: center; margin: 18px 0 0; flex-wrap: wrap; }
-.thumbs button { position: relative; appearance: none; padding: 0; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: none; cursor: pointer; width: 118px; opacity: .5; transition: opacity .25s, border-color .25s, transform .25s var(--ease); }
-.thumbs button:hover { opacity: .9; transform: translateY(-3px); }
-.thumbs button.on { opacity: 1; border-color: var(--sky); transform: translateY(-3px); }
-.thumbs img { display: block; width: 100%; }
-.thumbs button::after { content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: linear-gradient(90deg, var(--mint), var(--sky)); transform: scaleX(0); transform-origin: 0 50%; }
-.thumbs button.on.run::after { animation: fill var(--hold, 4.5s) linear forwards; }
-@keyframes fill { to { transform: scaleX(1); } }
+.live { display: block; width: 100%; height: 720px; border: 0; background: #0a0a0b; color-scheme: dark; }
+.livenote { color: var(--dim); font-size: 13.5px; margin: 14px 0 0; }
+.livenote::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); margin-right: 8px; vertical-align: 1px; animation: ping 1.8s ease-out infinite; }
 /* ticker */
 .ticker { margin: 54px 0 0; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
 .ticker div { display: flex; gap: 12px; width: max-content; animation: slide 36s linear infinite; }
@@ -191,7 +183,7 @@ details p { margin: 0; padding: 0 20px 18px; color: var(--sub); font-size: 15px;
 footer { margin: 90px 0 0; padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; text-align: center; }
 .rv { opacity: 0; transform: translateY(26px) scale(.98); transition: opacity .8s var(--ease), transform .8s var(--ease), border-color .25s; }
 .rv.in { opacity: 1; transform: none; }
-@media (max-width: 860px) { .grid, .steps { grid-template-columns: 1fr; } .hero { padding-top: 26px; } .thumbs button { width: 84px; } header a.gh { display: none; } .lang-name { display: none; } }
+@media (max-width: 860px) { .grid, .steps { grid-template-columns: 1fr; } .hero { padding-top: 26px; } .live { height: 640px; } header a.gh { display: none; } .lang-name { display: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .rv, h1 .w { opacity: 1; transform: none; filter: none; } html { scroll-behavior: auto; } #sparks { display: none; } .card .ic svg * { stroke-dashoffset: 0; } .step::before { transform: none; } }
 </style>
 </head>
@@ -220,9 +212,9 @@ footer { margin: 90px 0 0; padding: 26px 0 40px; border-top: 1px solid var(--lin
   <div class="count" id="count"></div>
   <div class="stage" id="stage"><div class="shot" id="shot"><div class="frame">
     <div class="chrome"><i></i><i></i><i></i><img src="img/favicon.png" alt=""><span>Loorek</span></div>
-    <div class="views" id="views"></div>
+    <iframe class="live" id="live" title="Loorek – live preview of the panel" loading="eager"></iframe>
   </div></div></div>
-  <div class="thumbs" id="thumbs"></div>
+  <p class="livenote" data-i="live">Live preview – click around. It runs on made-up data, nothing is real.</p>
 </div>
 
 <div class="ticker" aria-hidden="true"><div id="ticker"></div></div>
@@ -333,32 +325,14 @@ function apply(l) {
   lang = l; const d = SITE[l]; document.documentElement.lang = l.replace('_', '-'); document.title = d.title || SITE.en.title;
   document.querySelectorAll('[data-i]').forEach((n) => { const v = d[n.dataset.i] || SITE.en[n.dataset.i]; if (v) n.textContent = v; });
   words(document.querySelector('h1')); ticker(d); drawLang(); showCount();
+  const fr = $('live'); if (fr && fr.contentWindow && fr.src) fr.contentWindow.postMessage({ loorekLang: l }, '*');
 }
 apply(pick());
 
-// screenshots: cross-fade, switch by themselves, pause while the pointer is over the window
-const shots = ['home', 'camps', 'queue', 'tracked', 'points', 'kick'], views = $('views'), thumbs = $('thumbs'), HOLD = 4500;
-let cur = 0, timer = 0;
-shots.forEach((n, i) => {
-  const im = el('img', i ? '' : 'on'); im.src = 'img/' + n + '.png'; im.alt = i ? '' : 'Loorek panel'; if (i) im.loading = 'lazy'; views.append(im);
-  const b = el('button', i ? '' : 'on'); b.type = 'button'; const t = el('img'); t.src = 'img/' + n + '.png'; t.alt = ''; t.loading = 'lazy'; b.append(t); b.onclick = () => show(i, true); thumbs.append(b);
-});
-thumbs.style.setProperty('--hold', HOLD + 'ms');
-function show(i, byHand) {
-  cur = i;
-  [...views.children].forEach((n, k) => n.classList.toggle('on', k === i));
-  [...thumbs.children].forEach((n, k) => { n.classList.remove('run'); n.classList.toggle('on', k === i); });
-  clearTimeout(timer); if (calm) return;
-  void thumbs.offsetWidth; thumbs.children[i].classList.add('run');
-  timer = setTimeout(() => show((cur + 1) % shots.length), byHand ? HOLD * 2 : HOLD);
-}
-show(0);
-const shot = $('shot'), stage = $('stage');
-if (!calm) {
-  stage.addEventListener('mousemove', (ev) => { const r = stage.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width - .5, y = (ev.clientY - r.top) / r.height - .5; shot.style.transform = `rotateY(${x * 5}deg) rotateX(${-y * 5}deg) translateZ(0)`; });
-  stage.addEventListener('mouseleave', () => { shot.style.transform = ''; });
-  document.querySelectorAll('.card').forEach((c) => c.addEventListener('mousemove', (ev) => { const r = c.getBoundingClientRect(); c.style.setProperty('--mx', ev.clientX - r.left + 'px'); c.style.setProperty('--my', ev.clientY - r.top + 'px'); }));
-}
+// the hero window is the real panel, running on made-up data (docs/demo)
+const live = $('live');
+live.src = 'demo/index.html?lang=' + lang;
+if (!calm) document.querySelectorAll('.card').forEach((c) => c.addEventListener('mousemove', (ev) => { const r = c.getBoundingClientRect(); c.style.setProperty('--mx', ev.clientX - r.left + 'px'); c.style.setProperty('--my', ev.clientY - r.top + 'px'); }));
 
 const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
 document.querySelectorAll('.rv').forEach((n, i) => { n.style.transitionDelay = (i % 3) * 90 + 'ms'; io.observe(n); });

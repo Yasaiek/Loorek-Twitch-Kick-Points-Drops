@@ -2,6 +2,7 @@
 const SITE_LANGS = { en: 'English', pl: 'Polski', de: 'Deutsch', fr: 'Français', es: 'Español', it: 'Italiano', pt_BR: 'Português (BR)', ru: 'Русский', uk: 'Українська', tr: 'Türkçe', ja: '日本語', zh_CN: '简体中文' };
 const SITE = {
 en: {
+  live: 'Live preview – click around. It runs on made-up data, nothing is real.',
   title: 'Loorek – Twitch & Kick channel points and Twitch Drops in the background',
   eyebrow: 'Windows · free · open source · beta',
   h1: 'Channel points and drops, collected while you play.',
@@ -27,6 +28,7 @@ en: {
   foot: 'Loorek is not affiliated with Twitch or Kick. MIT licence.',
 },
 pl: {
+  live: 'Podgląd na żywo – klikaj śmiało. Działa na zmyślonych danych, nic nie jest prawdziwe.',
   title: 'Loorek – punkty kanału na Twitchu i Kicku oraz dropy Twitcha w tle',
   eyebrow: 'Windows · za darmo · otwarty kod · beta',
   h1: 'Punkty kanału i dropy zbierają się same, kiedy grasz.',
@@ -52,6 +54,7 @@ pl: {
   foot: 'Loorek nie jest powiązany z Twitchem ani Kickiem. Licencja MIT.',
 },
 de: {
+  live: 'Live-Vorschau – klick dich durch. Sie läuft mit erfundenen Daten, nichts ist echt.',
   title: 'Loorek – Kanalpunkte auf Twitch und Kick sowie Twitch Drops im Hintergrund',
   eyebrow: 'Windows · kostenlos · Open Source · Beta',
   h1: 'Kanalpunkte und Drops sammeln sich, während du spielst.',
@@ -77,6 +80,7 @@ de: {
   foot: 'Loorek steht in keiner Verbindung zu Twitch oder Kick. MIT-Lizenz.',
 },
 fr: {
+  live: 'Aperçu en direct – cliquez partout. Il tourne sur des données inventées, rien n\'est réel.',
   title: 'Loorek – points de chaîne Twitch et Kick et Twitch Drops en arrière-plan',
   eyebrow: 'Windows · gratuit · open source · bêta',
   h1: 'Les points de chaîne et les drops se récoltent pendant que tu joues.',
@@ -102,6 +106,7 @@ fr: {
   foot: 'Loorek n\'est affilié ni à Twitch ni à Kick. Licence MIT.',
 },
 es: {
+  live: 'Vista previa en vivo: haz clic donde quieras. Funciona con datos inventados, nada es real.',
   title: 'Loorek – puntos de canal de Twitch y Kick y Twitch Drops en segundo plano',
   eyebrow: 'Windows · gratis · código abierto · beta',
   h1: 'Puntos de canal y drops que se recogen mientras juegas.',
@@ -127,6 +132,7 @@ es: {
   foot: 'Loorek no está afiliado a Twitch ni a Kick. Licencia MIT.',
 },
 it: {
+  live: 'Anteprima dal vivo: clicca dove vuoi. Usa dati inventati, niente è reale.',
   title: 'Loorek – punti canale di Twitch e Kick e Twitch Drops in background',
   eyebrow: 'Windows · gratis · open source · beta',
   h1: 'Punti canale e drop si raccolgono mentre giochi.',
@@ -152,6 +158,7 @@ it: {
   foot: 'Loorek non è affiliato a Twitch o Kick. Licenza MIT.',
 },
 pt_BR: {
+  live: 'Prévia ao vivo – clique à vontade. Roda com dados inventados, nada é real.',
   title: 'Loorek – pontos do canal na Twitch e na Kick e Twitch Drops em segundo plano',
   eyebrow: 'Windows · grátis · código aberto · beta',
   h1: 'Pontos do canal e drops coletados enquanto você joga.',
@@ -177,6 +184,7 @@ pt_BR: {
   foot: 'O Loorek não é afiliado à Twitch nem à Kick. Licença MIT.',
 },
 ru: {
+  live: 'Живой предпросмотр – нажимайте смело. Он работает на вымышленных данных, ничего настоящего.',
   title: 'Loorek – баллы канала на Twitch и Kick и Twitch Drops в фоне',
   eyebrow: 'Windows · бесплатно · открытый код · бета',
   h1: 'Баллы канала и дропы собираются, пока вы играете.',
@@ -202,6 +210,7 @@ ru: {
   foot: 'Loorek не связан с Twitch и Kick. Лицензия MIT.',
 },
 uk: {
+  live: 'Живий перегляд – натискайте сміливо. Він працює на вигаданих даних, нічого справжнього.',
   title: 'Loorek – бали каналу на Twitch і Kick та Twitch Drops у фоні',
   eyebrow: 'Windows · безкоштовно · відкритий код · бета',
   h1: 'Бали каналу й дропи збираються, поки ви граєте.',
@@ -227,6 +236,7 @@ uk: {
   foot: 'Loorek не пов\'язаний із Twitch чи Kick. Ліцензія MIT.',
 },
 tr: {
+  live: 'Canlı önizleme – istediğin yere tıkla. Uydurma verilerle çalışır, hiçbiri gerçek değil.',
   title: 'Loorek – Twitch ve Kick kanal puanları ile Twitch Drops arka planda',
   eyebrow: 'Windows · ücretsiz · açık kaynak · beta',
   h1: 'Sen oynarken kanal puanları ve droplar toplanır.',
@@ -252,6 +262,7 @@ tr: {
   foot: 'Loorek\'in Twitch veya Kick ile bir bağlantısı yoktur. MIT lisansı.',
 },
 ja: {
+  live: 'ライブプレビュー – 自由にクリックしてください。架空のデータで動いており、実際の操作は行われません。',
   title: 'Loorek – TwitchとKickのチャンネルポイント、Twitch Dropsをバックグラウンドで',
   eyebrow: 'Windows · 無料 · オープンソース · ベータ',
   h1: 'プレイしている間に、チャンネルポイントとドロップが貯まる。',
@@ -277,6 +288,7 @@ ja: {
   foot: 'Loorek は Twitch および Kick とは無関係です。MIT ライセンス。',
 },
 zh_CN: {
+  live: '实时预览 – 随意点击。它使用虚构数据运行，不会产生任何真实操作。',
   title: 'Loorek – 在后台收集 Twitch 和 Kick 频道积分以及 Twitch 掉宝',
   eyebrow: 'Windows · 免费 · 开源 · 测试版',
   h1: '你玩游戏的时候，频道积分和掉宝自己到手。',

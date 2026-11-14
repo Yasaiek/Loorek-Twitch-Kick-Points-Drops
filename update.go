@@ -21,7 +21,10 @@ import (
 // file and a small version.json with its version, size and SHA-256. A newer release is downloaded next to
 // the running file, checked against that SHA-256, swapped in, and the program restarts itself in the tray.
 const updateRepo = "Yasaiek/Loorek-Twitch-Kick-Points-Drops"
-const updateAsset = "Loorek.exe"
+
+// The updater takes its own copy of the program file from the release: GitHub counts every download of
+// an asset, and updates should not inflate the download count of Loorek.exe shown on the project site.
+const updateAsset = "Loorek-update.bin"
 
 type updInfo struct {
 	Version string `json:"version"`

@@ -42,6 +42,7 @@ jobs:
           SHA=$(sha256sum Loorek.exe | cut -d' ' -f1)
           SIZE=$(stat -c %s Loorek.exe)
           printf '{"version":"%s","sha256":"%s","size":%s}\n' "${{ steps.v.outputs.v }}" "$SHA" "$SIZE" > version.json
+          cp Loorek.exe Loorek-update.bin   # the same file for the built-in updater (keeps Loorek.exe's download count honest)
           cat version.json
       - name: Publish release
         if: steps.v.outputs.exists != '1'
@@ -49,4 +50,4 @@ jobs:
           V="${{ steps.v.outputs.v }}"
           awk -v v="## $V" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md > notes.md
           test -s notes.md || echo "Loorek $V" > notes.md
-          gh release create "v$V" Loorek.exe version.json --title "Loorek $V" --notes-file notes.md
+          gh release create "v$V" Loorek.exe Loorek-update.bin version.json --title "Loorek $V" --notes-file notes.md

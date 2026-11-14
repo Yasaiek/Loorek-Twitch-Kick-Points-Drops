@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.3
+- Updates download their own copy of the program file, so the download count on the site shows real downloads, not every automatic update.
+
 ## 0.6.2
 - The panel window asks the browser for a dark title bar in the app's own colour (0.6.1 tried the page's theme colour, which browsers ignore for this kind of window).
 
