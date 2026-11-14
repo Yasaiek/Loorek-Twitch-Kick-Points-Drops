@@ -517,7 +517,7 @@ async function setLang(code) {
   LANG = code; LOC = code.replace('_', '-'); for (const k in sigs) delete sigs[k]; applyStatic(); return true;
 }
 const fmt = (n) => Number(n || 0).toLocaleString(LOC);
-let VER = '', langBusy = false;
+let VER = '', langBusy = false, fails = 0, doneShown = false;
 let S = null, pending = 0, dragging = false, detailId = '', detail = null;
 const seen = { chan: new Set(), kick: new Set(), camp: new Set(), queue: new Set(), track: new Set() };
 const sigs = {};
@@ -527,9 +527,9 @@ async function api(path, body) {
   if (!r.ok) throw new Error('http ' + r.status);
   return r.json();
 }
-async function op(o) { pending++; try { const r = await api('/api/op', o); await load(); return r; } catch (e) { toast(tr('toast.noconn')); } finally { pending--; } }
+async function op(o) { pending++; try { const r = await api('/api/op', o); await load(); return r; } catch (e) { toast(tr(fails >= 3 ? 'noconn.hint' : 'toast.noconn'), fails >= 3 ? 3600000 : 0); } finally { pending--; } }
 let toastT;
-function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+function toast(msg, ms) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms || 2600); }
 
 // Service icons come straight from the services' own sites; nothing is bundled.
 const SVC_SRC = { twitch: ['https://www.twitch.tv/favicon.ico', 'https://assets.twitch.tv/assets/favicon-32-e29e246c157142c94346.png'], kick: ['https://kick.com/favicon.ico'] };
@@ -719,7 +719,8 @@ function render() {
   if (!pending) document.querySelectorAll('[data-set]').forEach((inp) => { const v = s.settings[inp.dataset.set]; if (inp.type === 'checkbox') inp.checked = !!v; else if (document.activeElement !== inp) inp.value = v; });
   if (changed('langPref', [s.settings.lang, LANG])) syncLang();
   const u = s.update || {};
-  $('updNote').textContent = u.state === 'downloading' ? tr('upd.downloading', { v: u.latest }) : u.state === 'available' ? tr('upd.avail', { v: u.latest }) : u.state === 'checking' ? tr('upd.checking') : u.state === 'failed' ? tr('upd.failed') : u.state === 'current' ? tr('upd.current') : tr('upd.never');
+  $('updNote').textContent = u.state === 'downloading' ? tr('upd.downloading', { v: u.latest }) : u.state === 'available' ? tr('upd.avail', { v: u.latest }) : u.state === 'checking' ? tr('upd.checking') : u.state === 'failed' ? tr('upd.failed') : u.state === 'current' ? tr('upd.current') : u.doneAt ? tr('upd.done', { v: s.version }) : tr('upd.never');
+  if (u.doneAt && Date.now() - u.doneAt < 180000 && !doneShown) { doneShown = true; toast(tr('upd.done', { v: s.version }), 7000); }
   $('updInstall').hidden = u.state !== 'available';
   const chat = s.chat;
   $('chatNote').textContent = chat.state === 'denied' ? tr('chat.denied') : chat.state === 'on' ? tr('chat.on', { n: chat.joined }) : tr('chat.hint');
@@ -840,7 +841,11 @@ function render() {
   renderDetail();
 }
 
-async function load() { try { S = await api('/api/state'); render(); } catch (e) { $('pill').className = 'pill bad'; $('pill').textContent = T['pill.noconn'] || '…'; } }
+// The app restarts itself after an update, so a short break is normal; a longer one gets a hint what to do.
+async function load() {
+  try { S = await api('/api/state'); if (fails >= 3) $('toast').classList.remove('show'); fails = 0; render(); }
+  catch (e) { fails++; $('pill').className = 'pill bad'; $('pill').textContent = T['pill.noconn'] || '…'; if (fails >= 3 && T['noconn.hint']) toast(T['noconn.hint'], 3600000); }
+}
 setInterval(() => { if (!document.hidden && !pending) { load(); if (detailId) loadDetail(); } }, 1500);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 load();

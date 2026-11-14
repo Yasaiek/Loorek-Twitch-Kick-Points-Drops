@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var version = "0.5.1" // a variable so that test builds can override it
+var version = "0.5.2" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -108,6 +108,7 @@ type Engine struct {
 
 	upd    updState
 	apiKey string
+	port   int
 
 	chans map[string]*chanRT
 	slots []*chanRT
@@ -199,8 +200,14 @@ func (e *Engine) step(now time.Time) {
 	if !e.ensureAuth(now) {
 		return
 	}
-	if !now.Before(e.nextOnline) {
+	// the panel moves these two timers too (refresh, a new channel), so they are read and set under the lock
+	e.mu.Lock()
+	online := !now.Before(e.nextOnline)
+	if online {
 		e.nextOnline = now.Add(iv(2 * time.Minute))
+	}
+	e.mu.Unlock()
+	if online {
 		e.checkOnline()
 	}
 	e.dropsStep(now)
@@ -220,8 +227,13 @@ func (e *Engine) step(now time.Time) {
 				e.pointsContext(ch, now)
 			}
 		}
-		if !now.Before(e.nextBalances) {
+		e.mu.Lock()
+		balances := !now.Before(e.nextBalances)
+		if balances {
 			e.nextBalances = now.Add(iv(10 * time.Minute))
+		}
+		e.mu.Unlock()
+		if balances {
 			e.refreshBalances(now)
 		}
 	}

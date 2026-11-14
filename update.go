@@ -33,6 +33,7 @@ type updState struct {
 	State   string // "" | checking | current | available | downloading | failed
 	Latest  string
 	Checked time.Time
+	Done    time.Time // when this copy started as a freshly installed update
 	info    updInfo
 	busy    bool
 }
@@ -230,8 +231,9 @@ func (e *Engine) updateInstall(info updInfo) error {
 	e.mu.Lock()
 	gen := e.winGen
 	e.mu.Unlock()
+	// the new copy takes over this one's port and key, so that an open panel keeps working and reloads itself
 	cmd := exec.Command(exe, "--tray", "--updated")
-	cmd.Env = append(os.Environ(), "DROPOMAT_KEY="+e.apiKey, "DROPOMAT_GEN="+strconv.Itoa(gen))
+	cmd.Env = append(os.Environ(), "DROPOMAT_KEY="+e.apiKey, "DROPOMAT_GEN="+strconv.Itoa(gen), "DROPOMAT_PORT="+strconv.Itoa(e.port))
 	if err := cmd.Start(); err != nil {
 		os.Remove(exe)
 		os.Rename(old, exe)

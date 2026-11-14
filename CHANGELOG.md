@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.2
+- Fixed: after an update the open panel could stay on "Downloading…" with "No connection" although the app had already updated and restarted. The new version now takes over the address of the old one, so the panel reloads by itself.
+- The panel says clearly that the update is done ("Updated to version X") and, while downloading, that the app will restart by itself.
+- When the panel loses the app for longer, it tells you to reopen it from the tray icon.
+- Starting a newer Loorek.exe by hand while an older one runs keeps the open panel working too.
+- Small fixes: a timing race between the panel and the watcher, the panel page is served to local addresses only.
+
 ## 0.5.1
 - In-app language switch with flags; change language any time, including on the sign-in screen.
 - Track a drop game with a visible star button on each campaign card; clearer campaign icons.

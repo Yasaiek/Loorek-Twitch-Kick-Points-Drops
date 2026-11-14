@@ -193,7 +193,7 @@ func (e *Engine) view() map[string]any {
 		"version": version,
 		"app":     appName,
 		"lang":    resolveLang(e.set.Lang),
-		"update":  map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked)},
+		"update":  map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked), "doneAt": ms(e.upd.Done)},
 		"auth":    map[string]any{"state": e.authState, "login": e.auth.Login, "note": e.authNote, "mode": e.loginMode},
 		"settings": map[string]any{"pointsOn": e.set.PointsOn, "chatOn": e.set.ChatOn, "dropsOn": e.set.DropsOn, "autoClaim": e.set.AutoClaim,
 			"rotateMin": e.set.RotateMin, "stallMin": e.set.StallMin, "autostart": e.set.Autostart, "openOnStart": e.set.OpenOnStart,
@@ -521,6 +521,14 @@ func (s *server) routes() http.Handler {
 		fmt.Fprint(w, "ok")
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		host := r.Host
+		if h, _, err := net.SplitHostPort(host); err == nil {
+			host = h
+		}
+		if host != "127.0.0.1" && host != "localhost" { // the page carries the key: local addresses only
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
 		name := strings.TrimPrefix(r.URL.Path, "/")
 		if name == "" || name == "panel" {
 			name = "index.html"
