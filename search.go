@@ -110,9 +110,27 @@ func (e *Engine) searchKick(q string) ([]map[string]any, error) {
 	token := e.auth.KickToken
 	e.mu.Unlock()
 	base := strings.TrimRight(e.c.ep.Kick, "/")
-	st, v, err := e.kick.get(base+"/api/search?searched_word="+url.QueryEscape(q), nil, token)
-	if err != nil {
-		return nil, err
+	// never let a stuck Kick connection hold the panel's request for longer than a few seconds
+	type answer struct {
+		st  int
+		v   any
+		err error
+	}
+	done := make(chan answer, 1)
+	go func() {
+		st, v, err := e.kick.get(base+"/api/search?searched_word="+url.QueryEscape(q), nil, token)
+		done <- answer{st, v, err}
+	}()
+	var st int
+	var v any
+	select {
+	case a := <-done:
+		if a.err != nil {
+			return nil, a.err
+		}
+		st, v = a.st, a.v
+	case <-time.After(10 * time.Second):
+		return nil, errors.New("kick search: no answer")
 	}
 	if st != 200 {
 		return nil, errors.New("kick search: unexpected answer")

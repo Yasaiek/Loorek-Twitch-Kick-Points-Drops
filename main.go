@@ -21,6 +21,10 @@ type instanceFile struct {
 }
 
 func main() {
+	// A program that starts this one may hand down SSLKEYLOGFILE (a debugging switch that makes TLS write
+	// its keys to a file). The Kick client honours it, and when that file cannot be written every Kick
+	// request fails and then hangs. This program never wants its keys written anywhere.
+	os.Unsetenv("SSLKEYLOGFILE")
 	trayOnly, updated := false, false
 	for _, a := range os.Args[1:] {
 		switch a {

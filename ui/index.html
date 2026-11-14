@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Loorek</title>
+<meta name="theme-color" content="#0b0b0d">
+<meta name="color-scheme" content="dark">
 <link rel="icon" href="icon.png">
 <style>
 :root {
@@ -55,6 +57,7 @@ h2 .svc, .row .svc { margin-right: 8px; }
 .lbl .svc, .sub .svc { width: 14px; height: 14px; margin-right: 6px; vertical-align: -2.5px; }
 .lbl .svc img, .sub .svc img { border-radius: 3px; }
 .nav:hover { background: rgba(255,255,255,.045); color: var(--text); }
+.nav:focus-visible, .seg button:focus-visible { outline: none; background: rgba(255,255,255,.06); color: var(--text); }
 .nav.on { background: rgba(255,255,255,.07); color: var(--text); font-weight: 600; }
 .nav::before { content: ""; position: absolute; left: 0; top: 50%; width: 3px; height: 16px; margin-top: -8px; border-radius: 3px; background: var(--accent); transform: scaleY(0); transition: transform .3s var(--ease); }
 .nav.on::before { transform: scaleY(1); }
@@ -216,6 +219,7 @@ input[type=number] { width: 70px; text-align: center; }
 .tag.ok { color: var(--ok); } .tag.warn { color: var(--warn); } .tag.run { color: var(--accent); }
 .qitem { flex-direction: column; align-items: stretch; gap: 0; padding: 12px 14px; }
 .qitem .top { display: flex; align-items: center; gap: 12px; }
+.qitem .top .pill { align-self: center; }
 .qitem .body { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: none; }
 .qitem.open .body { display: block; animation: fade .25s; }
 .qitem .top.fold { cursor: pointer; }
@@ -663,8 +667,9 @@ function suggest(input, kind, pick, has) {
     const q = input.value.trim(), my = ++seq;
     if (q.length < 2) { items = []; close(); return; }
     if (!items.length) draw(tr('ac.searching'));
-    try { const r = await api('/api/search?kind=' + kind + '&q=' + encodeURIComponent(q)); if (my !== seq) return; items = r.items || []; sel = -1; draw(items.length ? '' : tr(r.failed ? 'ac.failed' : 'ac.none')); }
-    catch (e) { if (my === seq) close(); }
+    const slow = setTimeout(() => { if (my === seq) { items = []; draw(tr('ac.failed')); } }, 12000); // never sit on "Searching…" for good
+    try { const r = await api('/api/search?kind=' + kind + '&q=' + encodeURIComponent(q)); clearTimeout(slow); if (my !== seq) return; items = r.items || []; sel = -1; draw(items.length ? '' : tr(r.failed ? 'ac.failed' : 'ac.none')); }
+    catch (e) { clearTimeout(slow); if (my === seq) close(); }
   };
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, 260); });
   input.addEventListener('focus', () => { if (items.length && input.value.trim().length >= 2) draw(''); });

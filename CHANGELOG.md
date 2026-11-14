@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1
+- Fixed Kick not working at all (search stuck on "Searching…", no channel data) when Loorek was started by a program that passes on the SSLKEYLOGFILE setting. Loorek now ignores that setting.
+- The window's title bar takes the colour of the panel instead of the browser's grey.
+- The status label in queue and tracked rows is centred; a search that gets no answer says so instead of waiting for ever.
+
 ## 0.6.0
 - Simpler navigation: two sections, **Drops** (Drop campaigns, Queue, Tracked games) and **Points** (Twitch, Kick).
 - Tracked games: search for any game and track it, also one that has no campaign right now.
