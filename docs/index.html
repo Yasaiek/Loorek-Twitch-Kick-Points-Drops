@@ -412,7 +412,10 @@ addEventListener('scroll', onScroll, { passive: true }); onScroll();
 })();
 
 fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=100').then((r) => r.ok ? r.json() : []).then((rs) => {
-  let n = 0; for (const r of rs) for (const a of r.assets || []) if (a.name === 'Loorek.exe') n += a.download_count || 0;
+  // Up to 0.6.3 the program updated itself by downloading Loorek.exe, so those releases' counts are mostly updates and tests.
+  // Later versions update from a separate file, and Loorek.exe is downloaded only by people.
+  const ver = (t) => String(t || '').replace(/^v/, '').split('.').map(Number), after = (t) => { const v = ver(t), m = [0, 6, 3]; for (let i = 0; i < 3; i++) if ((v[i] || 0) !== m[i]) return (v[i] || 0) > m[i]; return false; };
+  let n = 0; for (const r of rs) if (after(r.tag_name)) for (const a of r.assets || []) if (a.name === 'Loorek.exe') n += a.download_count || 0;
   downloads = n; showCount();
 }).catch(() => {});
 </script>
