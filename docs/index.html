@@ -105,9 +105,60 @@ h1.done .w { animation: word .8s var(--ease) forwards, sheen 7s linear 1s infini
 section { padding: 78px 0 0; }
 h2 { font-size: clamp(24px, 3vw, 34px); letter-spacing: -.02em; margin: 0 0 26px; text-align: center; }
 h2 span { background: linear-gradient(100deg, var(--text), var(--mint)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-/* demo */
-.demo { position: relative; max-width: 900px; margin: 0 auto; border-radius: 16px; border: 1px solid var(--line-2); overflow: hidden; background: #0a0a0b; box-shadow: 0 40px 120px -40px rgba(0,0,0,.9), 0 0 70px -30px rgba(143,123,255,.55); }
-.demo img { display: block; width: 100%; height: auto; }
+/* the animated mock of the panel: a pointer clicks through it */
+.mk { position: relative; max-width: 900px; margin: 0 auto; border-radius: 16px; border: 1px solid var(--line-2); overflow: hidden; background: #0a0a0b; box-shadow: 0 40px 120px -40px rgba(0,0,0,.9), 0 0 70px -30px rgba(143,123,255,.55); font-size: 13px; line-height: 1.4; text-align: left; --a: #60cdff; --c1: #151517; --c2: #1c1c1f; --ln: rgba(255,255,255,.08); user-select: none; -webkit-user-select: none; }
+.mk-bar { display: flex; align-items: center; gap: 7px; padding: 9px 13px; border-bottom: 1px solid var(--ln); font-size: 12px; color: var(--sub); }
+.mk-bar i { width: 10px; height: 10px; border-radius: 50%; background: #2a2d38; }
+.mk-bar img { width: 15px; height: 15px; border-radius: 4px; margin-left: 6px; }
+.mk-body { display: grid; grid-template-columns: 168px minmax(0, 1fr); height: 452px; }
+.mk-side { display: flex; flex-direction: column; gap: 3px; padding: 14px 9px; border-right: 1px solid var(--ln); background: rgba(14,14,16,.7); }
+.mk-brand { display: flex; align-items: center; gap: 9px; padding: 0 7px 12px; } .mk-brand img { width: 26px; height: 26px; border-radius: 7px; } .mk-brand b { font-size: 14.5px; }
+.mk-nav { position: relative; display: flex; align-items: center; padding: 7px 10px; border-radius: 7px; color: var(--sub); transition: background .2s, color .2s; }
+.mk-nav.on { background: rgba(255,255,255,.07); color: var(--text); font-weight: 600; }
+.mk-nav.on::before { content: ""; position: absolute; left: 0; top: 50%; width: 3px; height: 14px; margin-top: -7px; border-radius: 3px; background: var(--a); }
+.mk-nav b { margin-left: auto; font-size: 11px; color: var(--a); background: rgba(96,205,255,.12); border-radius: 99px; padding: 0 7px; animation: mkPop .35s cubic-bezier(.3,1.8,.5,1); }
+.mk-run { margin-top: auto; align-self: flex-start; font-size: 11px; color: var(--a); border: 1px solid rgba(96,205,255,.4); background: rgba(96,205,255,.1); border-radius: 99px; padding: 2px 9px; }
+.mk-main { padding: 16px 18px; overflow: hidden; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.mk-main > * { animation: mkIn .35s var(--ease) both; }
+@keyframes mkIn { from { opacity: 0; transform: translateY(10px); } }
+@keyframes mkPop { from { transform: scale(.3); } to { transform: scale(1); } }
+.mk-h { font: 600 19px/1.2 "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif; }
+.mk-seg { display: inline-flex; align-self: flex-start; gap: 3px; padding: 3px; background: var(--c1); border: 1px solid var(--ln); border-radius: 8px; }
+.mk-seg span { padding: 5px 12px; border-radius: 6px; color: var(--sub); transition: background .2s, color .2s; }
+.mk-seg span.on { background: #232327; color: var(--text); font-weight: 600; }
+.mk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mk-g { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; background: var(--c1); border: 1px solid var(--ln); transition: border-color .25s, background .25s, transform .15s; }
+.mk-g.q { border-color: rgba(96,205,255,.5); background: rgba(96,205,255,.07); }
+.tap { transform: scale(.97); }
+.mk-art { width: 34px; height: 46px; border-radius: 5px; flex-shrink: 0; background: #26262a center/cover no-repeat; }
+.mk-t { flex: 1; min-width: 0; } .mk-t b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .mk-t i { display: block; font-style: normal; font-size: 11.5px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mk-n { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #7a7a82; border: 1.5px solid rgba(255,255,255,.14); flex-shrink: 0; }
+.mk-g.q .mk-n, .mk-n.on { border: 0; background: var(--a); color: #00232f; animation: mkPop .35s cubic-bezier(.3,1.8,.5,1); }
+.mk-farm { display: flex; flex-direction: column; gap: 9px; padding: 12px; border-radius: 10px; border: 1px solid rgba(96,205,255,.35); background: linear-gradient(135deg, rgba(96,205,255,.08), rgba(143,123,255,.06)); }
+.mk-farm .row { display: flex; align-items: center; gap: 12px; }
+.mk-bar2 { height: 5px; border-radius: 9px; background: #2a2a2e; overflow: hidden; } .mk-bar2 div { height: 100%; width: 39%; border-radius: 9px; background: linear-gradient(90deg, var(--a), #8f7bff); transition: width 3.6s linear; }
+.mk-drop { position: relative; width: 38px; height: 38px; border-radius: 9px; background: #101012 center/cover no-repeat; border: 1px solid var(--ln); flex-shrink: 0; margin-left: auto; transition: border-color .3s; }
+.mk-drop.done { border-color: #6ccb5f; } .mk-drop.done::after { content: "✓"; position: absolute; right: -5px; bottom: -5px; width: 16px; height: 16px; border-radius: 50%; background: #6ccb5f; color: #0b0b0c; font: 700 10px/16px system-ui; text-align: center; animation: mkPop .35s cubic-bezier(.3,1.8,.5,1); }
+.mk-row { position: relative; display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 9px; background: var(--c2); border: 1px solid var(--ln); }
+.mk-row.new { animation: mkIn .45s var(--ease) both; border-color: rgba(96,205,255,.5); }
+.mk-pill { font-size: 11px; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--ln); color: var(--sub); white-space: nowrap; }
+.mk-pill.run { color: var(--a); border-color: rgba(96,205,255,.45); background: rgba(96,205,255,.1); } .mk-pill.ok { color: #6ccb5f; border-color: rgba(108,203,95,.4); }
+.mk-av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 600 12px system-ui; color: #fff; flex-shrink: 0; }
+.mk-pts { margin-left: auto; text-align: right; font-variant-numeric: tabular-nums; } .mk-pts b { display: block; } .mk-pts i { display: block; font-style: normal; font-size: 11px; color: var(--sub); }
+.mk-plus { position: absolute; right: 12px; top: 2px; font-weight: 700; color: #8af5d6; opacity: 0; animation: mkUp 1.3s ease-out forwards; }
+@keyframes mkUp { 0% { opacity: 0; transform: translateY(8px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(-22px); } }
+.mk-in { position: relative; } .mk-in div.box { height: 32px; display: flex; align-items: center; padding: 0 11px; border-radius: 7px; background: #0f0f11; border: 1px solid rgba(255,255,255,.14); color: var(--dim); transition: border-color .2s; }
+.mk-in.focus div.box { border-bottom-color: var(--a); color: var(--text); } .mk-in.focus div.box::after { content: ""; width: 1px; height: 15px; background: var(--text); margin-left: 1px; animation: mkBlink 1s steps(1) infinite; }
+@keyframes mkBlink { 50% { opacity: 0; } }
+.mk-menu { position: absolute; left: 0; right: 0; top: 37px; z-index: 2; padding: 5px; border-radius: 9px; background: var(--c2); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 16px 40px rgba(0,0,0,.6); animation: mkIn .25s var(--ease) both; }
+.mk-menu .mk-row { background: rgba(255,255,255,.06); border-color: transparent; }
+.mk-toast { position: absolute; left: 50%; bottom: 16px; transform: translate(-50%, 30px); opacity: 0; padding: 7px 14px; border-radius: 9px; background: #232327; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 12px 34px rgba(0,0,0,.5); transition: transform .35s var(--ease), opacity .25s; white-space: nowrap; z-index: 3; }
+.mk-toast.show { transform: translate(-50%, 0); opacity: 1; }
+.mk-cur { position: absolute; width: 22px; height: 22px; left: 0; top: 0; z-index: 5; pointer-events: none; opacity: 0; transition: transform .75s cubic-bezier(.5,0,.2,1), opacity .3s; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+.mk.live .mk-cur { opacity: 1; }
+.mk-ring { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; border: 2px solid var(--a); pointer-events: none; z-index: 4; animation: mkRing .5s ease-out forwards; }
+@keyframes mkRing { from { transform: scale(.3); opacity: .9; } to { transform: scale(1.6); opacity: 0; } }
+@media (max-width: 700px) { .mk-body { grid-template-columns: 1fr; } .mk-side { display: none; } .mk-grid { grid-template-columns: 1fr; } .mk-grid .mk-g:nth-child(n+5) { display: none; } }
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .card { position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; transition: border-color .25s, transform .3s var(--ease); }
 .card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgba(138,245,214,.14), transparent 65%); opacity: 0; transition: opacity .3s; pointer-events: none; }
@@ -178,7 +229,23 @@ footer { margin: 90px 0 0; padding: 26px 0 40px; border-top: 1px solid var(--lin
 
 <section>
   <h2><span data-i="shotsT">A look inside</span></h2>
-  <div class="demo rv"><img src="img/demo.gif" alt="Loorek – a walk through the panel" width="880" height="608" loading="lazy"></div>
+  <div class="mk rv" id="mk" aria-hidden="true">
+    <div class="mk-bar"><i></i><i></i><i></i><img src="img/favicon.png" alt=""><span>Loorek</span></div>
+    <div class="mk-body">
+      <div class="mk-side">
+        <div class="mk-brand"><img src="img/icon.png" alt=""><b>Loorek</b></div>
+        <span class="mk-nav" data-n="home">Overview</span>
+        <span class="mk-nav on" data-n="drops">Drops<b id="mkQ" hidden></b></span>
+        <span class="mk-nav" data-n="points">Points</span>
+        <span class="mk-nav">Journal</span>
+        <span class="mk-nav">Settings</span>
+        <span class="mk-run">Running</span>
+      </div>
+      <div class="mk-main" id="mkMain"></div>
+    </div>
+    <div class="mk-toast" id="mkToast"></div>
+    <svg class="mk-cur" id="mkCur" viewBox="0 0 24 24"><path d="M5 3l14 8-6.2 1.8L10 19z" fill="#fff" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/></svg>
+  </div>
 </section>
 
 <section>
@@ -321,6 +388,53 @@ addEventListener('scroll', onScroll, { passive: true }); onScroll();
   init(); addEventListener('resize', init);
   document.addEventListener('visibilitychange', () => { on = !document.hidden; if (on) { last = performance.now(); requestAnimationFrame(tick); } });
   requestAnimationFrame(tick);
+})();
+
+// the animated mock: a pointer queues three games, the first drop is farmed and claimed, a channel is added by typing
+(() => {
+  const mk = $('mk'), main = $('mkMain'), cur = $('mkCur'), toastBox = $('mkToast'); let run = 0, seen = false;
+  const G = [['Apex Legends', 'Apex Legends | Godzilla', 'apex-legends'], ['Cyberpunk 2077', 'Quadra Paintjobs', 'cyberpunk-2077'], ['Delta Force', 'Delta Force Drops', 'delta-force'], ['Genshin Impact', 'V7.2 Genshin Impact Drops', 'genshin-impact'], ['Rainbow Six Siege', 'Twitch Drops', 'rainbow-six-siege'], ['Sea of Thieves', 'Twitch Drops', 'sea-of-thieves']];
+  const CH = [['H2P_Gucio', 'watching · Just Chatting', 48210, 'linear-gradient(135deg,#2f8f83,#1d5a78)'], ['EWROON', 'watching · Just Chatting', 27600, 'linear-gradient(135deg,#3f8f3a,#1f6a52)'], ['IzakOOO', 'offline', 8340, 'linear-gradient(135deg,#a8532f,#7a2f3d)']];
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const h = (html) => { main.innerHTML = html; };
+  const art = (slug) => `<div class="mk-art" style="background-image:url(img/games/${slug}.png)"></div>`;
+  const nav = (n) => mk.querySelectorAll('.mk-nav').forEach((x) => x.classList.toggle('on', x.dataset.n === n));
+  const seg = (items, on) => `<div class="mk-seg">${items.map((t, i) => `<span class="${i === on ? 'on' : ''}">${t}</span>`).join('')}</div>`;
+  const toast = async (t) => { toastBox.textContent = t; toastBox.classList.add('show'); await sleep(1700); toastBox.classList.remove('show'); };
+  const at = (node, fx, fy) => { const b = node.getBoundingClientRect(), m = mk.getBoundingClientRect(); return [b.left - m.left + b.width * fx, b.top - m.top + b.height * fy]; };
+  async function go(node, fx = .5, fy = .5) { const [x, y] = at(node, fx, fy); cur.style.transform = `translate(${x}px,${y}px)`; await sleep(820); return [x, y]; }
+  async function click(node, fx, fy) { const [x, y] = await go(node, fx, fy); const r = document.createElement('i'); r.className = 'mk-ring'; r.style.left = x + 'px'; r.style.top = y + 'px'; mk.append(r); setTimeout(() => r.remove(), 520); node.classList.add('tap'); await sleep(120); node.classList.remove('tap'); }
+  const camps = () => h(`<div class="mk-h">Drops</div>${seg(['Drop campaigns', 'Queue', 'Tracked games'], 0)}<div class="mk-grid">${G.map((g) => `<div class="mk-g">${art(g[2])}<div class="mk-t"><b>${g[0]}</b><i>${g[1]}</i></div><div class="mk-n">+</div></div>`).join('')}</div>`);
+  const queue = (order) => h(`<div class="mk-h">Drops</div>${seg(['Drop campaigns', 'Queue', 'Tracked games'], 1)}<div class="mk-farm"><div class="row">${art(G[order[0]][2])}<div class="mk-t"><i>Farming a drop now</i><b style="font-size:15px">${G[order[0]][0]}</b><i>watching twitch.tv/cdprojektred</i></div><div class="mk-drop" id="mkDrop" style="background-image:url(img/games/cp1.png)"></div></div><div class="mk-bar2"><div id="mkFill"></div></div></div>${order.map((i, n) => `<div class="mk-row"><div class="mk-n on">${n + 1}</div>${art(G[i][2])}<div class="mk-t"><b>${G[i][0]}</b><i>${n ? 'waiting for its turn' : 'watching CDPROJEKTRED'}</i></div><span class="mk-pill ${n ? '' : 'run'}" ${n ? '' : 'id="mkSt"'}>${n ? 'Queued' : 'Watching'}</span></div>`).join('')}`);
+  const chan = (c, cls) => `<div class="mk-row ${cls || ''}"><div class="mk-av" style="background:${c[3]}">${c[0][0].toUpperCase()}</div><div class="mk-t"><b>${c[0]}</b><i>${c[1]}</i></div><div class="mk-pts"><b>${c[2].toLocaleString('en-US')}</b><i>points</i></div></div>`;
+  const points = () => h(`<div class="mk-h">Points</div>${seg(['Twitch', 'Kick'], 0)}<div class="mk-in" id="mkIn"><div class="box" id="mkBox">Add a channel – start typing its name</div></div><div id="mkList" style="display:flex;flex-direction:column;gap:6px">${CH.map((c) => chan(c)).join('')}</div>`);
+  async function loop() {
+    const my = ++run, alive = () => my === run;
+    while (alive()) {
+      mk.classList.add('live'); nav('drops'); $('mkQ').hidden = true; camps();
+      cur.style.transform = `translate(${mk.clientWidth - 60}px,${mk.clientHeight - 50}px)`; await sleep(900);
+      const cards = [...main.querySelectorAll('.mk-g')], order = [1, 5, 4];
+      for (let n = 0; n < order.length && alive(); n++) { const c = cards[order[n]]; await click(c.querySelector('.mk-n')); c.classList.add('q'); c.querySelector('.mk-n').textContent = n + 1; const q = $('mkQ'); q.hidden = false; q.textContent = n + 1; await sleep(380); }
+      if (!alive()) return;
+      await click(main.querySelectorAll('.mk-seg span')[1]); queue(order); await sleep(500);
+      if (!alive()) return; $('mkFill').style.width = '100%'; await go($('mkDrop'), .5, .5); await sleep(2900);
+      if (!alive()) return; $('mkDrop').classList.add('done'); const st = $('mkSt'); st.textContent = 'Claimed'; st.className = 'mk-pill ok'; await toast('Drop claimed: Quadra Paintjobs');
+      if (!alive()) return;
+      await click(mk.querySelector('.mk-nav[data-n="points"]')); nav('points'); points(); await sleep(500);
+      const box = $('mkBox'), wrap = $('mkIn'); await click(box, .3, .5); wrap.classList.add('focus'); box.textContent = '';
+      for (const ch of 'xay') { if (!alive()) return; await sleep(230); box.textContent += ch; }
+      await sleep(450); wrap.insertAdjacentHTML('beforeend', `<div class="mk-menu">${chan(['xayoo_', 'xayoo_ · 6,000 followers · live', 12750, 'linear-gradient(135deg,#b06a2c,#8a3b2a)'])}</div>`);
+      await sleep(500); if (!alive()) return;
+      await click(wrap.querySelector('.mk-menu .mk-row'), .4, .5); wrap.querySelector('.mk-menu').remove(); wrap.classList.remove('focus'); box.textContent = 'Add a channel – start typing its name';
+      $('mkList').insertAdjacentHTML('beforeend', chan(['xayoo_', 'live · Just Chatting', 12750, 'linear-gradient(135deg,#b06a2c,#8a3b2a)'], 'new'));
+      toast('Channel added.'); await sleep(900);
+      for (let k = 0; k < 2 && alive(); k++) { [...$('mkList').children].slice(0, 2).forEach((r, i) => { const p = document.createElement('span'); p.className = 'mk-plus'; p.textContent = '+10'; r.append(p); setTimeout(() => p.remove(), 1300); const b = r.querySelector('.mk-pts b'); CH[i][2] += 10; b.textContent = CH[i][2].toLocaleString('en-US'); }); await sleep(1300); }
+      mk.classList.remove('live'); await sleep(1400);
+    }
+  }
+  if (calm) { nav('drops'); queue([1, 5, 4]); $('mkDrop').classList.add('done'); return; }
+  // run only while the mock is on screen
+  new IntersectionObserver((es) => { const vis = es[0].isIntersecting; if (vis && !seen) { seen = true; loop(); } else if (!vis && seen) { seen = false; run++; } }, { threshold: .25 }).observe(mk);
 })();
 
 fetch('https://api.github.com/repos/' + REPO + '/releases?per_page=100').then((r) => r.ok ? r.json() : []).then((rs) => {

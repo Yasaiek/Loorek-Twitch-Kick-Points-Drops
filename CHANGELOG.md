@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.2
+- The panel window asks the browser for a dark title bar in the app's own colour (0.6.1 tried the page's theme colour, which browsers ignore for this kind of window).
+
 ## 0.6.1
 - Fixed Kick not working at all (search stuck on "Searching…", no channel data) when Loorek was started by a program that passes on the SSLKEYLOGFILE setting. Loorek now ignores that setting.
 - The window's title bar takes the colour of the panel instead of the browser's grey.
