@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -124,6 +125,15 @@ func demoReal() {
 		{ID: "R1", Name: "Apex Legends | Godzilla", GameID: "g21", Linked: true, Drops: many("ax", 1, func(int) int { return 60 })},
 		{ID: "R6", Name: "V7.2 Genshin Impact Drops", GameID: "g25", Linked: true, Drops: many("gi", 1, func(int) int { return 60 })},
 		{ID: "R2", Name: "Crimson Desert DLC Week 2", GameID: "g22", Linked: true, Drops: many("cd", 1, func(int) int { return 60 })},
+	}
+	if hide := os.Getenv("MOCK_DEMO_HIDE"); hide != "" { // a game that is known but has no campaign (for the tracked-games shot)
+		kept := camps[:0]
+		for _, c := range camps {
+			if c.GameID != hide {
+				kept = append(kept, c)
+			}
+		}
+		camps = kept
 	}
 	channels = map[string]*channel{}
 	add := func(login, name, gameID string, live bool, viewers, balance int, drops ...string) {
@@ -438,7 +448,10 @@ func main() {
 			for _, g := range games {
 				all = append(all, *g)
 			}
-			all = append(all, game{"g77", "Nowhere Kings", "nowhere-kings"}, game{"g78", "Nowhere Kings II", "nowhere-kings-ii"})
+			if os.Getenv("MOCK_DEMO") != "real" {
+				all = append(all, game{"g77", "Nowhere Kings", "nowhere-kings"}, game{"g78", "Nowhere Kings II", "nowhere-kings-ii"})
+			}
+			sort.Slice(all, func(i, j int) bool { return all[i].Name < all[j].Name })
 			for _, g := range all {
 				if strings.Contains(strings.ToLower(g.Name), word) {
 					edges = append(edges, map[string]any{"node": map[string]any{"id": g.ID, "name": g.Name, "displayName": g.Name, "slug": g.Slug, "boxArtURL": base + "/art/" + g.ID + "-144x192.jpg"}})
