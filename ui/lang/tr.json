@@ -261,6 +261,7 @@
 "L.keepFail": "%s: izleme sürdürülemiyor (%v).",
 "L.bonus": "%s: puan bonusu alındı.",
 "L.bonusFail": "%s: bonus alınamadı.",
+"L.noPoints": "%s: %d dakikalık izlemede hiç puan gelmedi – Twitch bunu saymıyor.",
 "L.camps": "Drop kampanyaları: %d (hesapta sürmekte olan: %d).",
 "L.claimed": "Drop alındı: %s (%s).",
 "L.claimFail": "Drop alınamadı: %s (%s) – Twitch envanterinden al. [%s]",

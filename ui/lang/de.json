@@ -261,6 +261,7 @@
 "L.keepFail": "%s: Zuschauen lässt sich nicht aufrechterhalten (%v).",
 "L.bonus": "%s: Punktebonus abgeholt.",
 "L.bonusFail": "%s: Bonus konnte nicht abgeholt werden.",
+"L.noPoints": "%s: seit %d Minuten Zuschauen keine Punkte – Twitch zählt es nicht.",
 "L.camps": "Drop-Kampagnen: %d (auf dem Konto in Arbeit: %d).",
 "L.claimed": "Drop abgeholt: %s (%s).",
 "L.claimFail": "Drop konnte nicht abgeholt werden: %s (%s) – hole ihn im Twitch-Inventar ab. [%s]",

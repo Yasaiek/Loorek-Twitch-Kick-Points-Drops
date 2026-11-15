@@ -503,6 +503,9 @@ type watchInfo struct {
 	ChannelID, Login, BroadcastID, Game, GameID string
 }
 
+// minuteWatched reports one watched minute, the way Twitch's own web player does.
+// "location" and "player" say that the report comes from the player on a channel page. Twitch accepts a
+// report without them (it still answers 204) but then credits no channel points for the watching.
 func (c *Client) minuteWatched(spade string, w watchInfo) error {
 	_, uid, _, _ := c.auth()
 	payload := []map[string]any{{
@@ -511,6 +514,7 @@ func (c *Client) minuteWatched(spade string, w watchInfo) error {
 			"broadcast_id": w.BroadcastID, "channel_id": w.ChannelID, "channel": w.Login,
 			"client_time": time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
 			"game":        w.Game, "game_id": w.GameID, "hidden": false, "is_live": true, "live": true,
+			"location": "channel", "player": "site",
 			"logged_in": true, "minutes_logged": 1, "muted": false, "user_id": num(uid),
 		},
 	}}

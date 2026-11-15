@@ -261,6 +261,7 @@
 "L.keepFail": "%s: no puedo mantener el visionado (%v).",
 "L.bonus": "%s: bonus de puntos reclamado.",
 "L.bonusFail": "%s: no se pudo reclamar el bonus.",
+"L.noPoints": "%s: ningún punto en %d minutos de visionado – Twitch no lo está contando.",
 "L.camps": "Campañas de drops: %d (en curso en la cuenta: %d).",
 "L.claimed": "Drop reclamado: %s (%s).",
 "L.claimFail": "No se pudo reclamar el drop: %s (%s) – reclámalo en el inventario de Twitch. [%s]",

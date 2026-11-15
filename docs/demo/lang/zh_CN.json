@@ -261,6 +261,7 @@
 "L.keepFail": "%s：无法保持观看 (%v)。",
 "L.bonus": "%s：已领取积分奖励。",
 "L.bonusFail": "%s：无法领取奖励。",
+"L.noPoints": "%s：观看 %d 分钟没有获得任何积分 – Twitch 没有计入。",
 "L.camps": "掉宝活动: %d（账号上进行中: %d）。",
 "L.claimed": "已领取掉宝: %s (%s)。",
 "L.claimFail": "无法领取掉宝: %s (%s) – 请在 Twitch 物品栏中领取。[%s]",

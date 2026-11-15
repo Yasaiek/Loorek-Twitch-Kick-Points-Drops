@@ -261,6 +261,7 @@
 "L.keepFail": "%s: cannot keep watching (%v).",
 "L.bonus": "%s: points bonus claimed.",
 "L.bonusFail": "%s: could not claim the bonus.",
+"L.noPoints": "%s: no points credited for %d minutes of watching – Twitch is not counting it.",
 "L.camps": "Drop campaigns: %d (in progress on the account: %d).",
 "L.claimed": "Drop claimed: %s (%s).",
 "L.claimFail": "Could not claim the drop: %s (%s) – claim it in your Twitch inventory. [%s]",

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.4
+- Fixed Twitch channel points not being earned: the "minute watched" report lacked two fields Twitch's web player sends, so Twitch accepted it but credited nothing.
+- The journal now warns when a channel is watched for 25 minutes without a single point.
+
 ## 0.6.3
 - Updates download their own copy of the program file, so the download count on the site shows real downloads, not every automatic update.
 

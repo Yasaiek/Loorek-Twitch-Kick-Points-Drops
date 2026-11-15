@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var version = "0.6.3" // a variable so that test builds can override it
+var version = "0.6.4" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -87,6 +87,8 @@ type chanRT struct {
 	lastOK     time.Time
 	lastSpade  time.Time
 	lastCtx    time.Time
+	gainAt     time.Time // when the balance last grew, or when watching started
+	noGain     bool      // already said that watching brings no points
 	fails      int
 	gone       int
 }
@@ -534,6 +536,7 @@ func (e *Engine) decideSlots(now time.Time) {
 	for _, w := range want {
 		if !w.Watching {
 			w.Watching = true
+			w.gainAt, w.noGain = now, false
 			w.lastTouch, w.lastOK = time.Time{}, time.Time{}
 			w.fails = 0
 		}
@@ -648,10 +651,14 @@ func (e *Engine) applyPoints(ch *chanRT, data map[string]any) (claimID string) {
 	bal := num(dig(cp, "balance"))
 	if ch.BalKnown && bal > ch.Balance {
 		ch.Earned += bal - ch.Balance
+		ch.gainAt, ch.noGain = time.Now(), false
 	}
 	ch.Balance, ch.BalKnown = bal, true
 	return str(dig(cp, "availableClaim", "id"))
 }
+
+// noGainAfter: watching for this long without a single point is reported in the journal.
+const noGainAfter = 25 * time.Minute
 
 func (e *Engine) pointsContext(ch *chanRT, now time.Time) {
 	ch.lastCtx = now
@@ -663,7 +670,17 @@ func (e *Engine) pointsContext(ch *chanRT, now time.Time) {
 	e.mu.Lock()
 	claim := e.applyPoints(ch, data)
 	id := ch.ID
+	// Watching should bring +10 every five minutes. When it brings nothing for a long time although every
+	// request succeeds, say so: that is how a change on Twitch's side shows up, and it is silent otherwise.
+	silent := ch.Watching && ch.BalKnown && !ch.noGain && !ch.gainAt.IsZero() && now.Sub(ch.gainAt) > iv(noGainAfter)
+	if silent {
+		ch.noGain = true
+	}
+	name := ch.Name
 	e.mu.Unlock()
+	if silent {
+		e.log.Warn("L.noPoints", name, int(noGainAfter/time.Minute))
+	}
 	if claim == "" || id == "" {
 		return
 	}

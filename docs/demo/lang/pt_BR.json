@@ -261,6 +261,7 @@
 "L.keepFail": "%s: não consigo manter a exibição (%v).",
 "L.bonus": "%s: bônus de pontos resgatado.",
 "L.bonusFail": "%s: não foi possível resgatar o bônus.",
+"L.noPoints": "%s: nenhum ponto em %d minutos assistindo – a Twitch não está contando.",
 "L.camps": "Campanhas de drops: %d (em andamento na conta: %d).",
 "L.claimed": "Drop resgatado: %s (%s).",
 "L.claimFail": "Não foi possível resgatar o drop: %s (%s) – resgate no inventário da Twitch. [%s]",

@@ -502,10 +502,6 @@ func main() {
 		}
 		ch.Touches++
 		ch.LastTouch = time.Now()
-		ch.Balance += 10
-		if ch.Claim == "" && ch.Touches%bonusEvery == 0 {
-			ch.Claim = fmt.Sprintf("claim-%s-%d", ch.Login, ch.Touches)
-		}
 		for _, id := range ch.Drops {
 			if c := camp(id); c != nil && c.Linked {
 				if d := currentDrop(c); d != nil {
@@ -531,8 +527,15 @@ func main() {
 		mu.Lock()
 		if len(ev) > 0 {
 			props, _ := ev[0]["properties"].(map[string]any)
-			if ch := channels[fmt.Sprint(props["channel"])]; ch != nil {
+			// like Twitch: a report that does not say it comes from the web player on a channel page is
+			// accepted (204) but does not count
+			// Points come from these reports, not from reading the playlist.
+			if ch := channels[fmt.Sprint(props["channel"])]; ch != nil && props["player"] == "site" && props["location"] == "channel" {
 				ch.Spade++
+				ch.Balance += 10
+				if ch.Claim == "" && ch.Spade%bonusEvery == 0 {
+					ch.Claim = fmt.Sprintf("claim-%s-%d", ch.Login, ch.Spade)
+				}
 			}
 		}
 		mu.Unlock()

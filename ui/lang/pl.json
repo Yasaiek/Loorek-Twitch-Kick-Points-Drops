@@ -261,6 +261,7 @@
 "L.keepFail": "%s: nie mogę podtrzymać oglądania (%v).",
 "L.bonus": "%s: odebrano bonus punktów.",
 "L.bonusFail": "%s: nie udało się odebrać bonusu.",
+"L.noPoints": "%s: od %d minut oglądania nie wpadł żaden punkt – Twitch tego nie zalicza.",
 "L.camps": "Kampanie dropów: %d (w toku na koncie: %d).",
 "L.claimed": "Odebrano drop: %s (%s).",
 "L.claimFail": "Nie udało się odebrać dropa: %s (%s) – odbierz go w ekwipunku Twitcha. [%s]",
