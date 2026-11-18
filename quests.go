@@ -80,7 +80,8 @@ func (e *Engine) fetchQuests(now time.Time, uid string) (out []*Campaign, ok boo
 		if c.End.IsZero() {
 			continue
 		}
-		finished := false
+		finished, started := false, false
+		var cats []GameRef
 		for _, g := range list(dig(q, "rewardGroups")) {
 			gid := str(dig(g, "id"))
 			p := progress[gid]
@@ -91,15 +92,20 @@ func (e *Engine) fetchQuests(now time.Time, uid string) (out []*Campaign, ok boo
 			if gid == "" || req <= 0 {
 				continue // a group earned with subscriptions cannot be farmed by watching
 			}
-			if c.Game.ID == "" {
-				for _, cat := range list(dig(g, "categories")) {
-					if gr := gameRef(cat); gr.ID != "" {
-						c.Game = gr
-						break
+			for _, cat := range list(dig(g, "categories")) {
+				gr := gameRef(cat)
+				known := gr.ID == ""
+				for _, have := range cats {
+					if have.ID == gr.ID {
+						known = true
 					}
 				}
+				if !known {
+					cats = append(cats, gr)
+				}
 			}
-			d := &Drop{ID: gid, Name: p.name, Req: req, Cur: p.cur, HasSelf: p.has, Img: p.img}
+			started = started || p.has
+			d := &Drop{ID: gid, Name: p.name, Req: req, Cur: p.cur, HasSelf: p.has, Img: p.img, Later: !p.has}
 			var names []string
 			for _, r := range list(dig(g, "rewards")) {
 				if n := str(dig(r, "name")); n != "" && len(names) < 3 {
@@ -137,8 +143,21 @@ func (e *Engine) fetchQuests(now time.Time, uid string) (out []*Campaign, ok boo
 			}
 			c.Drops = append(c.Drops, d)
 		}
-		if c.Game.ID == "" {
+		switch {
+		case len(cats) == 1:
+			c.Game = cats[0]
+		case len(cats) > 1:
+			// It counts in many categories, so it belongs to none of them: it is listed under its own
+			// name, and any of the categories will do for watching.
+			c.Game = GameRef{ID: "quest-" + id, Name: c.Name, Art: cats[0].Art}
+			c.Cats = cats
+		default:
 			c.Game = gameRef(dig(q, "game"))
+		}
+		if !started { // nothing begun yet: every stage is open. Once some are, Twitch counts only those; the rest open later
+			for _, d := range c.Drops {
+				d.Later = false
+			}
 		}
 		if finished || c.Game.ID == "" || len(c.Drops) == 0 {
 			continue // nothing to earn by watching, or no category to watch it in

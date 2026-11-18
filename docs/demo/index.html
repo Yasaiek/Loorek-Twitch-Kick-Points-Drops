@@ -489,7 +489,7 @@ select:focus { border-color: var(--accent); }
 </div>
 <div id="toast"></div>
 
-<script>window.LOOREK_VERSION = "0.7.0";</script>
+<script>window.LOOREK_VERSION = "0.7.1";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -886,7 +886,7 @@ function render() {
 
   // campaigns
   const q = $('campSearch').value.trim().toLowerCase();
-  const games = s.drops.games.filter((g) => !q || g.name.toLowerCase().includes(q));
+  const games = s.drops.games.filter((g) => !q || g.name.toLowerCase().includes(q) || (g.names || '').toLowerCase().includes(q)); // by game or by campaign name
   $('campInfo').textContent = s.drops.fetchedAt ? tr('camps.info', { n: s.drops.games.length, time: new Date(s.drops.fetchedAt).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) }) : '';
   if (changed('camps', [games, s.drops.fetchedAt > 0, s.drops.err])) {
     const list = $('campList'); list.textContent = '';

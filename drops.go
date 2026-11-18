@@ -20,6 +20,7 @@ type Drop struct {
 	Start    time.Time
 	End      time.Time
 	Day      int       // reward campaigns: which round of a repeating (daily) group this is, 0 = does not repeat
+	Later    bool      // reward campaigns: a later stage, opens after the stages already started
 	Next     time.Time // reward campaigns: this round is done, the next one opens then
 }
 
@@ -35,7 +36,8 @@ type Campaign struct {
 	LinkURL  string
 	Channels []ACL
 	Drops    []*Drop
-	Quest    bool // one of Twitch's own reward campaigns (see quests.go)
+	Quest    bool      // one of Twitch's own reward campaigns (see quests.go)
+	Cats     []GameRef // reward campaigns that count in several categories: all of them (Game is then the campaign itself)
 }
 
 type farm struct {
@@ -95,7 +97,7 @@ func (c *Campaign) earnable(now time.Time) []*Drop {
 	}
 	var out []*Drop
 	for _, d := range c.Drops {
-		if d.Req <= 0 || d.finished() {
+		if d.Req <= 0 || d.finished() || d.Later {
 			continue
 		}
 		if (!d.Start.IsZero() && now.Before(d.Start)) || (!d.End.IsZero() && !now.Before(d.End)) {
@@ -477,6 +479,8 @@ func (e *Engine) dropsStep(now time.Time) {
 		e.mu.Lock()
 		e.drops.force = false
 		switch {
+		case !ok && e.drops.fetchedAt.IsZero(): // nothing to show yet (Twitch timed out): do not make the user wait long
+			e.drops.nextFetch = now.Add(iv(20 * time.Second))
 		case !ok:
 			e.drops.nextFetch = now.Add(iv(2 * time.Minute))
 		case e.drops.cur != nil:
@@ -651,12 +655,14 @@ func (e *Engine) findDropChannel(g GameRef, now time.Time) (*chanRT, map[string]
 	campIDs := map[string]bool{}
 	acl := map[string]ACL{}
 	allACL := true
-	questOnly := true // only Twitch's reward campaigns are open for this game
+	questOnly := true  // only Twitch's reward campaigns are open for this game
+	var dirs []GameRef // the categories whose streams count: the game itself, or a reward campaign's categories
 	for _, c := range e.gameCamps(g, now) {
 		if len(c.earnable(now)) == 0 {
 			continue
 		}
 		campIDs[c.ID] = true
+		dirs = append(dirs, c.Cats...)
 		if !c.Quest {
 			questOnly = false
 		}
@@ -701,7 +707,18 @@ func (e *Engine) findDropChannel(g GameRef, now time.Time) (*chanRT, map[string]
 			}
 		}
 	}
-	if !allACL { // any channel of the game with drops switched on
+	if len(dirs) > 0 { // a reward campaign counting in several categories: the first one with drops-enabled streams
+		if len(dirs) > 12 {
+			dirs = dirs[:12]
+		}
+		for _, cat := range dirs {
+			s := firstNonEmpty(cat.Slug, guessSlug(cat.Name))
+			cands = append(cands, e.dropStreams(s, cat)...)
+			if len(cands) > 0 {
+				break
+			}
+		}
+	} else if !allACL { // any channel of the game with drops switched on
 		if slug == "" {
 			if data, err := e.c.gqlOne("DirectoryGameRedirect", map[string]any{"name": g.Name}); err == nil {
 				slug = str(dig(data, "game", "slug"))
@@ -713,27 +730,7 @@ func (e *Engine) findDropChannel(g GameRef, now time.Time) (*chanRT, map[string]
 			e.drops.slugs[g.ID] = slug
 			e.mu.Unlock()
 		}
-		data, err := e.c.gqlOne("DirectoryPage_Game", map[string]any{
-			"limit": 30, "slug": slug, "imageWidth": 50, "includeCostreaming": false, "sortTypeIsRecency": false,
-			"options": map[string]any{
-				"broadcasterLanguages": []string{}, "freeformTags": nil, "includeRestricted": []string{"SUB_ONLY_LIVE"},
-				"recommendationsContext": map[string]any{"platform": "web"}, "sort": "RELEVANCE",
-				"systemFilters": []string{"DROPS_ENABLED"}, "tags": []string{}, "requestID": "JIRA-VXP-2397",
-			},
-		})
-		e.gqlErr("directory "+slug, err)
-		for _, edge := range list(dig(data, "game", "streams", "edges")) {
-			n := dig(edge, "node")
-			b := dig(n, "broadcaster")
-			if b == nil {
-				continue
-			}
-			ch := &chanRT{Login: strings.ToLower(str(dig(b, "login"))), ID: str(dig(b, "id")), Name: firstNonEmpty(str(dig(b, "displayName")), str(dig(b, "login"))),
-				Online: true, StreamID: str(dig(n, "id")), Viewers: num(dig(n, "viewersCount")), Game: g.Name, GameID: g.ID}
-			if ch.Login != "" && ch.ID != "" {
-				cands = append(cands, ch)
-			}
-		}
+		cands = append(cands, e.dropStreams(slug, g)...)
 	}
 	sort.SliceStable(cands, func(i, j int) bool { return cands[i].Viewers > cands[j].Viewers })
 	var first *chanRT
@@ -770,6 +767,33 @@ func (e *Engine) findDropChannel(g GameRef, now time.Time) (*chanRT, map[string]
 		return e.adopt(first), campIDs
 	}
 	return nil, nil
+}
+
+// dropStreams lists the live channels of a category that have drops switched on.
+func (e *Engine) dropStreams(slug string, g GameRef) []*chanRT {
+	data, err := e.c.gqlOne("DirectoryPage_Game", map[string]any{
+		"limit": 30, "slug": slug, "imageWidth": 50, "includeCostreaming": false, "sortTypeIsRecency": false,
+		"options": map[string]any{
+			"broadcasterLanguages": []string{}, "freeformTags": nil, "includeRestricted": []string{"SUB_ONLY_LIVE"},
+			"recommendationsContext": map[string]any{"platform": "web"}, "sort": "RELEVANCE",
+			"systemFilters": []string{"DROPS_ENABLED"}, "tags": []string{}, "requestID": "JIRA-VXP-2397",
+		},
+	})
+	e.gqlErr("directory "+slug, err)
+	var out []*chanRT
+	for _, edge := range list(dig(data, "game", "streams", "edges")) {
+		n := dig(edge, "node")
+		b := dig(n, "broadcaster")
+		if b == nil {
+			continue
+		}
+		ch := &chanRT{Login: strings.ToLower(str(dig(b, "login"))), ID: str(dig(b, "id")), Name: firstNonEmpty(str(dig(b, "displayName")), str(dig(b, "login"))),
+			Online: true, StreamID: str(dig(n, "id")), Viewers: num(dig(n, "viewersCount")), Game: g.Name, GameID: g.ID}
+		if ch.Login != "" && ch.ID != "" {
+			out = append(out, ch)
+		}
+	}
+	return out
 }
 
 // adopt reuses the listed channel record when drops are farmed on a channel that is also on the points list.

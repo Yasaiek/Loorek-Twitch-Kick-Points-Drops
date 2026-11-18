@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+- The campaign search also matches campaign names, not only game names: "GTAVI Launch Celebration" sits under the game "Grand Theft Auto VI", so typing "gta" found nothing.
+- Reward campaigns that count in many categories (the Pokémon ones count in 21 games) are listed under their own name instead of being hidden under the first game, and are farmed on whichever of those categories has a drops-enabled stream.
+- In staged campaigns (evolutions) only the stages Twitch has opened are counted; the later ones are shown as locked.
+- If Twitch times out on the very first campaign load, Loorek retries after 20 seconds instead of 2 minutes.
+
 ## 0.7.0
 - Twitch's own reward campaigns are in the campaign list now: daily chests and badge collections such as "GTAVI Launch Celebration". They can be queued and tracked like any other campaign; a daily one is farmed again by itself when the next day opens.
 - For these campaigns Loorek keeps Twitch's last answer in `data/quests-debug.json` (names and progress only), to make problems with this new kind of campaign easy to find.

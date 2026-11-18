@@ -75,7 +75,7 @@
 "inSession": "本次会话",
 "kick.waitHint": "如果没有出现登录表单，请点击页面右上角的“登录”。",
 "camps.sub": "按你想要挂取的顺序点击游戏。右键 = 关注游戏 ★。ⓘ 图标会显示具体能获得什么。",
-"camps.searchPh": "搜索游戏…",
+"camps.searchPh": "搜索游戏或活动…",
 "refresh": "刷新",
 "camps.info": "有活动的游戏: {n} · 读取于 {time}",
 "camps.err": "无法加载活动 – 稍后重试。",

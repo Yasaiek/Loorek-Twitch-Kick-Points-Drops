@@ -75,7 +75,7 @@
 "inSession": "in questa sessione",
 "kick.waitHint": "Se il modulo di accesso non compare, clicca su «Accedi» in alto a destra nella pagina.",
 "camps.sub": "Clicca i giochi nell'ordine in cui vanno farmati. Tasto destro = segui il gioco ★. L'icona ⓘ mostra esattamente cosa si può ottenere.",
-"camps.searchPh": "Cerca gioco…",
+"camps.searchPh": "Cerca gioco o campagna…",
 "refresh": "Aggiorna",
 "camps.info": "giochi con campagne: {n} · lettura delle {time}",
 "camps.err": "Impossibile caricare le campagne – riprovo tra poco.",

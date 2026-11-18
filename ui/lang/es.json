@@ -75,7 +75,7 @@
 "inSession": "en esta sesión",
 "kick.waitHint": "Si no aparece el formulario de inicio de sesión, haz clic en «Iniciar sesión» arriba a la derecha de la página.",
 "camps.sub": "Haz clic en los juegos en el orden en que deben farmearse. Clic derecho = seguir el juego ★. El icono ⓘ muestra exactamente qué se puede conseguir.",
-"camps.searchPh": "Buscar juego…",
+"camps.searchPh": "Buscar juego o campaña…",
 "refresh": "Actualizar",
 "camps.info": "juegos con campañas: {n} · leído a las {time}",
 "camps.err": "No se pudieron cargar las campañas – reintento enseguida.",

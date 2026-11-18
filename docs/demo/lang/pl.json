@@ -75,7 +75,7 @@
 "inSession": "w tej sesji",
 "kick.waitHint": "Jeśli formularz logowania się nie pojawi, kliknij „Zaloguj się” w prawym górnym rogu strony.",
 "camps.sub": "Kliknij gry w kolejności, w jakiej mają być wbijane. Prawy przycisk = śledź grę ★. Ikona ⓘ pokazuje, co dokładnie jest do zdobycia.",
-"camps.searchPh": "Szukaj gry…",
+"camps.searchPh": "Szukaj gry lub kampanii…",
 "refresh": "Odśwież",
 "camps.info": "gier z kampaniami: {n} · odczyt {time}",
 "camps.err": "Nie udało się wczytać kampanii – ponowię za chwilę.",

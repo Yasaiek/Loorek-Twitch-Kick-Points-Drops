@@ -75,7 +75,7 @@
 "inSession": "in dieser Sitzung",
 "kick.waitHint": "Falls das Anmeldeformular nicht erscheint, klicke oben rechts auf der Seite auf „Anmelden“.",
 "camps.sub": "Klicke Spiele in der Reihenfolge an, in der sie gefarmt werden sollen. Rechtsklick = Spiel verfolgen ★. Das Symbol ⓘ zeigt genau, was es zu holen gibt.",
-"camps.searchPh": "Spiel suchen…",
+"camps.searchPh": "Spiel oder Kampagne suchen…",
 "refresh": "Aktualisieren",
 "camps.info": "Spiele mit Kampagnen: {n} · Stand {time}",
 "camps.err": "Kampagnen konnten nicht geladen werden – gleich noch einmal.",

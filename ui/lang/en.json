@@ -75,7 +75,7 @@
 "inSession": "this session",
 "kick.waitHint": "If the sign-in form does not appear, click \"Log in\" in the top right corner of the page.",
 "camps.sub": "Click games in the order they should be farmed. Right click = track the game ★. The ⓘ icon shows exactly what can be earned.",
-"camps.searchPh": "Search games…",
+"camps.searchPh": "Search games or campaigns…",
 "refresh": "Refresh",
 "camps.info": "games with campaigns: {n} · read at {time}",
 "camps.err": "Could not load campaigns – retrying shortly.",

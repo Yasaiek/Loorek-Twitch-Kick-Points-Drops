@@ -128,6 +128,7 @@ func (e *Engine) view() map[string]any {
 		end   time.Time
 		name  string
 		start time.Time
+		names []string
 	}
 	games := map[string]*agg{}
 	for _, c := range e.drops.camps {
@@ -148,6 +149,10 @@ func (e *Engine) view() map[string]any {
 			a = &agg{g: c.Game, end: c.End, name: c.Name, start: c.Start}
 			games[c.Game.ID] = a
 		}
+		a.names = append(a.names, c.Name)
+		if len(c.Cats) > 0 && a.name == c.Game.Name { // listed under its own name: say where it counts instead of repeating it
+			a.name = fmt.Sprintf("%s +%d", c.Cats[0].Name, len(c.Cats)-1)
+		}
 		a.n++
 		if c.End.Before(a.end) {
 			a.end = c.End
@@ -161,7 +166,7 @@ func (e *Engine) view() map[string]any {
 	}
 	list := []map[string]any{}
 	for _, a := range games {
-		list = append(list, map[string]any{"id": a.g.ID, "slug": a.g.Slug, "name": a.g.Name, "art": a.g.Art, "camps": a.n, "camp": a.name,
+		list = append(list, map[string]any{"id": a.g.ID, "slug": a.g.Slug, "name": a.g.Name, "art": a.g.Art, "camps": a.n, "camp": a.name, "names": strings.Join(a.names, " | "),
 			"end": ms(a.end), "upcoming": now.Before(a.start), "start": ms(a.start), "status": e.gameStatus(a.g, now), "queued": queuePos(a.g), "tracked": isTracked(a.g)})
 	}
 	sort.Slice(list, func(i, j int) bool {
@@ -256,7 +261,7 @@ func (e *Engine) campViews(g GameRef, now time.Time) []map[string]any {
 				left += d.Req - d.Cur
 			}
 			drops = append(drops, map[string]any{"id": d.ID, "name": d.Name, "img": d.Img, "cur": d.Cur, "req": d.Req, "claimed": d.Claimed,
-				"pre": pre, "blocked": blocked && !d.finished(), "end": ms(d.End), "day": d.Day, "next": ms(d.Next)})
+				"pre": pre, "blocked": (blocked || d.Later) && !d.finished(), "end": ms(d.End), "day": d.Day, "next": ms(d.Next)})
 		}
 		out = append(out, map[string]any{"id": c.ID, "name": c.Name, "start": ms(c.Start), "end": ms(c.End), "active": c.active(now),
 			"linked": c.Linked, "link": c.LinkURL, "channels": names, "channelCount": len(c.Channels), "drops": drops, "left": left, "quest": c.Quest})

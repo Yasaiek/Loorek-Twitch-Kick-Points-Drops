@@ -454,6 +454,10 @@ func main() {
 				list := []any{}
 				if !demo {
 					cat := map[string]any{"id": "g4", "displayName": "Neon Coast", "slug": "neon-coast", "boxArtURL": base + "/art/g4-{width}x{height}.jpg"}
+					cats := []any{cat}
+					if os.Getenv("MOCK_QUEST_CATS") == "multi" { // counts in several categories; nobody streams the first one
+						cats = []any{map[string]any{"id": "g9", "displayName": "Empty Bay", "slug": "empty-bay", "boxArtURL": base + "/art/g9-{width}x{height}.jpg"}, cat}
+					}
 					reward := func(id, name string) map[string]any {
 						return map[string]any{"id": id, "name": name, "thumbnailImage": map[string]any{"image1xURL": base + "/art/" + id + ".png"}}
 					}
@@ -461,7 +465,7 @@ func main() {
 						"startsAt": ts(time.Now().Add(-time.Hour)), "endsAt": ts(time.Now().Add(48 * time.Hour)), "aboutURL": base + "/about-quest",
 						"rewardGroups": []any{
 							map[string]any{"id": "QG1", "unlockRequirements": map[string]any{"minuteWatchedGoal": questReq, "subsGoal": 0, "turboSubsGoal": 0, "eventTriggerGoal": 0},
-								"categories": []any{cat}, "rewards": []any{reward("qb1", "Purple Chain"), reward("qb2", "Bronze Chain"), reward("qb3", "Silver Chain")}},
+								"categories": cats, "rewards": []any{reward("qb1", "Purple Chain"), reward("qb2", "Bronze Chain"), reward("qb3", "Silver Chain")}},
 							map[string]any{"id": "QG2", "unlockRequirements": map[string]any{"minuteWatchedGoal": 0, "subsGoal": 3, "turboSubsGoal": 0, "eventTriggerGoal": 0},
 								"categories": []any{cat}, "rewards": []any{reward("qe1", "Sub Emote")}},
 						}})
