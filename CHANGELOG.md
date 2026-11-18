@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.2
+- Fixed: a daily reward of a Twitch campaign that Twitch grants by itself (GTA DVD Chest) was "claimed" again every ten seconds. Such a reward is now shown as done until its next day opens, and nothing is claimed unless Twitch says there is something to claim.
+- Fixed: "drop finished" was written to the journal every minute, and the whole account was re-read every ten seconds, when Twitch counted the minutes on a reward that cannot be earned.
+- A Twitch campaign that watching does not move at all is put aside for six hours instead of being watched for nothing.
+
 ## 0.8.1
 - Discord status: a second button, "GitHub", next to "Get Loorek".
 

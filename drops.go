@@ -49,9 +49,10 @@ type farm struct {
 	lastProg time.Time
 	lastPoll time.Time
 	lastCur  int64
-	total    int64     // minutes seen on the account for this game at the last inventory read
-	solo     bool      // points watching is paused so that nothing competes with this drop
-	quest    time.Time // a reward campaign is among the farmed ones: when its progress was last read
+	total    int64           // minutes seen on the account for this game at the last inventory read
+	solo     bool            // points watching is paused so that nothing competes with this drop
+	told     map[string]bool // drops whose completion was already announced during this farm
+	quest    time.Time       // a reward campaign is among the farmed ones: when its progress was last read
 }
 
 type dropsState struct {
@@ -66,6 +67,8 @@ type dropsState struct {
 	gameWait  map[string]time.Time // game id -> not before
 	gameNote  map[string]string    // game id -> why nothing is farmed (nostreams)
 	claimFail map[string]int
+	claimedAt map[string]time.Time // drop id -> when it was last claimed here
+	stalls    map[string]int       // game id -> how many times in a row watching brought nothing
 	slugs     map[string]string
 }
 
@@ -75,6 +78,8 @@ func (d *dropsState) init() {
 	d.gameWait = map[string]time.Time{}
 	d.gameNote = map[string]string{}
 	d.claimFail = map[string]int{}
+	d.claimedAt = map[string]time.Time{}
+	d.stalls = map[string]int{}
 	d.slugs = map[string]string{}
 }
 
@@ -362,9 +367,17 @@ func (e *Engine) claimDrops(now time.Time) {
 			continue
 		}
 		for _, d := range c.Drops {
-			if !d.Claimed && d.HasSelf && d.Req > 0 && d.Cur >= d.Req && e.drops.claimFail[d.ID] < 3 {
-				jobs = append(jobs, job{c, d})
+			if d.Claimed || !d.HasSelf || d.Req <= 0 || d.Cur < d.Req || e.drops.claimFail[d.ID] >= 3 {
+				continue
 			}
+			if c.Quest && d.ClaimID == "" {
+				continue // a reward campaign: Twitch grants it by itself unless it says there is something to claim
+			}
+			if at, ok := e.drops.claimedAt[d.ID]; ok && now.Sub(at) < iv(30*time.Minute) {
+				d.Claimed = true // claimed a moment ago; the account has not caught up yet - never ask twice
+				continue
+			}
+			jobs = append(jobs, job{c, d})
 		}
 	}
 	e.mu.Unlock()
@@ -378,6 +391,7 @@ func (e *Engine) claimDrops(now time.Time) {
 		e.mu.Lock()
 		if err == nil && (status == "ELIGIBLE_FOR_ALL" || status == "DROP_INSTANCE_ALREADY_CLAIMED") {
 			j.d.Claimed = true
+			e.drops.claimedAt[j.d.ID] = now
 			if next := now.Add(iv(10 * time.Second)); j.c.Quest && next.Before(e.drops.nextFetch) {
 				e.drops.nextFetch = next // a daily reward: read when its next round opens
 			}
@@ -516,6 +530,7 @@ func (e *Engine) dropsStep(now time.Time) {
 				}
 				if total > f.total {
 					f.lastProg = now
+					delete(e.drops.stalls, f.game.ID)
 				}
 				f.total = total
 			}
@@ -560,8 +575,19 @@ func (e *Engine) dropsStep(now time.Time) {
 			cur.solo, cur.lastProg = true, now
 			e.log.Warn("L.solo", cur.game.Name)
 		case now.Sub(cur.lastProg) > e.stallLimit(cur):
-			e.log.Warn("L.stall", cur.game.Name, cur.ch.Name)
-			e.drops.badCh[cur.ch.ID] = now.Add(iv(30 * time.Minute))
+			e.drops.stalls[cur.game.ID]++
+			if !cur.quest.IsZero() && e.drops.stalls[cur.game.ID] >= 2 {
+				// A reward campaign that does not move on two streams in a row: Twitch wants something that
+				// watching alone does not give. Leave it for a few hours instead of watching for nothing.
+				e.log.Warn("L.stuck", cur.game.Name, stuckHours)
+				e.drops.gameWait[cur.game.ID] = now.Add(iv(stuckHours * time.Hour))
+				e.drops.gameNote[cur.game.ID] = "stuck"
+				delete(e.drops.stalls, cur.game.ID)
+				top = nil // it was this step's choice: the next step picks the next game
+			} else {
+				e.log.Warn("L.stall", cur.game.Name, cur.ch.Name)
+				e.drops.badCh[cur.ch.ID] = now.Add(iv(30 * time.Minute))
+			}
 			e.drops.cur, cur = nil, nil
 			e.drops.nextPick = now
 		}
@@ -629,9 +655,13 @@ func (e *Engine) pollQuests(f *farm, now time.Time) {
 	}
 	if total > f.total {
 		f.lastProg = now
+		delete(e.drops.stalls, f.game.ID)
 	}
 	f.total = total
 }
+
+// stuckHours: how long a reward campaign that watching does not move is left alone.
+const stuckHours = 6
 
 // stallLimit: how long without progress before the stream is changed. When Twitch does not report the
 // running drop at all, progress is only visible in the inventory (read every 10 min), so wait longer.
@@ -671,24 +701,44 @@ func (e *Engine) pollDrop(f *farm, now time.Time) {
 	if id != f.dropID || cur != f.lastCur {
 		e.log.Debug("drop session on %s: %s %d/%d", f.ch.Login, id, cur, num(dig(s, "requiredMinutesWatched")))
 	}
+	var camp *Campaign
+	var drop *Drop
+	for _, c := range e.drops.camps {
+		if d := c.drop(id); d != nil {
+			camp, drop = c, d
+			break
+		}
+	}
+	// Twitch sometimes counts the minutes on a reward that cannot be earned: one already granted, or a later
+	// stage of a reward campaign the account has not opened. Such minutes lead nowhere - they are no progress.
+	dead := drop != nil && (drop.Claimed || drop.Later || (camp.Quest && drop.Cur >= drop.Req))
+	if dead {
+		if f.dropID != id {
+			e.log.Debug("drop session on %s: %s cannot be earned - not counted as progress", f.ch.Login, id)
+		}
+		f.dropID, f.lastCur = id, cur
+		return
+	}
 	if id != f.dropID || cur > f.lastCur {
 		f.lastProg = now
+		delete(e.drops.stalls, f.game.ID)
 	}
 	if f.dropID != "" && id != f.dropID {
 		recheck()
 	}
 	f.dropID, f.lastCur = id, cur
-	for _, c := range e.drops.camps {
-		if d := c.drop(id); d != nil {
-			if cur > d.Cur {
-				d.Cur = cur
+	if drop != nil {
+		if cur > drop.Cur {
+			drop.Cur = cur
+		}
+		drop.HasSelf = true
+		if drop.Req > 0 && drop.Cur >= drop.Req && !f.told[id] {
+			if f.told == nil {
+				f.told = map[string]bool{}
 			}
-			d.HasSelf = true
-			if d.Req > 0 && d.Cur >= d.Req && !d.Claimed {
-				e.log.OK("L.dropDone", c.Game.Name, d.Name)
-				e.drops.nextFetch = now.Add(iv(10 * time.Second)) // confirm on the account, then claim
-			}
-			return
+			f.told[id] = true // said once: the account reading replaces the record, and the session keeps reporting it
+			e.log.OK("L.dropDone", camp.Game.Name, drop.Name)
+			e.drops.nextFetch = now.Add(iv(10 * time.Second)) // confirm on the account, then claim
 		}
 	}
 }

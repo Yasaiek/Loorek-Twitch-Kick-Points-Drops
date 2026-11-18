@@ -295,6 +295,8 @@
 "L.streamEnded": "%s: the stream of %s ended – looking for the next one.",
 "L.solo": "%s: progress is stuck – pausing the second channel while this drop is farmed.",
 "L.stall": "%s: no progress on %s – switching stream.",
+"L.stuck": "%s: watching brings nothing – Twitch is not counting minutes for this campaign. Putting it aside for %d h; check on Twitch whether the reward needs something more.",
+"stt.stuck": "Twitch is not counting",
 "L.farm": "%s: watching %s.",
 "L.noStreams": "%s: no streams with drops – checking again in 5 min.",
 "L.dropDone": "%s: drop earned – %s.",

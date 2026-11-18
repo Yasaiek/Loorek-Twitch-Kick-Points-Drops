@@ -118,19 +118,25 @@ func (e *Engine) fetchQuests(now time.Time, uid string) (out []*Campaign, ok boo
 			if d.Name == "" {
 				d.Name = strings.Join(names, ", ")
 			}
-			if p.grants > 0 || !p.next.IsZero() {
+			reopens := p.next // when the next round of a repeating (daily) group opens
+			if reopens.IsZero() {
+				reopens = p.window
+			}
+			if p.grants > 0 || !reopens.IsZero() {
 				d.Day = int(p.grants) + 1 // a group that repeats: which day (round) this is
 			}
-			switch p.status {
-			case "CLAIMABLE":
+			switch {
+			case p.status == "CLAIMABLE":
 				d.Cur = req
 				d.ClaimID = uid + "#" + firstNonEmpty(p.campID, id) + "#" + gid
-			case "CLAIMED", "FULFILLED":
+			case p.status == "CLAIMED" || p.status == "FULFILLED" || (p.grants > 0 && p.cur >= req):
+				// Twitch usually grants these rewards by itself and keeps saying IN_PROGRESS with a full
+				// counter until the day's window ends: a grant on record plus a full counter is a finished round.
 				switch {
-				case p.next.IsZero(): // earned for good
+				case reopens.IsZero(): // earned for good
 					d.Claimed, d.Cur = true, req
-				case now.Before(p.next): // today's round is done, the next one opens later
-					d.Claimed, d.Cur, d.Next = true, req, p.next
+				case now.Before(reopens): // today's round is done, the next one opens later
+					d.Claimed, d.Cur, d.Next = true, req, reopens
 					if d.Day > 1 {
 						d.Day--
 					}

@@ -295,6 +295,8 @@
 "L.streamEnded": "%s: a live de %s acabou – procurando a próxima.",
 "L.solo": "%s: o progresso está parado – pausando o segundo canal enquanto este drop é farmado.",
 "L.stall": "%s: sem progresso em %s – trocando de live.",
+"L.stuck": "%s: assistir não rende nada – a Twitch não está contando os minutos desta campanha. Deixada de lado por %d h; confira na Twitch se a recompensa exige algo mais.",
+"stt.stuck": "A Twitch não está contando",
 "L.farm": "%s: assistindo %s.",
 "L.noStreams": "%s: nenhuma live com drops – verifico de novo em 5 min.",
 "L.dropDone": "%s: drop conquistado – %s.",

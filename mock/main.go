@@ -92,8 +92,14 @@ var (
 	perTouch   = 0.25 // minutes of drop progress per playlist read
 	claimsPts  = 0
 	claimsDrop = 0
-	gqlCount   = 0
-	headCount  = 0
+	// MOCK_QUEST_MODE: "" = the reward must be claimed; "auto" = Twitch grants it by itself and keeps saying
+	// IN_PROGRESS with a full counter until the day's window ends; "stuck" = watching never moves the group
+	// the account has, while the watching session reports another, not started group with ever more minutes.
+	questMode   = os.Getenv("MOCK_QUEST_MODE")
+	questClaims = 0 // claim requests for the reward campaign
+	dashCount   = 0 // full campaign list readings
+	gqlCount    = 0
+	headCount   = 0
 )
 
 func addCh(login, gameID string, live bool, viewers int, drops ...string) {
@@ -321,6 +327,7 @@ func handleOp(name string, v map[string]any) (any, string) {
 		}
 		return map[string]any{"currentUser": map[string]any{"inventory": map[string]any{"dropCampaignsInProgress": prog, "gameEventDrops": ev}}}, ""
 	case "ViewerDropsDashboard":
+		dashCount++
 		var l []any
 		for _, c := range camps {
 			l = append(l, campJSON(c, false, false))
@@ -336,6 +343,10 @@ func handleOp(name string, v map[string]any) (any, string) {
 		ch := chByID(s("channelID"))
 		if ch == nil || time.Since(ch.LastTouch) > 5*time.Second {
 			return map[string]any{"currentUser": map[string]any{"dropCurrentSession": nil}}, ""
+		}
+		if ch.GameID == "g4" && questMode == "stuck" { // minutes pile up on a group the account has not started
+			return map[string]any{"currentUser": map[string]any{"dropCurrentSession": map[string]any{
+				"dropID": "QG0", "currentMinutesWatched": 250 + ch.Touches/4, "requiredMinutesWatched": questReq}}}, ""
 		}
 		for _, id := range ch.Drops {
 			if c := camp(id); c != nil && c.Linked {
@@ -374,6 +385,12 @@ func handleOp(name string, v map[string]any) (any, string) {
 	case "DropsPage_ClaimDropRewards":
 		in, _ := v["input"].(map[string]any)
 		parts := strings.Split(fmt.Sprint(in["dropInstanceID"]), "#")
+		if len(parts) == 3 && parts[1] == "Q1" {
+			questClaims++
+			if questMode != "" { // nothing to claim there, yet Twitch answers as if all were well
+				return map[string]any{"claimDropRewards": map[string]any{"status": "ELIGIBLE_FOR_ALL"}}, ""
+			}
+		}
 		if len(parts) == 3 && parts[1] == "Q1" && parts[2] == "QG1" && quest.Status == "CLAIMABLE" {
 			quest.Status, quest.Next = "CLAIMED", time.Now().Add(questGap)
 			quest.Grants++
@@ -464,6 +481,8 @@ func main() {
 					list = append(list, map[string]any{"id": "Q1", "name": "Neon Launch Celebration", "brand": "Twitch", "isSitewide": true, "game": nil,
 						"startsAt": ts(time.Now().Add(-time.Hour)), "endsAt": ts(time.Now().Add(48 * time.Hour)), "aboutURL": base + "/about-quest",
 						"rewardGroups": []any{
+							map[string]any{"id": "QG0", "unlockRequirements": map[string]any{"minuteWatchedGoal": questReq, "subsGoal": 0, "turboSubsGoal": 0, "eventTriggerGoal": 0},
+								"categories": cats, "rewards": []any{reward("qg0", "Ghost Stage")}},
 							map[string]any{"id": "QG1", "unlockRequirements": map[string]any{"minuteWatchedGoal": questReq, "subsGoal": 0, "turboSubsGoal": 0, "eventTriggerGoal": 0},
 								"categories": cats, "rewards": []any{reward("qb1", "Purple Chain"), reward("qb2", "Bronze Chain"), reward("qb3", "Silver Chain")}},
 							map[string]any{"id": "QG2", "unlockRequirements": map[string]any{"minuteWatchedGoal": 0, "subsGoal": 3, "turboSubsGoal": 0, "eventTriggerGoal": 0},
@@ -474,7 +493,14 @@ func main() {
 				return
 			}
 			inProgress, completed := []any{}, []any{}
-			if !demo && (quest.Status != "" || quest.Grants > 0) {
+			if !demo && questMode != "" && (quest.Status != "" || quest.Grants > 0 || questMode == "stuck") {
+				self := map[string]any{"status": "IN_PROGRESS", "currentMinutesWatched": int(quest.Cur), "currentSubs": 0, "grantCount": quest.Grants,
+					"nextEligibleAt": nil, "currentWindow": nil}
+				if !quest.Next.IsZero() {
+					self["currentWindow"] = map[string]any{"expiresAt": ts(quest.Next)}
+				}
+				inProgress = append(inProgress, map[string]any{"id": "Q1", "rewardGroups": []any{map[string]any{"id": "QG1", "name": "Neon Chest", "self": self, "rewards": []any{}}}})
+			} else if !demo && (quest.Status != "" || quest.Grants > 0) {
 				self := map[string]any{"status": quest.Status, "currentMinutesWatched": int(quest.Cur), "currentSubs": 0, "grantCount": quest.Grants,
 					"nextEligibleAt": nil, "currentWindow": map[string]any{"expiresAt": ts(time.Now().Add(time.Hour))}}
 				if quest.Status == "" {
@@ -569,7 +595,18 @@ func main() {
 		}
 		ch.Touches++
 		ch.LastTouch = time.Now()
-		if ch.GameID == "g4" && quest.Grants < questDays {
+		if ch.GameID == "g4" && questMode == "auto" && quest.Grants < questDays {
+			if !quest.Next.IsZero() && !time.Now().Before(quest.Next) {
+				quest.Cur, quest.Next = 0, time.Time{} // the day's window ended: the counter starts again
+			}
+			if quest.Next.IsZero() {
+				quest.Status = "IN_PROGRESS"
+				if quest.Cur += perTouch; quest.Cur >= float64(questReq) {
+					quest.Cur, quest.Next = float64(questReq), time.Now().Add(questGap)
+					quest.Grants++ // granted without a claim
+				}
+			}
+		} else if ch.GameID == "g4" && questMode == "" && quest.Grants < questDays {
 			if quest.Status == "CLAIMED" && !time.Now().Before(quest.Next) {
 				quest.Status, quest.Cur = "", 0 // the next day has opened
 			}
@@ -778,7 +815,7 @@ func main() {
 		for j := range joins {
 			js = append(js, j)
 		}
-		json.NewEncoder(w).Encode(map[string]any{"kick": kchans, "kshakes": kshakes, "channels": channels, "drops": drops, "joins": js, "claimsPts": claimsPts, "claimsDrop": claimsDrop, "gql": gqlCount, "heads": headCount})
+		json.NewEncoder(w).Encode(map[string]any{"kick": kchans, "kshakes": kshakes, "channels": channels, "drops": drops, "joins": js, "claimsPts": claimsPts, "claimsDrop": claimsDrop, "questClaims": questClaims, "dash": dashCount, "gql": gqlCount, "heads": headCount})
 	})
 	mux.HandleFunc("/ctl/live", func(w http.ResponseWriter, r *http.Request) {
 		mu.Lock()

@@ -295,6 +295,8 @@
 "L.streamEnded": "%s: %s yayını bitti – sıradakini arıyorum.",
 "L.solo": "%s: ilerleme durdu – bu drop kasılırken ikinci kanalı duraklatıyorum.",
 "L.stall": "%s: %s kanalında ilerleme yok – yayını değiştiriyorum.",
+"L.stuck": "%s: izlemek bir şey kazandırmıyor – Twitch bu kampanya için dakika saymıyor. %d saatliğine kenara alındı; ödülün başka bir şey isteyip istemediğine Twitch’te bak.",
+"stt.stuck": "Twitch saymıyor",
 "L.farm": "%s: %s izleniyor.",
 "L.noStreams": "%s: droplu yayın yok – 5 dk sonra yeniden bakacağım.",
 "L.dropDone": "%s: drop kazanıldı – %s.",

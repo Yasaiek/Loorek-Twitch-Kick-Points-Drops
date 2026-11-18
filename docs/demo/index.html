@@ -534,7 +534,7 @@ select:focus { border-color: var(--accent); }
 </div>
 <div id="toast"></div>
 
-<script>window.LOOREK_VERSION = "0.8.1";</script>
+<script>window.LOOREK_VERSION = "0.8.2";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -1002,7 +1002,7 @@ function render() {
     const line = g.farming ? tr('q.watching', { ch: g.channel }) : g.status === 'nocamp' ? tr('q.waitCamp') : g.status === 'ready' ? tr('q.left', { t: mins(total) }) : g.end ? tr('camps.until', { when: when(g.end) }) : '';
     txt.append(el('div', 'sb', [line, all ? tr('q.rewards', { a: got, b: all }) : ''].filter(Boolean).join(' · ')));
     let [label, cls] = stOf(g.status);
-    if (g.farming) { label = tr('stt.watching'); cls = 'run'; } else if (g.status === 'ready' && g.note === 'nostreams') { label = tr('stt.nostreams'); cls = 'wait'; } else if (g.status === 'ready' && !s.settings.dropsOn) { label = tr('stt.off'); }
+    if (g.farming) { label = tr('stt.watching'); cls = 'run'; } else if (g.status === 'ready' && g.note === 'nostreams') { label = tr('stt.nostreams'); cls = 'wait'; } else if (g.status === 'ready' && g.note === 'stuck') { label = tr('stt.stuck'); cls = 'wait'; } else if (g.status === 'ready' && !s.settings.dropsOn) { label = tr('stt.off'); }
     const pill = el(g.status === 'nolink' && g.link ? 'a' : 'span', 'pill ' + cls, label);
     if (g.status === 'nolink' && g.link) { pill.href = g.link; pill.target = '_blank'; pill.title = tr('q.linkTip'); }
     const del = iconBtn('icon', 'x', tracked ? tr('q.untrack') : tr('q.remove'));
