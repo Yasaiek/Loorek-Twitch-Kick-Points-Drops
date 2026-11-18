@@ -191,6 +191,9 @@ input[type=number] { width: 70px; text-align: center; }
 .rw.live { border-color: rgba(96,205,255,.55); } .rw.live .rs { color: var(--accent); }
 .rw.lock { min-width: 0; padding: 0; border: 0; background: none; opacity: .5; position: relative; } .rw.lock .dimg { width: 38px; height: 38px; margin: 0; filter: grayscale(1); }
 .rw.lock::after { content: "🔒"; position: absolute; right: -3px; bottom: -4px; font-size: 11px; }
+#rpcMore { transition: opacity .2s; } #rpcMore.off { opacity: .45; }
+#rpcCard > .row { padding-bottom: 10px; } #rpcMore > .row:first-child { border-top: 1px solid var(--line); padding-top: 10px; }
+#rpcNote.ok { color: var(--ok); } #rpcNote.bad { color: var(--warn); }
 .icon svg, .ib svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; display: block; }
 .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; margin-right: 6px; }
 .gacts { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -477,6 +480,16 @@ select:focus { border-color: var(--accent); }
       <div class="row"><span>Loorek <span id="ver"></span><small id="updNote">–</small></span><span style="display:flex;gap:8px"><button class="btn small primary" id="updInstall" hidden data-i="upd.install"></button><button class="btn small" id="updCheck" data-i="upd.check"></button></span></div>
       <label class="row"><span><span data-i="upd.auto"></span><small data-i="upd.autoHint"></small></span><input type="checkbox" class="sw" data-set="autoUpdate"></label>
     </div>
+    <div class="card" id="rpcCard">
+      <label class="row"><span><i class="svc" data-svc="discord"></i><span data-i="set.rpc"></span><small id="rpcNote"></small></span><input type="checkbox" class="sw" data-set="rpcOn"></label>
+      <div id="rpcMore">
+        <label class="row"><span><span data-i="set.rpcDrop"></span><small data-i="set.rpcDropHint"></small></span><input type="checkbox" class="sw" data-set="rpcDrop"></label>
+        <label class="row"><span data-i="set.rpcQueue"></span><input type="checkbox" class="sw" data-set="rpcQueue"></label>
+        <label class="row"><span data-i="set.rpcTracked"></span><input type="checkbox" class="sw" data-set="rpcTracked"></label>
+        <label class="row"><span><span data-i="set.rpcPoints"></span><small data-i="set.rpcPointsHint"></small></span><input type="checkbox" class="sw" data-set="rpcPoints"></label>
+        <label class="row"><span data-i="set.rpcBtn"></span><input type="checkbox" class="sw" data-set="rpcBtn"></label>
+      </div>
+    </div>
     <div class="card">
       <div class="row"><span><span data-i="set.bg"></span><small data-i="set.about"></small></span><button class="btn small" id="quit" data-i="quit"></button></div>
     </div>
@@ -521,7 +534,7 @@ select:focus { border-color: var(--accent); }
 </div>
 <div id="toast"></div>
 
-<script>window.LOOREK_VERSION = "0.7.2";</script>
+<script>window.LOOREK_VERSION = "0.8.0";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -613,7 +626,7 @@ let toastT;
 function toast(msg, ms) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms || 2600); }
 
 // Service icons come straight from the services' own sites; nothing is bundled.
-const SVC_SRC = { twitch: ['https://www.twitch.tv/favicon.ico', 'https://assets.twitch.tv/assets/favicon-32-e29e246c157142c94346.png'], kick: ['https://kick.com/favicon.ico'] };
+const SVC_SRC = { twitch: ['https://www.twitch.tv/favicon.ico', 'https://assets.twitch.tv/assets/favicon-32-e29e246c157142c94346.png'], kick: ['https://kick.com/favicon.ico'], discord: ['https://discord.com/favicon.ico'] };
 const SVC = {};
 function paintSvc(root) {
   for (const n of (root || document).querySelectorAll('.svc[data-svc]')) {
@@ -859,6 +872,13 @@ function render() {
   else if (watching.length || cur || s.kick.watching) { pill.className = 'pill run'; pill.textContent = tr('pill.run'); }
   else { pill.className = 'pill wait'; pill.textContent = tr('pill.wait'); }
 
+  { // Discord status: what is shown, and whether Discord took it
+    const rpc = s.rpc || {}, on = !!s.settings.rpcOn, note = $('rpcNote');
+    note.textContent = on && rpc.state && rpc.state !== 'off' ? tr('rpc.st.' + rpc.state) : tr('set.rpcHint');
+    note.className = !on ? '' : rpc.state === 'ok' ? 'ok' : 'bad';
+    $('rpcMore').classList.toggle('off', !on);
+    $('rpcCard').hidden = !rpc.ready; // a build without Loorek's Discord application has nothing to show
+  }
   if (!pending) document.querySelectorAll('[data-set]').forEach((inp) => { const v = s.settings[inp.dataset.set]; if (inp.type === 'checkbox') inp.checked = !!v; else if (document.activeElement !== inp) inp.value = v; });
   if (changed('langPref', [s.settings.lang, LANG])) syncLang();
   const u = s.update || {};

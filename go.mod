@@ -6,6 +6,7 @@ toolchain go1.24.7
 
 require (
 	fyne.io/systray v0.0.0
+	github.com/Microsoft/go-winio v0.6.2
 	github.com/andybalholm/brotli v1.1.1
 	github.com/bogdanfinn/fhttp v0.6.2
 	github.com/bogdanfinn/tls-client v1.11.2

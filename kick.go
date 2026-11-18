@@ -54,6 +54,20 @@ type kickChan struct {
 	lastPoints time.Time
 }
 
+// watchedNames lists the channels points are being collected on right now.
+func (k *Kick) watchedNames() []string {
+	k.mu.Lock()
+	defer k.mu.Unlock()
+	var out []string
+	for _, ch := range k.chans {
+		if ch.Watching {
+			out = append(out, firstNonEmpty(ch.Name, ch.Login))
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
 type Kick struct {
 	e  *Engine
 	hc tls_client.HttpClient

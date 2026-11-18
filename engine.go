@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var version = "0.7.2" // a variable so that test builds can override it
+var version = "0.8.0" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -48,10 +48,12 @@ type Settings struct {
 	Autostart    bool      `json:"autostart"`
 	OpenOnStart  bool      `json:"openOnStart"`
 	AutoUpdate   bool      `json:"autoUpdate"`
+	Discord      RPCCfg    `json:"discord"`
 }
 
 func defaultSettings() Settings {
-	return Settings{Lang: "auto", PointsOn: true, ChatOn: true, DropsOn: true, AutoClaim: true, StallMin: 15, OpenOnStart: true, KickOn: true, KickMax: 2, AutoUpdate: true}
+	return Settings{Lang: "auto", PointsOn: true, ChatOn: true, DropsOn: true, AutoClaim: true, StallMin: 15, OpenOnStart: true, KickOn: true, KickMax: 2, AutoUpdate: true,
+		Discord: RPCCfg{Drop: true, Queue: true, Tracked: true, Points: true, Button: true}} // off until the user switches it on
 }
 
 type AuthFile struct {
@@ -118,6 +120,8 @@ type Engine struct {
 	chans map[string]*chanRT
 	slots []*chanRT
 
+	rpcState string // Discord Rich Presence: off | noid | nodiscord | badid | refused | ok
+
 	nextOnline   time.Time
 	nextBalances time.Time
 	rotateStart  time.Time
@@ -181,6 +185,7 @@ func (e *Engine) run() {
 	go e.chat.run()
 	go e.kick.run()
 	go e.updateLoop()
+	go e.discordLoop()
 	t := time.NewTicker(iv(time.Second))
 	defer t.Stop()
 	for {

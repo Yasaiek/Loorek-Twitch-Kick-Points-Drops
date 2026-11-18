@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+- Discord status (Rich Presence): Loorek can show on your Discord profile what it is doing – the drop being farmed with its progress, the queue, the tracked games and the channels points are collected on. It follows the language of the app.
+- Settings > Discord status: switch it on or off as a whole, and choose which of those parts are shown. It is off until you switch it on.
+
 ## 0.7.2
 - Twitch's own reward campaigns have a place of their own at the top of the campaign list: one wide bar per campaign with all its rewards and their progress. Game drops follow below as before.
 - While such a campaign is being farmed its progress is re-read every two minutes (it used to move only every ten).

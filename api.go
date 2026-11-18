@@ -234,7 +234,10 @@ func (e *Engine) view() map[string]any {
 		"auth":    map[string]any{"state": e.authState, "login": e.auth.Login, "note": e.authNote, "mode": e.loginMode},
 		"settings": map[string]any{"pointsOn": e.set.PointsOn, "chatOn": e.set.ChatOn, "dropsOn": e.set.DropsOn, "autoClaim": e.set.AutoClaim,
 			"rotateMin": e.set.RotateMin, "stallMin": e.set.StallMin, "autostart": e.set.Autostart, "openOnStart": e.set.OpenOnStart,
-			"kickOn": e.set.KickOn, "kickMax": e.set.KickMax, "autoUpdate": e.set.AutoUpdate, "lang": e.set.Lang},
+			"kickOn": e.set.KickOn, "kickMax": e.set.KickMax, "autoUpdate": e.set.AutoUpdate, "lang": e.set.Lang,
+			"rpcOn": e.set.Discord.On, "rpcDrop": e.set.Discord.Drop, "rpcQueue": e.set.Discord.Queue, "rpcTracked": e.set.Discord.Tracked,
+			"rpcPoints": e.set.Discord.Points, "rpcBtn": e.set.Discord.Button},
+		"rpc":    map[string]any{"state": e.rpcState, "ready": firstNonEmpty(e.set.Discord.AppID, discordAppID) != ""},
 		"points": map[string]any{"channels": chans, "earned": earned, "claims": claims, "watching": watching},
 		"chat":   map[string]any{"state": chatState, "joined": chatJoined},
 		"kick":   kickView,
@@ -434,6 +437,18 @@ func (s *server) handleOp(req opReq) map[string]any {
 				e.set.KickMax = int(min(max(num(v), 1), 5))
 			case "openOnStart":
 				e.set.OpenOnStart = boolean(v)
+			case "rpcOn":
+				e.set.Discord.On = boolean(v)
+			case "rpcDrop":
+				e.set.Discord.Drop = boolean(v)
+			case "rpcQueue":
+				e.set.Discord.Queue = boolean(v)
+			case "rpcTracked":
+				e.set.Discord.Tracked = boolean(v)
+			case "rpcPoints":
+				e.set.Discord.Points = boolean(v)
+			case "rpcBtn":
+				e.set.Discord.Button = boolean(v)
 			case "autoUpdate":
 				e.set.AutoUpdate = boolean(v)
 			case "lang":
