@@ -129,6 +129,7 @@ func (e *Engine) view() map[string]any {
 		name  string
 		start time.Time
 		names []string
+		quest []*Campaign // Twitch's own reward campaigns among them: these get a banner of their own
 	}
 	games := map[string]*agg{}
 	for _, c := range e.drops.camps {
@@ -150,6 +151,9 @@ func (e *Engine) view() map[string]any {
 			games[c.Game.ID] = a
 		}
 		a.names = append(a.names, c.Name)
+		if c.Quest {
+			a.quest = append(a.quest, c)
+		}
 		if len(c.Cats) > 0 && a.name == c.Game.Name { // listed under its own name: say where it counts instead of repeating it
 			a.name = fmt.Sprintf("%s +%d", c.Cats[0].Name, len(c.Cats)-1)
 		}
@@ -166,8 +170,32 @@ func (e *Engine) view() map[string]any {
 	}
 	list := []map[string]any{}
 	for _, a := range games {
-		list = append(list, map[string]any{"id": a.g.ID, "slug": a.g.Slug, "name": a.g.Name, "art": a.g.Art, "camps": a.n, "camp": a.name, "names": strings.Join(a.names, " | "),
-			"end": ms(a.end), "upcoming": now.Before(a.start), "start": ms(a.start), "status": e.gameStatus(a.g, now), "queued": queuePos(a.g), "tracked": isTracked(a.g)})
+		row := map[string]any{"id": a.g.ID, "slug": a.g.Slug, "name": a.g.Name, "art": a.g.Art, "camps": a.n, "camp": a.name, "names": strings.Join(a.names, " | "),
+			"end": ms(a.end), "upcoming": now.Before(a.start), "start": ms(a.start), "status": e.gameStatus(a.g, now), "queued": queuePos(a.g), "tracked": isTracked(a.g)}
+		if len(a.quest) > 0 {
+			sort.Slice(a.quest, func(i, j int) bool {
+				if !a.quest[i].End.Equal(a.quest[j].End) {
+					return a.quest[i].End.Before(a.quest[j].End)
+				}
+				return a.quest[i].ID < a.quest[j].ID
+			})
+			first := a.quest[0]
+			where := first.Game.Name // the categories it counts in
+			if len(first.Cats) > 1 {
+				where = fmt.Sprintf("%s +%d", first.Cats[0].Name, len(first.Cats)-1)
+			}
+			rewards := []map[string]any{}
+			for _, c := range a.quest {
+				for _, d := range c.Drops {
+					if d.Req > 0 {
+						rewards = append(rewards, map[string]any{"id": d.ID, "name": d.Name, "img": d.Img, "cur": d.Cur, "req": d.Req, "claimed": d.Claimed,
+							"locked": d.Later && !d.finished(), "day": d.Day, "next": ms(d.Next)})
+					}
+				}
+			}
+			row["quest"], row["title"], row["where"], row["rewards"] = true, first.Name, where, rewards
+		}
+		list = append(list, row)
 	}
 	sort.Slice(list, func(i, j int) bool {
 		return strings.ToLower(list[i]["name"].(string)) < strings.ToLower(list[j]["name"].(string))
@@ -189,7 +217,7 @@ func (e *Engine) view() map[string]any {
 				art = c.Game.Art
 			}
 		}
-		cur := map[string]any{"game": f.game.Name, "art": art, "channel": f.ch.Name, "login": f.ch.Login, "since": ms(f.started), "drop": "", "cur": 0, "req": 0}
+		cur := map[string]any{"game": f.game.Name, "art": art, "channel": f.ch.Name, "login": f.ch.Login, "since": ms(f.started), "drop": "", "cur": 0, "req": 0, "gameId": f.game.ID, "dropId": f.dropID}
 		for _, c := range e.drops.camps {
 			if d := c.drop(f.dropID); d != nil && f.dropID != "" {
 				cur["drop"], cur["cur"], cur["req"], cur["img"] = d.Name, d.Cur, d.Req, d.Img

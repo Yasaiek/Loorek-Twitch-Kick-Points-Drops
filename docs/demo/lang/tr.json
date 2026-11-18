@@ -145,6 +145,8 @@
 "fact.any": "bu oyunun dropları açık herhangi bir kanalı",
 "camp.noTimed": "Bu kampanyada izleme süresine bağlı ödül yok.",
 "camp.quest": "Twitch ödülü",
+"camps.quests": "Twitch kampanyaları",
+"camps.games": "Oyun dropları",
 "drop.day": "{n}. gün",
 "drop.next": "bugün tamam ✓ · sonraki {when}",
 "farm.now": "Şu anda drop kasıyorum",

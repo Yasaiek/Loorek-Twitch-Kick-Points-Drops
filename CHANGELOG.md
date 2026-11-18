@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.2
+- Twitch's own reward campaigns have a place of their own at the top of the campaign list: one wide bar per campaign with all its rewards and their progress. Game drops follow below as before.
+- While such a campaign is being farmed its progress is re-read every two minutes (it used to move only every ten).
+
 ## 0.7.1
 - The campaign search also matches campaign names, not only game names: "GTAVI Launch Celebration" sits under the game "Grand Theft Auto VI", so typing "gta" found nothing.
 - Reward campaigns that count in many categories (the Pokémon ones count in 21 games) are listed under their own name instead of being hidden under the first game, and are farmed on whichever of those categories has a drops-enabled stream.

@@ -161,6 +161,35 @@ input[type=number] { width: 70px; text-align: center; }
 .gcard:hover { border-color: var(--line-2); transform: translateY(-2px); background: var(--card-2); }
 .gcard.q { border-color: rgba(96,205,255,.45); background: linear-gradient(100deg, rgba(96,205,255,.1), var(--card) 65%); }
 .gcard.done { opacity: .6; }
+.qsec { display: flex; align-items: center; gap: 10px; margin: 2px 0 8px; font: 600 12px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+.qsec::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.quests { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.quests:empty, .qsec[hidden] { display: none; }
+.qban { position: relative; display: flex; gap: 14px; align-items: center; padding: 14px 16px 14px 18px; border-radius: 12px; cursor: pointer; overflow: hidden;
+  border: 1px solid rgba(143,123,255,.32); background: linear-gradient(100deg, rgba(143,123,255,.2), rgba(96,205,255,.06) 42%, var(--card) 78%); transition: border-color .2s, transform .2s var(--ease), box-shadow .2s; }
+.qban::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--violet), var(--accent)); }
+.qban:hover { border-color: rgba(143,123,255,.65); transform: translateY(-2px); box-shadow: 0 10px 28px -14px rgba(143,123,255,.6); }
+.qban.q { border-color: rgba(96,205,255,.6); }
+.qban.done { opacity: .62; }
+.qban .main { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; flex: 1; min-width: 0; }
+.qban .who { display: flex; gap: 14px; align-items: center; flex: 0 1 300px; min-width: 0; }
+.qban .who .art.big { width: 66px; height: 88px; border-radius: 9px; box-shadow: 0 6px 18px -8px #000; }
+.qban .who .nm { font: 650 17px var(--display); letter-spacing: -.01em; white-space: normal; }
+.qban .who .pill { margin-bottom: 5px; }
+.qban .who .pill:not(.run) { color: #c9bfff; border-color: rgba(143,123,255,.45); background: rgba(143,123,255,.12); }
+.qban .rws { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1 1 230px; min-width: 0; }
+@media (max-width: 1040px) { .qban .who { flex-basis: 236px; gap: 11px; } .qban .who .art.big { width: 54px; height: 72px; } .qban .who .nm { font-size: 15.5px; } .rwl { max-width: none; padding-left: 0; } }
+.rwl { display: flex; flex-wrap: wrap; gap: 8px 7px; max-width: 132px; padding-left: 4px; }
+.rw { min-width: 98px; max-width: 150px; padding: 8px 8px 7px; border-radius: 9px; background: rgba(0,0,0,.28); border: 1px solid var(--line); text-align: center; min-width: 0; }
+.rw .dimg { width: 44px; height: 44px; margin: 0 auto 6px; }
+.rw .rn { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rw .rs { font-size: 11px; color: var(--sub); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rw .bar { margin-top: 5px; height: 4px; }
+.rw.done { border-color: rgba(108,203,95,.4); } .rw.done .bar div { background: var(--ok); } .rw.done .rs { color: var(--ok); }
+.rw.claim { border-color: rgba(245,200,76,.5); } .rw.claim .rs { color: var(--warn); }
+.rw.live { border-color: rgba(96,205,255,.55); } .rw.live .rs { color: var(--accent); }
+.rw.lock { min-width: 0; padding: 0; border: 0; background: none; opacity: .5; position: relative; } .rw.lock .dimg { width: 38px; height: 38px; margin: 0; filter: grayscale(1); }
+.rw.lock::after { content: "🔒"; position: absolute; right: -3px; bottom: -4px; font-size: 11px; }
 .icon svg, .ib svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; display: block; }
 .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; margin-right: 6px; }
 .gacts { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -344,6 +373,9 @@ select:focus { border-color: var(--accent); }
     <div class="pane on" id="sub-camps">
       <div class="pane-head"><p data-i="camps.sub"></p></div>
       <div class="toolbar"><input type="text" id="campSearch" data-ip="camps.searchPh" autocomplete="off" spellcheck="false"><button class="btn" id="refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/></svg><span data-i="refresh"></span></button><span class="sub" id="campInfo"></span></div>
+      <div class="qsec" id="questHead" data-i="camps.quests" hidden></div>
+      <div class="quests" id="questList"></div>
+      <div class="qsec" id="gamesHead" data-i="camps.games" hidden></div>
       <div class="grid" id="campList"></div>
     </div>
     <div class="pane" id="sub-queue">
@@ -885,25 +917,52 @@ function render() {
   const q = $('campSearch').value.trim().toLowerCase();
   const games = s.drops.games.filter((g) => !q || g.name.toLowerCase().includes(q) || (g.names || '').toLowerCase().includes(q)); // by game or by campaign name
   $('campInfo').textContent = s.drops.fetchedAt ? tr('camps.info', { n: s.drops.games.length, time: new Date(s.drops.fetchedAt).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) }) : '';
-  if (changed('camps', [games, s.drops.fetchedAt > 0, s.drops.err])) {
+  if (changed('camps', [games, s.drops.fetchedAt > 0, s.drops.err, s.drops.current && [s.drops.current.gameId, s.drops.current.dropId, s.drops.current.channel]])) {
     const list = $('campList'); list.textContent = '';
     if (!s.drops.fetchedAt) list.append(el('div', 'empty', s.drops.err ? tr('camps.err') : tr('camps.loading')));
     else if (!games.length) list.append(el('div', 'empty', q ? tr('camps.noMatch') : tr('camps.none')));
+    const quests = $('questList'); quests.textContent = '';
+    const banners = games.filter((g) => g.quest), cur = s.drops.current;
+    $('questHead').hidden = $('gamesHead').hidden = !banners.length; $('gamesHead').hidden = $('gamesHead').hidden || banners.length === games.length;
     games.forEach((g, i) => {
-      const it = el('div', 'gcard' + (g.queued ? ' q' : '') + (g.status === 'done' ? ' done' : '')); enter(it, seen.camp, g.id, i);
-      const txt = el('div', 'txt'); txt.append(el('div', 'nm', g.name));
-      txt.append(el('div', 'sb', g.camps > 1 ? tr('det.many', { n: g.camps }) : g.camp));
-      txt.append(el('div', 'sb', g.status === 'done' ? tr('camps.allDone') : g.upcoming ? tr('camp.start', { when: when(g.start) }) : tr('camps.until', { when: when(g.end) }) + ' · ' + left(g.end)));
       const ref = { id: g.id, slug: g.slug, name: g.name, art: g.art };
       const track = () => op({ op: 'trackToggle', game: ref }).then(() => toast(tr(g.tracked ? 'toast.untracked' : 'toast.tracked', { name: g.name })));
       const info = iconBtn('ib', 'info', tr('camps.infoTip')); info.onclick = (ev) => { ev.stopPropagation(); openDetail(g.id); };
       const star = iconBtn('ib star' + (g.tracked ? ' on' : ''), 'star', g.tracked ? tr('q.untrack') : tr('det.track')); star.onclick = (ev) => { ev.stopPropagation(); track(); };
       const add = el('button', 'ib add' + (g.queued ? ' on' : '')); add.type = 'button'; add.title = g.queued ? tr('q.remove') : tr('det.queue'); if (g.queued) add.textContent = g.queued; else add.append(ico('plus'));
       const col = el('div', 'col2'); col.append(info, star); const acts = el('div', 'gacts'); acts.append(col, add);
-      it.append(art(g.art, true), txt, acts);
+      const again = g.quest && g.rewards.some((d) => d.next > Date.now()); // a daily reward waits for its next round: not finished
+      const until = g.status === 'done' && !again ? tr('camps.allDone') : g.upcoming ? tr('camp.start', { when: when(g.start) }) : tr('camps.until', { when: when(g.end) }) + ' · ' + left(g.end);
+      const it = el('div', (g.quest ? 'qban' : 'gcard') + (g.queued ? ' q' : '') + (g.status === 'done' && !again ? ' done' : '')); enter(it, seen.camp, g.id, i);
+      const txt = el('div', 'txt');
+      if (g.quest) { // one of Twitch's own reward campaigns: a wide banner of its own, with every reward in it
+        const watching = cur && cur.gameId === g.id;
+        txt.append(el('span', 'pill' + (watching ? ' run' : ''), watching ? tr('q.watching', { ch: cur.channel }) : tr('camp.quest')), el('div', 'nm', g.title));
+        txt.append(el('div', 'sb', [g.title === g.where ? '' : g.where, g.camps > 1 ? tr('det.many', { n: g.camps }) : ''].filter(Boolean).join(' · ')), el('div', 'sb', until));
+        const who = el('div', 'who'); who.append(art(g.art, true), txt);
+        const rws = el('div', 'rws'), later = el('div', 'rwl');
+        for (const d of [...g.rewards.filter((d) => !d.locked), ...g.rewards.filter((d) => d.locked)]) { // the open ones first; later stages as small locked tiles
+          // Twitch does not say which reward is running in these campaigns: every open, unfinished one is
+          const claim = !d.claimed && d.cur >= d.req, live = watching && !d.claimed && !claim && !d.locked;
+          const r = el('div', 'rw' + (d.claimed ? ' done' : claim ? ' claim' : d.locked ? ' lock' : live ? ' live' : ''));
+          const im = el('div', 'dimg'); if (d.img) { const p = el('img'); p.src = d.img; p.alt = ''; p.draggable = false; p.onerror = () => { p.remove(); im.textContent = '🎁'; }; im.append(p); } else im.textContent = '🎁';
+          const bar = el('div', 'bar' + (live ? ' live' : '')), fill = el('div'); fill.style.width = (d.claimed ? 100 : d.req ? Math.min(100, d.cur / d.req * 100) : 0) + '%'; bar.append(fill);
+          const st = d.claimed ? (d.next ? '✓ · ' + new Date(d.next).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) : '✓') : claim ? tr('stt.claim') : Math.floor(Math.min(d.cur, d.req)) + ' / ' + tr('dur.m', { m: d.req });
+          if (d.locked && !d.claimed && !claim) r.append(im); else r.append(im, el('div', 'rn', d.name || tr('drop.noname')), bar, el('div', 'rs', (d.day ? tr('drop.day', { n: d.day }) + ' · ' : '') + st));
+          r.title = tr('drop.tip', { name: d.name || tr('drop.reward'), t: mins(d.req) }) + (d.locked ? '\n' + tr('drop.first', { name: tr('drop.prev') }) : '');
+          if (d.locked && !d.claimed && !claim) later.append(r); else rws.append(r);
+        }
+        if (later.childNodes.length) rws.append(later);
+        const main = el('div', 'main'); main.append(who, rws); it.append(main, acts);
+      } else {
+        txt.append(el('div', 'nm', g.name));
+        txt.append(el('div', 'sb', g.camps > 1 ? tr('det.many', { n: g.camps }) : g.camp));
+        txt.append(el('div', 'sb', until));
+        it.append(art(g.art, true), txt, acts);
+      }
       it.onclick = () => op({ op: 'queueToggle', game: ref });
       it.oncontextmenu = (ev) => { ev.preventDefault(); track(); };
-      list.append(it);
+      (g.quest ? quests : list).append(it);
     });
   }
 
@@ -997,7 +1056,7 @@ $('updCheck').onclick = () => { op({ op: 'updateCheck' }); };
 $('updInstall').onclick = () => op({ op: 'updateInstall' });
 $('clearLog').onclick = () => op({ op: 'clearLog' });
 $('quit').onclick = async () => { await op({ op: 'quit' }); window.close(); };
-document.addEventListener('contextmenu', (ev) => { if (!ev.target.closest('.gcard, input, .log')) ev.preventDefault(); });
+document.addEventListener('contextmenu', (ev) => { if (!ev.target.closest('.gcard, .qban, input, .log')) ev.preventDefault(); });
 </script>
 </body>
 </html>

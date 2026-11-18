@@ -145,6 +145,8 @@
 "fact.any": "ドロップが有効なこのゲームのチャンネルならどれでも",
 "camp.noTimed": "このキャンペーンには視聴時間による報酬がありません。",
 "camp.quest": "Twitch の報酬",
+"camps.quests": "Twitchのキャンペーン",
+"camps.games": "ゲームのドロップ",
 "drop.day": "{n} 日目",
 "drop.next": "今日は完了 ✓ · 次回 {when}",
 "farm.now": "ドロップを周回中",

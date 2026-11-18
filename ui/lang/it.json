@@ -145,6 +145,8 @@
 "fact.any": "qualsiasi canale di questo gioco con i drop attivi",
 "camp.noTimed": "Questa campagna non ha ricompense per il tempo di visione.",
 "camp.quest": "ricompensa Twitch",
+"camps.quests": "Campagne Twitch",
+"camps.games": "Drop dei giochi",
 "drop.day": "giorno {n}",
 "drop.next": "oggi fatto ✓ · prossimo {when}",
 "farm.now": "Sto farmando un drop",

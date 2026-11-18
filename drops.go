@@ -49,8 +49,9 @@ type farm struct {
 	lastProg time.Time
 	lastPoll time.Time
 	lastCur  int64
-	total    int64 // minutes seen on the account for this game at the last inventory read
-	solo     bool  // points watching is paused so that nothing competes with this drop
+	total    int64     // minutes seen on the account for this game at the last inventory read
+	solo     bool      // points watching is paused so that nothing competes with this drop
+	quest    time.Time // a reward campaign is among the farmed ones: when its progress was last read
 }
 
 type dropsState struct {
@@ -377,6 +378,9 @@ func (e *Engine) claimDrops(now time.Time) {
 		e.mu.Lock()
 		if err == nil && (status == "ELIGIBLE_FOR_ALL" || status == "DROP_INSTANCE_ALREADY_CLAIMED") {
 			j.d.Claimed = true
+			if next := now.Add(iv(10 * time.Second)); j.c.Quest && next.Before(e.drops.nextFetch) {
+				e.drops.nextFetch = next // a daily reward: read when its next round opens
+			}
 			e.mu.Unlock()
 			e.log.OK("L.claimed", j.d.Name, j.c.Game.Name)
 			continue
@@ -570,6 +574,11 @@ func (e *Engine) dropsStep(now time.Time) {
 		e.mu.Lock()
 		if ch != nil {
 			e.drops.cur = &farm{game: *top, ch: ch, campIDs: campIDs, started: now, lastProg: now, lastPoll: now.Add(-iv(30 * time.Second))}
+			for id := range campIDs {
+				if c := e.drops.camps[id]; c != nil && c.Quest {
+					e.drops.cur.quest = now
+				}
+			}
 			delete(e.drops.gameNote, top.ID)
 			if next := now.Add(iv(10 * time.Minute)); next.Before(e.drops.nextFetch) {
 				e.drops.nextFetch = next // while farming the account is read more often
@@ -587,6 +596,41 @@ func (e *Engine) dropsStep(now time.Time) {
 	if cur != nil && now.Sub(cur.lastPoll) >= iv(time.Minute) {
 		e.pollDrop(cur, now)
 	}
+	if cur != nil && !cur.quest.IsZero() && now.Sub(cur.quest) >= iv(2*time.Minute) {
+		e.pollQuests(cur, now)
+	}
+}
+
+// pollQuests re-reads only Twitch's reward campaigns while one of them is being farmed. Twitch does not
+// report a running reward the way it reports a drop, and the full account reading is too heavy to repeat
+// every couple of minutes; this one is two small requests and keeps the progress on screen moving.
+func (e *Engine) pollQuests(f *farm, now time.Time) {
+	f.quest = now
+	_, uid, _, _ := e.c.auth()
+	quests, ok := e.fetchQuests(now, uid)
+	if !ok {
+		return
+	}
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	for _, q := range quests {
+		e.drops.camps[q.ID] = q
+		for _, d := range q.Drops {
+			if !d.Claimed && d.HasSelf && d.Req > 0 && d.Cur >= d.Req && now.Add(iv(5*time.Second)).Before(e.drops.nextFetch) {
+				e.drops.nextFetch = now.Add(iv(5 * time.Second)) // finished: the full reading confirms and claims it
+			}
+		}
+	}
+	var total int64
+	for _, c := range e.gameCamps(f.game, now) {
+		for _, d := range c.Drops {
+			total += d.Cur
+		}
+	}
+	if total > f.total {
+		f.lastProg = now
+	}
+	f.total = total
 }
 
 // stallLimit: how long without progress before the stream is changed. When Twitch does not report the
