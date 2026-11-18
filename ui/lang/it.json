@@ -206,7 +206,7 @@
 "set.rpcTracked": "Giochi seguiti",
 "set.rpcPoints": "Punti",
 "set.rpcPointsHint": "I canali Twitch e Kick su cui vengono raccolti i punti",
-"set.rpcBtn": "Pulsante «Scarica Loorek»",
+"set.rpcBtn": "Pulsanti «Scarica Loorek» e «GitHub»",
 "rpc.st.ok": "Connesso a Discord: lo stato è visibile.",
 "rpc.st.nodiscord": "Discord non è in esecuzione su questo computer.",
 "rpc.st.badid": "Discord non conosce questo ID applicazione.",

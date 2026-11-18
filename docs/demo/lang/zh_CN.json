@@ -206,7 +206,7 @@
 "set.rpcTracked": "关注的游戏",
 "set.rpcPoints": "积分",
 "set.rpcPointsHint": "正在收集积分的 Twitch 和 Kick 频道",
-"set.rpcBtn": "“获取 Loorek”按钮",
+"set.rpcBtn": "“获取 Loorek”和“GitHub”按钮",
 "rpc.st.ok": "已连接 Discord – 状态已显示。",
 "rpc.st.nodiscord": "这台电脑上没有运行 Discord。",
 "rpc.st.badid": "Discord 不认识这个应用 ID。",

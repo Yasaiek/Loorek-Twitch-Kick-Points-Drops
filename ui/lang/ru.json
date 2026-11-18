@@ -206,7 +206,7 @@
 "set.rpcTracked": "Отслеживаемые игры",
 "set.rpcPoints": "Баллы",
 "set.rpcPointsHint": "Каналы Twitch и Kick, на которых собираются баллы",
-"set.rpcBtn": "Кнопка «Скачать Loorek»",
+"set.rpcBtn": "Кнопки «Скачать Loorek» и «GitHub»",
 "rpc.st.ok": "Подключено к Discord – статус виден.",
 "rpc.st.nodiscord": "Discord не запущен на этом компьютере.",
 "rpc.st.badid": "Discord не знает этот ID приложения.",

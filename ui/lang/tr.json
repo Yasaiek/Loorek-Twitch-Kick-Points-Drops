@@ -206,7 +206,7 @@
 "set.rpcTracked": "Takip edilen oyunlar",
 "set.rpcPoints": "Puanlar",
 "set.rpcPointsHint": "Puan toplanan Twitch ve Kick kanalları",
-"set.rpcBtn": "“Loorek’i indir” düğmesi",
+"set.rpcBtn": "“Loorek’i indir” ve “GitHub” düğmeleri",
 "rpc.st.ok": "Discord’a bağlandı – durum görünüyor.",
 "rpc.st.nodiscord": "Discord bu bilgisayarda çalışmıyor.",
 "rpc.st.badid": "Discord bu uygulama kimliğini tanımıyor.",

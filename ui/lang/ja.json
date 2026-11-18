@@ -206,7 +206,7 @@
 "set.rpcTracked": "追跡中のゲーム",
 "set.rpcPoints": "ポイント",
 "set.rpcPointsHint": "ポイントを集めているTwitchとKickのチャンネル",
-"set.rpcBtn": "「Loorekを入手」ボタン",
+"set.rpcBtn": "「Loorekを入手」と「GitHub」のボタン",
 "rpc.st.ok": "Discordに接続しました – ステータスが表示されています。",
 "rpc.st.nodiscord": "このパソコンでDiscordが起動していません。",
 "rpc.st.badid": "DiscordはこのアプリケーションIDを認識しません。",

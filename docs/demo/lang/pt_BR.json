@@ -206,7 +206,7 @@
 "set.rpcTracked": "Jogos seguidos",
 "set.rpcPoints": "Pontos",
 "set.rpcPointsHint": "Os canais da Twitch e do Kick em que os pontos são coletados",
-"set.rpcBtn": "Botão “Baixar Loorek”",
+"set.rpcBtn": "Botões “Baixar Loorek” e “GitHub”",
 "rpc.st.ok": "Conectado ao Discord – o status está visível.",
 "rpc.st.nodiscord": "O Discord não está aberto neste computador.",
 "rpc.st.badid": "O Discord não reconhece este ID de aplicativo.",

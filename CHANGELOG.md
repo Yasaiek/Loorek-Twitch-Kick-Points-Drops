@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.1
+- Discord status: a second button, "GitHub", next to "Get Loorek".
+
 ## 0.8.0
 - Discord status (Rich Presence): Loorek can show on your Discord profile what it is doing – the drop being farmed with its progress, the queue, the tracked games and the channels points are collected on. It follows the language of the app.
 - Settings > Discord status: switch it on or off as a whole, and choose which of those parts are shown. It is off until you switch it on.

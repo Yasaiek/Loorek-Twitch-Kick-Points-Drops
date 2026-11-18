@@ -32,7 +32,10 @@ const (
 	rpcIdle   = "idle"
 )
 
-const siteURL = "https://yasaiek.github.io/Loorek-Twitch-Kick-Points-Drops/"
+const (
+	siteURL = "https://yasaiek.github.io/Loorek-Twitch-Kick-Points-Drops/"
+	repoURL = "https://github.com/Yasaiek/Loorek-Twitch-Kick-Points-Drops"
+)
 
 // RPCCfg: what the user lets Discord show.
 type RPCCfg struct {
@@ -41,7 +44,7 @@ type RPCCfg struct {
 	Queue   bool   `json:"queue"`           // the drops queue
 	Tracked bool   `json:"tracked"`         // the tracked games
 	Points  bool   `json:"points"`          // the channels points are collected on
-	Button  bool   `json:"button"`          // a "Get Loorek" button
+	Button  bool   `json:"button"`          // the link buttons: "Get Loorek" (the site) and "GitHub"
 	AppID   string `json:"appId,omitempty"` // not in the panel: only for trying another application
 }
 
@@ -183,7 +186,7 @@ func (e *Engine) presence(now time.Time) (cfg RPCCfg, id string, act *rpcActivit
 	act.Assets.LargeText = rpcText(firstNonEmpty(strings.Join(lists, " • "), appName+" "+version))
 	act.Assets.SmallText = rpcText(firstNonEmpty(more, appName+" "+version))
 	if cfg.Button {
-		act.Buttons = []rpcButton{{Label: rpcText(tr("rpc.btn")), URL: siteURL}}
+		act.Buttons = []rpcButton{{Label: rpcText(tr("rpc.btn")), URL: siteURL}, {Label: "GitHub", URL: repoURL}}
 	}
 	return cfg, id, act
 }

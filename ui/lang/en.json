@@ -206,7 +206,7 @@
 "set.rpcTracked": "Tracked games",
 "set.rpcPoints": "Points",
 "set.rpcPointsHint": "The Twitch and Kick channels points are collected on",
-"set.rpcBtn": "“Get Loorek” button",
+"set.rpcBtn": "“Get Loorek” and “GitHub” buttons",
 "rpc.st.ok": "Connected to Discord – the status is visible.",
 "rpc.st.nodiscord": "Discord is not running on this computer.",
 "rpc.st.badid": "Discord does not know this application ID.",
