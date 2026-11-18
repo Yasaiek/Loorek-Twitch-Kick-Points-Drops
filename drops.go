@@ -19,6 +19,8 @@ type Drop struct {
 	Img      string
 	Start    time.Time
 	End      time.Time
+	Day      int       // reward campaigns: which round of a repeating (daily) group this is, 0 = does not repeat
+	Next     time.Time // reward campaigns: this round is done, the next one opens then
 }
 
 type ACL struct{ ID, Login, Name string }
@@ -33,6 +35,7 @@ type Campaign struct {
 	LinkURL  string
 	Channels []ACL
 	Drops    []*Drop
+	Quest    bool // one of Twitch's own reward campaigns (see quests.go)
 }
 
 type farm struct {
@@ -306,6 +309,20 @@ func (e *Engine) fetchDrops(now time.Time) bool {
 			}
 		}
 	}
+	// Twitch's own reward campaigns (daily chests, badge collections) come from a separate place
+	quests, ok := e.fetchQuests(now, uid)
+	e.mu.Lock()
+	if !ok { // not read this time: keep the ones already known
+		for id, c := range e.drops.camps {
+			if c.Quest && camps[id] == nil {
+				camps[id] = c
+			}
+		}
+	}
+	e.mu.Unlock()
+	for _, q := range quests {
+		camps[q.ID] = q
+	}
 	e.mu.Lock()
 	first := e.drops.fetchedAt.IsZero()
 	e.drops.camps = camps
@@ -467,6 +484,15 @@ func (e *Engine) dropsStep(now time.Time) {
 		default:
 			e.drops.nextFetch = now.Add(iv(30 * time.Minute))
 		}
+		if ok { // a daily reward that reopens before the next reading: read again right when it does
+			for _, c := range e.drops.camps {
+				for _, d := range c.Drops {
+					if at := d.Next.Add(5 * time.Second); !d.Next.IsZero() && at.After(now) && at.Before(e.drops.nextFetch) {
+						e.drops.nextFetch = at
+					}
+				}
+			}
+		}
 		e.mu.Unlock()
 		if ok && auto {
 			e.claimDrops(now)
@@ -625,11 +651,15 @@ func (e *Engine) findDropChannel(g GameRef, now time.Time) (*chanRT, map[string]
 	campIDs := map[string]bool{}
 	acl := map[string]ACL{}
 	allACL := true
+	questOnly := true // only Twitch's reward campaigns are open for this game
 	for _, c := range e.gameCamps(g, now) {
 		if len(c.earnable(now)) == 0 {
 			continue
 		}
 		campIDs[c.ID] = true
+		if !c.Quest {
+			questOnly = false
+		}
 		if len(c.Channels) == 0 {
 			allACL = false
 		}
@@ -714,6 +744,12 @@ func (e *Engine) findDropChannel(g GameRef, now time.Time) (*chanRT, map[string]
 		}
 		if first == nil {
 			first = ch
+		}
+		if questOnly {
+			// A reward campaign counts on the category's streams with drops on and is not listed per
+			// channel, so there is nothing to verify: take the biggest one. A stream that brings no
+			// progress is dropped later by the usual "stalled" rule.
+			return e.adopt(ch), campIDs
 		}
 		if checked >= 6 {
 			break

@@ -256,10 +256,10 @@ func (e *Engine) campViews(g GameRef, now time.Time) []map[string]any {
 				left += d.Req - d.Cur
 			}
 			drops = append(drops, map[string]any{"id": d.ID, "name": d.Name, "img": d.Img, "cur": d.Cur, "req": d.Req, "claimed": d.Claimed,
-				"pre": pre, "blocked": blocked && !d.finished(), "end": ms(d.End)})
+				"pre": pre, "blocked": blocked && !d.finished(), "end": ms(d.End), "day": d.Day, "next": ms(d.Next)})
 		}
 		out = append(out, map[string]any{"id": c.ID, "name": c.Name, "start": ms(c.Start), "end": ms(c.End), "active": c.active(now),
-			"linked": c.Linked, "link": c.LinkURL, "channels": names, "channelCount": len(c.Channels), "drops": drops, "left": left})
+			"linked": c.Linked, "link": c.LinkURL, "channels": names, "channelCount": len(c.Channels), "drops": drops, "left": left, "quest": c.Quest})
 	}
 	return out
 }

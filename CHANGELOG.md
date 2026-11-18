@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0
+- Twitch's own reward campaigns are in the campaign list now: daily chests and badge collections such as "GTAVI Launch Celebration". They can be queued and tracked like any other campaign; a daily one is farmed again by itself when the next day opens.
+- For these campaigns Loorek keeps Twitch's last answer in `data/quests-debug.json` (names and progress only), to make problems with this new kind of campaign easy to find.
+
 ## 0.6.4
 - Fixed Twitch channel points not being earned: the "minute watched" report lacked two fields Twitch's web player sends, so Twitch accepted it but credited nothing.
 - The journal now warns when a channel is watched for 25 minutes without a single point.

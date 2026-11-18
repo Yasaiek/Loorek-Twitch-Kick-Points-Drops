@@ -489,7 +489,7 @@ select:focus { border-color: var(--accent); }
 </div>
 <div id="toast"></div>
 
-<script>window.LOOREK_VERSION = "0.6.4";</script>
+<script>window.LOOREK_VERSION = "0.7.0";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -711,9 +711,10 @@ function dropCard(d, live) {
   const done = d.claimed, claim = !done && d.cur >= d.req;
   const c = el('div', 'dcard' + (done ? ' done' : claim ? ' claim' : ''));
   const im = el('div', 'dimg'); if (d.img) { const i = el('img'); i.src = d.img; i.alt = ''; i.draggable = false; i.onerror = () => { i.remove(); im.textContent = '🎁'; }; im.append(i); } else im.textContent = '🎁';
-  const t = el('div', 'txt'); t.append(el('div', 'nm', d.name || tr('drop.noname')));
-  const state = done ? [tr('drop.claimed'), 'ok'] : claim ? [tr('drop.toClaim'), 'warn'] : d.blocked ? [tr('drop.first', { name: d.pre[0] || tr('drop.prev') }), ''] : live ? [tr('drop.live'), 'run'] : d.cur > 0 ? [tr('drop.progress'), ''] : [tr('drop.waits'), ''];
-  const line = el('div', 'sb'); line.append(tr('drop.of', { a: mins(Math.min(d.cur, d.req)), b: mins(d.req) }) + ' · '); line.append(el('span', 'tag ' + state[1], state[0])); t.append(line);
+  const t = el('div', 'txt'); t.append(el('div', 'nm', (d.name || tr('drop.noname')) + (d.day ? ' · ' + tr('drop.day', { n: d.day }) : '')));
+  const soon = (ms) => (ms - Date.now() < 86400000 ? new Date(ms).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) : when(ms)); // a daily reward: when the next round opens
+  const state = done ? [d.next ? tr('drop.next', { when: soon(d.next) }) : tr('drop.claimed'), 'ok'] : claim ? [tr('drop.toClaim'), 'warn'] : d.blocked ? [tr('drop.first', { name: d.pre[0] || tr('drop.prev') }), ''] : live ? [tr('drop.live'), 'run'] : d.cur > 0 ? [tr('drop.progress'), ''] : [tr('drop.waits'), ''];
+  const line = el('div', 'sb'); if (!(done && d.next)) line.append(tr('drop.of', { a: mins(Math.min(d.cur, d.req)), b: mins(d.req) }) + ' · '); line.append(el('span', 'tag ' + state[1], state[0])); t.append(line);
   const bar = el('div', 'bar' + (live ? ' live' : '')), fill = el('div'); fill.style.width = (d.req ? Math.min(100, d.cur / d.req * 100) : 0) + '%'; bar.append(fill); t.append(bar);
   c.title = tr('drop.tip', { name: d.name || tr('drop.reward'), t: mins(d.req) }) + (d.pre && d.pre.length ? '\n' + tr('drop.requires', { list: d.pre.join(', ') }) : '');
   c.append(im, t); return c;
@@ -723,7 +724,8 @@ function campBlock(c, liveDropId) {
   const b = el('div', 'camp');
   const top = el('div', 'camp-top'); top.append(el('h3', '', c.name || tr('camp.default')));
   top.append(el('span', 'pill' + (c.active ? '' : ' wait'), c.active ? left(c.end) : tr('camp.start', { when: when(c.start) })));
-  if (c.linked) top.append(el('span', 'pill ok', tr('camp.linked'))); else { const a = el(c.link ? 'a' : 'span', 'pill bad', tr(c.link ? 'camp.unlinkedLink' : 'camp.unlinked')); if (c.link) { a.href = c.link; a.target = '_blank'; } top.append(a); }
+  if (c.quest) { const a = el(c.link ? 'a' : 'span', 'pill run', tr('camp.quest')); if (c.link) { a.href = c.link; a.target = '_blank'; } top.append(a); }
+  else if (c.linked) top.append(el('span', 'pill ok', tr('camp.linked'))); else { const a = el(c.link ? 'a' : 'span', 'pill bad', tr(c.link ? 'camp.unlinkedLink' : 'camp.unlinked')); if (c.link) { a.href = c.link; a.target = '_blank'; } top.append(a); }
   b.append(top);
   const f = el('div', 'facts');
   const fact = (k, v) => { const s = el('span'); s.append(k + ' '); s.append(el('b', '', v)); f.append(s); };

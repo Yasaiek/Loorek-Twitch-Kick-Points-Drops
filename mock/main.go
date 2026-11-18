@@ -68,16 +68,27 @@ var kchans = map[string]*kch{
 var (
 	mu       sync.Mutex
 	base     string
-	games    = map[string]*game{"g1": {"g1", "Space Game", "space-game"}, "g2": {"g2", "Farm Story", "farm-story"}, "g3": {"g3", "Unlinked Quest", "unlinked-quest"}}
+	games    = map[string]*game{"g1": {"g1", "Space Game", "space-game"}, "g2": {"g2", "Farm Story", "farm-story"}, "g3": {"g3", "Unlinked Quest", "unlinked-quest"}, "g4": {"g4", "Neon Coast", "neon-coast"}}
 	channels = map[string]*channel{}
 	camps    = []*campaign{
 		{ID: "c1", Name: "Space Drops", GameID: "g1", Linked: true, Drops: []*drop{{ID: "d1", Name: "Helmet", Req: 2, Benefit: "b1"}, {ID: "d2", Name: "Suit", Req: 3, Pre: []string{"d1"}, Benefit: "b2"}}},
 		{ID: "c2", Name: "Quest Drops", GameID: "g3", Linked: false, Drops: []*drop{{ID: "d9", Name: "Sword", Req: 60, Benefit: "b9"}}},
 		{ID: "c3", Name: "Farm Drops", GameID: "g2", Linked: true, ACL: []string{"beta"}, Drops: []*drop{{ID: "d3", Name: "Tractor", Req: 2, Benefit: "b3"}}},
 	}
+	// One of Twitch's own reward campaigns: a daily chest on game g4. Watching a g4 stream for questReq
+	// minutes makes it claimable; after the claim the next "day" opens questGap later, questDays times in all.
+	quest = struct {
+		Cur    float64
+		Grants int
+		Status string // "", IN_PROGRESS, CLAIMABLE, CLAIMED
+		Next   time.Time
+	}{}
 	awarded    = map[string]time.Time{}
 	joins      = map[string]bool{}
 	bonusEvery = 4
+	questReq   = 2
+	questDays  = 3
+	questGap   = 12 * time.Second
 	perTouch   = 0.25 // minutes of drop progress per playlist read
 	claimsPts  = 0
 	claimsDrop = 0
@@ -363,6 +374,12 @@ func handleOp(name string, v map[string]any) (any, string) {
 	case "DropsPage_ClaimDropRewards":
 		in, _ := v["input"].(map[string]any)
 		parts := strings.Split(fmt.Sprint(in["dropInstanceID"]), "#")
+		if len(parts) == 3 && parts[1] == "Q1" && parts[2] == "QG1" && quest.Status == "CLAIMABLE" {
+			quest.Status, quest.Next = "CLAIMED", time.Now().Add(questGap)
+			quest.Grants++
+			claimsDrop++
+			return map[string]any{"claimDropRewards": map[string]any{"status": "ELIGIBLE_FOR_ALL"}}, ""
+		}
 		if len(parts) == 3 {
 			if c := camp(parts[1]); c != nil {
 				for _, d := range c.Drops {
@@ -395,8 +412,12 @@ func main() {
 	addCh("gamma", "g2", false, 0)
 	addCh("delta", "g1", true, 900, "c1")
 	addCh("epsilon", "g1", true, 200, "c1")
+	addCh("zeta", "g4", true, 700, "quest") // drops are on, but its only campaign is the reward campaign
 	if os.Getenv("MOCK_DEMO") == "real" {
 		demoReal()
+	}
+	if n, err := time.ParseDuration(os.Getenv("MOCK_QUEST_GAP")); err == nil && n > 0 {
+		questGap = n // how long the reward campaign's next "day" takes to open
 	}
 
 	mux := http.NewServeMux()
@@ -425,6 +446,48 @@ func main() {
 		defer mu.Unlock()
 		gqlCount++
 		var out []any
+		if q, _ := ops[0]["query"].(string); q != "" && len(ops) == 1 && (strings.Contains(q, "rewardCampaignsAvailableToUser") || strings.Contains(q, "viewerRewardDropCampaignsInProgress")) {
+			// Twitch's own reward campaigns
+			w.Header().Set("Content-Type", "application/json")
+			demo := os.Getenv("MOCK_DEMO") == "real" // (the handler already holds the lock)
+			if strings.Contains(q, "rewardCampaignsAvailableToUser") {
+				list := []any{}
+				if !demo {
+					cat := map[string]any{"id": "g4", "displayName": "Neon Coast", "slug": "neon-coast", "boxArtURL": base + "/art/g4-{width}x{height}.jpg"}
+					reward := func(id, name string) map[string]any {
+						return map[string]any{"id": id, "name": name, "thumbnailImage": map[string]any{"image1xURL": base + "/art/" + id + ".png"}}
+					}
+					list = append(list, map[string]any{"id": "Q1", "name": "Neon Launch Celebration", "brand": "Twitch", "isSitewide": true, "game": nil,
+						"startsAt": ts(time.Now().Add(-time.Hour)), "endsAt": ts(time.Now().Add(48 * time.Hour)), "aboutURL": base + "/about-quest",
+						"rewardGroups": []any{
+							map[string]any{"id": "QG1", "unlockRequirements": map[string]any{"minuteWatchedGoal": questReq, "subsGoal": 0, "turboSubsGoal": 0, "eventTriggerGoal": 0},
+								"categories": []any{cat}, "rewards": []any{reward("qb1", "Purple Chain"), reward("qb2", "Bronze Chain"), reward("qb3", "Silver Chain")}},
+							map[string]any{"id": "QG2", "unlockRequirements": map[string]any{"minuteWatchedGoal": 0, "subsGoal": 3, "turboSubsGoal": 0, "eventTriggerGoal": 0},
+								"categories": []any{cat}, "rewards": []any{reward("qe1", "Sub Emote")}},
+						}})
+				}
+				json.NewEncoder(w).Encode(map[string]any{"data": map[string]any{"rewardCampaignsAvailableToUser": list}})
+				return
+			}
+			inProgress, completed := []any{}, []any{}
+			if !demo && (quest.Status != "" || quest.Grants > 0) {
+				self := map[string]any{"status": quest.Status, "currentMinutesWatched": int(quest.Cur), "currentSubs": 0, "grantCount": quest.Grants,
+					"nextEligibleAt": nil, "currentWindow": map[string]any{"expiresAt": ts(time.Now().Add(time.Hour))}}
+				if quest.Status == "" {
+					self["status"] = "CLAIMED" // Twitch keeps saying "claimed" until the new day's watching starts
+				}
+				if !quest.Next.IsZero() && quest.Grants < questDays {
+					self["nextEligibleAt"] = ts(quest.Next)
+				}
+				inProgress = append(inProgress, map[string]any{"id": "Q1", "rewardGroups": []any{map[string]any{"id": "QG1", "name": "Neon Chest", "self": self, "rewards": []any{}}}})
+			}
+			if quest.Grants >= questDays {
+				completed = append(completed, map[string]any{"id": "Q1"})
+			}
+			json.NewEncoder(w).Encode(map[string]any{"data": map[string]any{"currentUser": map[string]any{"inventory": map[string]any{
+				"viewerRewardDropCampaignsInProgress": inProgress, "completedRewardCampaigns": completed}}}})
+			return
+		}
 		if q, _ := ops[0]["query"].(string); q != "" && len(ops) == 1 { // a plain query: the searches behind the suggestions
 			vars, _ := ops[0]["variables"].(map[string]any)
 			word := strings.ToLower(fmt.Sprint(vars["q"]))
@@ -502,6 +565,17 @@ func main() {
 		}
 		ch.Touches++
 		ch.LastTouch = time.Now()
+		if ch.GameID == "g4" && quest.Grants < questDays {
+			if quest.Status == "CLAIMED" && !time.Now().Before(quest.Next) {
+				quest.Status, quest.Cur = "", 0 // the next day has opened
+			}
+			if quest.Status == "" || quest.Status == "IN_PROGRESS" {
+				quest.Status = "IN_PROGRESS"
+				if quest.Cur += perTouch; quest.Cur >= float64(questReq) {
+					quest.Cur, quest.Status = float64(questReq), "CLAIMABLE"
+				}
+			}
+		}
 		for _, id := range ch.Drops {
 			if c := camp(id); c != nil && c.Linked {
 				if d := currentDrop(c); d != nil {
