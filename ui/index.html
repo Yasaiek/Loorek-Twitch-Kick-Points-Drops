@@ -188,6 +188,14 @@ input[type=number] { width: 70px; text-align: center; }
 .rw.done { border-color: rgba(108,203,95,.4); } .rw.done .bar div { background: var(--ok); } .rw.done .rs { color: var(--ok); }
 .rw.claim { border-color: rgba(245,200,76,.5); } .rw.claim .rs { color: var(--warn); }
 .rw.live { border-color: rgba(96,205,255,.55); } .rw.live .rs { color: var(--accent); }
+.rw.daily { min-width: 176px; max-width: 220px; }
+.rw .rs.sub { color: var(--dim); margin-top: 2px; }
+.pips { display: flex; gap: 4px; justify-content: center; margin: 2px 0 6px; }
+.pips:empty { display: none; }
+.pips i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.14); }
+.pips i.on { background: var(--ok); box-shadow: 0 0 6px rgba(108,203,95,.55); }
+.pips i.now { background: var(--accent); box-shadow: 0 0 6px rgba(96,205,255,.6); }
+.dcard .pips { justify-content: flex-start; margin: 4px 0 2px; }
 .rw.lock { min-width: 0; padding: 0; border: 0; background: none; opacity: .5; position: relative; } .rw.lock .dimg { width: 38px; height: 38px; margin: 0; filter: grayscale(1); }
 .rw.lock::after { content: "🔒"; position: absolute; right: -3px; bottom: -4px; font-size: 11px; }
 #rpcMore { transition: opacity .2s; } #rpcMore.off { opacity: .45; }
@@ -745,15 +753,36 @@ sortable($('chanList'), (order) => op({ op: 'reorderChannels', order }));
 sortable($('queueList'), (order) => op({ op: 'queueReorder', order }));
 sortable($('kickList'), (order) => op({ op: 'kickReorder', order }));
 
-const STC = { ready: '', claim: 'wait', done: 'ok', nolink: 'bad', nocamp: '', upcoming: '', blocked: '' };
+const STC = { ready: '', claim: 'wait', done: 'ok', today: 'ok', nolink: 'bad', nocamp: '', upcoming: '', blocked: '' };
 const stOf = (k) => (k in STC ? [tr('stt.' + k), STC[k]] : ['', '']);
 
 // one reward: picture, what it is, how much watching it needs, where it stands
+// a time that may be today: "15:00" within a day, the date otherwise
+const soonT = (ms) => (ms - Date.now() < 86400000 ? new Date(ms).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) : when(ms));
+const isDaily = (d) => !!(d.days || d.done || d.next || d.until);
+// a daily reward: one dot per day - collected, today's (running), still ahead
+function pips(d) {
+  const p = el('div', 'pips'); if (!d.days) return p;
+  for (let i = 0; i < d.days; i++) p.append(el('i', i < d.done ? 'on' : i === d.done && !d.claimed ? 'now' : ''));
+  return p;
+}
+// what a daily reward is at: done for today and when the next day opens, or today's minutes and the deadline
+function dailyText(d) {
+  if (d.days && d.done >= d.days) return [tr('drop.allDays'), d.days ? tr('drop.daysGot', { a: d.done, b: d.days }) : ''];
+  const day = d.days ? tr('drop.dayOf', { n: d.day, m: d.days }) : tr('drop.day', { n: d.day || 1 });
+  if (d.claimed && d.next) return [tr('drop.today') + ' · ' + day, tr('q.next', { when: soonT(d.next) })];
+  return [Math.floor(Math.min(d.cur, d.req)) + ' / ' + tr('dur.m', { m: d.req }) + ' · ' + day, d.until ? tr('drop.until', { when: soonT(d.until) }) : d.days ? tr('drop.daysGot', { a: d.done, b: d.days }) : tr('drop.daysGotN', { a: d.done })];
+}
 function dropCard(d, live) {
   const done = d.claimed, claim = !done && d.cur >= d.req;
   const c = el('div', 'dcard' + (done ? ' done' : claim ? ' claim' : ''));
   const im = el('div', 'dimg'); if (d.img) { const i = el('img'); i.src = d.img; i.alt = ''; i.draggable = false; i.onerror = () => { i.remove(); im.textContent = '🎁'; }; im.append(i); } else im.textContent = '🎁';
-  const t = el('div', 'txt'); t.append(el('div', 'nm', (d.name || tr('drop.noname')) + (d.day ? ' · ' + tr('drop.day', { n: d.day }) : '')));
+  const t = el('div', 'txt'); t.append(el('div', 'nm', (d.name || tr('drop.noname')) + (d.day && !isDaily(d) ? ' · ' + tr('drop.day', { n: d.day }) : '')));
+  if (isDaily(d)) { // a daily reward: the days, today's state, the next round
+    const [a, b] = dailyText(d); t.append(pips(d), el('div', 'sb', a), el('div', 'sb', b));
+    const bar = el('div', 'bar' + (live ? ' live' : '')), fill = el('div'); fill.style.width = (d.claimed ? 100 : d.req ? Math.min(100, d.cur / d.req * 100) : 0) + '%'; bar.append(fill); t.append(bar);
+    c.title = tr('drop.dailyTip', { t: mins(d.req) }); c.append(im, t); return c;
+  }
   const soon = (ms) => (ms - Date.now() < 86400000 ? new Date(ms).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) : when(ms)); // a daily reward: when the next round opens
   const state = done ? [d.next ? tr('drop.next', { when: soon(d.next) }) : tr('drop.claimed'), 'ok'] : claim ? [tr('drop.toClaim'), 'warn'] : d.blocked ? [tr('drop.first', { name: d.pre[0] || tr('drop.prev') }), ''] : live ? [tr('drop.live'), 'run'] : d.cur > 0 ? [tr('drop.progress'), ''] : [tr('drop.waits'), ''];
   const line = el('div', 'sb'); if (!(done && d.next)) line.append(tr('drop.of', { a: mins(Math.min(d.cur, d.req)), b: mins(d.req) }) + ' · '); line.append(el('span', 'tag ' + state[1], state[0])); t.append(line);
@@ -968,8 +997,12 @@ function render() {
           const im = el('div', 'dimg'); if (d.img) { const p = el('img'); p.src = d.img; p.alt = ''; p.draggable = false; p.onerror = () => { p.remove(); im.textContent = '🎁'; }; im.append(p); } else im.textContent = '🎁';
           const bar = el('div', 'bar' + (live ? ' live' : '')), fill = el('div'); fill.style.width = (d.claimed ? 100 : d.req ? Math.min(100, d.cur / d.req * 100) : 0) + '%'; bar.append(fill);
           const st = d.claimed ? (d.next ? '✓ · ' + new Date(d.next).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) : '✓') : claim ? tr('stt.claim') : Math.floor(Math.min(d.cur, d.req)) + ' / ' + tr('dur.m', { m: d.req });
-          if (d.locked && !d.claimed && !claim) r.append(im); else r.append(im, el('div', 'rn', d.name || tr('drop.noname')), bar, el('div', 'rs', (d.day ? tr('drop.day', { n: d.day }) + ' · ' : '') + st));
-          r.title = tr('drop.tip', { name: d.name || tr('drop.reward'), t: mins(d.req) }) + (d.locked ? '\n' + tr('drop.first', { name: tr('drop.prev') }) : '');
+          if (isDaily(d) && !d.locked) { // a daily reward: which day, done today or how far, and when the next one opens
+            const [a, b] = dailyText(d); r.classList.add('daily');
+            r.append(im, el('div', 'rn', d.name || tr('drop.noname')), pips(d), bar, el('div', 'rs', a), el('div', 'rs sub', b));
+            r.title = tr('drop.dailyTip', { t: mins(d.req) });
+          } else if (d.locked && !d.claimed && !claim) r.append(im); else r.append(im, el('div', 'rn', d.name || tr('drop.noname')), bar, el('div', 'rs', (d.day ? tr('drop.day', { n: d.day }) + ' · ' : '') + st));
+          if (!r.title) r.title = tr('drop.tip', { name: d.name || tr('drop.reward'), t: mins(d.req) }) + (d.locked ? '\n' + tr('drop.first', { name: tr('drop.prev') }) : '');
           if (d.locked && !d.claimed && !claim) later.append(r); else rws.append(r);
         }
         if (later.childNodes.length) rws.append(later);
@@ -996,7 +1029,7 @@ function render() {
     const total = g.camps.reduce((n, c) => n + (c.active ? c.left : 0), 0);
     const active = g.camps.filter((c) => c.active);
     const all = active.reduce((n, c) => n + c.drops.length, 0), got = active.reduce((n, c) => n + c.drops.filter((d) => d.claimed).length, 0);
-    const line = g.farming ? tr('q.watching', { ch: g.channel }) : g.status === 'nocamp' ? tr('q.waitCamp') : g.status === 'ready' ? tr('q.left', { t: mins(total) }) : g.end ? tr('camps.until', { when: when(g.end) }) : '';
+    const line = g.farming ? tr('q.watching', { ch: g.channel }) : g.status === 'nocamp' ? tr('q.waitCamp') : g.status === 'ready' ? tr('q.left', { t: mins(total) }) : g.status === 'today' && g.next ? tr('q.next', { when: soonT(g.next) }) : g.end ? tr('camps.until', { when: when(g.end) }) : '';
     txt.append(el('div', 'sb', [line, all ? tr('q.rewards', { a: got, b: all }) : ''].filter(Boolean).join(' · ')));
     let [label, cls] = stOf(g.status);
     if (g.farming) { label = tr('stt.watching'); cls = 'run'; } else if (g.status === 'ready' && g.note === 'nostreams') { label = tr('stt.nostreams'); cls = 'wait'; } else if (g.status === 'ready' && g.note === 'stuck') { label = tr('stt.stuck'); cls = 'wait'; } else if (g.status === 'ready' && !s.settings.dropsOn) { label = tr('stt.off'); }

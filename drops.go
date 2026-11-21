@@ -21,6 +21,9 @@ type Drop struct {
 	End      time.Time
 	Day      int       // reward campaigns: which round of a repeating (daily) group this is, 0 = does not repeat
 	Later    bool      // reward campaigns: a later stage, opens after the stages already started
+	Days     int       // reward campaigns, daily rewards: how many days in all (0 = Twitch does not say)
+	Done     int       // reward campaigns, daily rewards: days already collected
+	Until    time.Time // reward campaigns, daily rewards: today's round has to be finished by then
 	Next     time.Time // reward campaigns: this round is done, the next one opens then
 }
 
@@ -328,10 +331,11 @@ func (e *Engine) fetchDrops(now time.Time) bool {
 		}
 	}
 	e.mu.Unlock()
+	e.mu.Lock()
 	for _, q := range quests {
+		e.tellDays(e.drops.camps[q.ID], q, now)
 		camps[q.ID] = q
 	}
-	e.mu.Lock()
 	first := e.drops.fetchedAt.IsZero()
 	e.drops.camps = camps
 	e.drops.fetchedAt, e.drops.fetchErr = now, ""
@@ -436,7 +440,7 @@ func (e *Engine) gameStatus(g GameRef, now time.Time) string {
 		}
 		return "nocamp"
 	}
-	timed, claimed, toClaim, unlinked := 0, 0, 0, false
+	timed, claimed, toClaim, unlinked, today := 0, 0, 0, false, false
 	for _, c := range camps {
 		if len(c.earnable(now)) > 0 {
 			return "ready"
@@ -446,6 +450,9 @@ func (e *Engine) gameStatus(g GameRef, now time.Time) string {
 				continue
 			}
 			timed++
+			if d.Claimed && now.Before(d.Next) {
+				today = true // a daily reward: done for today, the next round opens later
+			}
 			switch {
 			case d.Claimed:
 				claimed++
@@ -461,6 +468,8 @@ func (e *Engine) gameStatus(g GameRef, now time.Time) string {
 	switch {
 	case toClaim > 0:
 		return "claim"
+	case today:
+		return "today"
 	case timed > 0 && claimed == timed:
 		return "done"
 	case unlinked:
@@ -562,7 +571,10 @@ func (e *Engine) dropsStep(now time.Time) {
 	if cur != nil {
 		switch {
 		case top == nil || !sameGame(*top, cur.game):
-			if e.gameStatus(cur.game, now) != "ready" {
+			switch st := e.gameStatus(cur.game, now); {
+			case st == "today":
+				e.log.OK("L.todayDone", cur.game.Name, logWhen(e.nextRound(cur.game, now), now))
+			case st != "ready":
 				e.log.OK("L.gameDone", cur.game.Name)
 			}
 			e.drops.cur, cur = nil, nil
@@ -640,6 +652,7 @@ func (e *Engine) pollQuests(f *farm, now time.Time) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	for _, q := range quests {
+		e.tellDays(e.drops.camps[q.ID], q, now)
 		e.drops.camps[q.ID] = q
 		for _, d := range q.Drops {
 			if !d.Claimed && d.HasSelf && d.Req > 0 && d.Cur >= d.Req && now.Add(iv(5*time.Second)).Before(e.drops.nextFetch) {
@@ -658,6 +671,51 @@ func (e *Engine) pollQuests(f *farm, now time.Time) {
 		delete(e.drops.stalls, f.game.ID)
 	}
 	f.total = total
+}
+
+// tellDays writes to the journal when a day of a daily reward has been collected. Call with e.mu held.
+func (e *Engine) tellDays(old, q *Campaign, now time.Time) {
+	if old == nil {
+		return
+	}
+	for _, d := range q.Drops {
+		if d.Days == 0 && d.Done == 0 && d.Next.IsZero() {
+			continue // not a daily reward
+		}
+		was := old.drop(d.ID)
+		if was == nil || was.finished() || !d.finished() {
+			continue
+		}
+		e.log.OK("L.dayGot", q.Game.Name, d.Name, max(d.Day, 1))
+		if d.Days > 0 && d.Done >= d.Days {
+			e.log.OK("L.daysAll", q.Game.Name, d.Name)
+		}
+	}
+}
+
+// nextRound: when the next day of a daily reward opens for this game (zero: none waits). Call with e.mu held.
+func (e *Engine) nextRound(g GameRef, now time.Time) time.Time {
+	var at time.Time
+	for _, c := range e.gameCamps(g, now) {
+		for _, d := range c.Drops {
+			if d.Claimed && now.Before(d.Next) && (at.IsZero() || d.Next.Before(at)) {
+				at = d.Next
+			}
+		}
+	}
+	return at
+}
+
+// logWhen: a time for the journal - "15:00" today, "22.11 15:00" later.
+func logWhen(t, now time.Time) string {
+	if t.IsZero() {
+		return "?"
+	}
+	t = t.Local()
+	if y, m, d := t.Date(); y == now.Local().Year() && m == now.Local().Month() && d == now.Local().Day() {
+		return t.Format("15:04")
+	}
+	return t.Format("02.01 15:04")
 }
 
 // stuckHours: how long a reward campaign that watching does not move is left alone.
@@ -712,6 +770,16 @@ func (e *Engine) pollDrop(f *farm, now time.Time) {
 	// Twitch sometimes counts the minutes on a reward that cannot be earned: one already granted, or a later
 	// stage of a reward campaign the account has not opened. Such minutes lead nowhere - they are no progress.
 	dead := drop != nil && (drop.Claimed || drop.Later || (camp.Quest && drop.Cur >= drop.Req))
+	if drop != nil && camp.Quest && !dead {
+		// Twitch's session adds the minutes of every day together (1454/60): it only shows that the
+		// minutes run. The progress itself comes from the account (pollQuests).
+		if id == f.dropID && cur > f.lastCur {
+			f.lastProg = now
+			delete(e.drops.stalls, f.game.ID)
+		}
+		f.dropID, f.lastCur = id, cur
+		return
+	}
 	if dead {
 		if f.dropID != id {
 			e.log.Debug("drop session on %s: %s cannot be earned - not counted as progress", f.ch.Login, id)

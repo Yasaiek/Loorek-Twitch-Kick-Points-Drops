@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -82,6 +84,21 @@ func (e *Engine) fetchQuests(now time.Time, uid string) (out []*Campaign, ok boo
 		}
 		finished, started := false, false
 		var cats []GameRef
+		days := summaryDays(str(dig(q, "summary"))) // "... one hour each day on six different days ..."
+		dailyGid := ""                              // the group the description's days are about: the one being watched, else the first one
+		if days > 0 {
+			for _, g := range list(dig(q, "rewardGroups")) {
+				if gid := str(dig(g, "id")); gid != "" && num(dig(g, "unlockRequirements", "minuteWatchedGoal")) > 0 {
+					if progress[gid].has {
+						dailyGid = gid
+						break
+					}
+					if dailyGid == "" {
+						dailyGid = gid
+					}
+				}
+			}
+		}
 		for _, g := range list(dig(q, "rewardGroups")) {
 			gid := str(dig(g, "id"))
 			p := progress[gid]
@@ -122,8 +139,17 @@ func (e *Engine) fetchQuests(now time.Time, uid string) (out []*Campaign, ok boo
 			if reopens.IsZero() {
 				reopens = p.window
 			}
-			if p.grants > 0 || !reopens.IsZero() {
+			if daily := p.grants > 0 || !reopens.IsZero() || gid == dailyGid; daily {
 				d.Day = int(p.grants) + 1 // a group that repeats: which day (round) this is
+				d.Done, d.Days = int(p.grants), days
+				if d.Days > 0 && d.Done >= d.Days {
+					d.Claimed, d.Cur, d.Day = true, req, d.Days // every day collected
+					c.Drops = append(c.Drops, d)
+					continue
+				}
+				if p.cur < req && !p.window.IsZero() && now.Before(p.window) {
+					d.Until = p.window // today's round has to be finished by then
+				}
 			}
 			switch {
 			case p.status == "CLAIMABLE":
@@ -186,3 +212,26 @@ func (e *Engine) dumpQuests(avail, prog map[string]any) {
 	}
 	os.WriteFile(filepath.Join(e.dir, "quests-debug.json"), raw, 0o600)
 }
+
+// summaryDays reads how many days a daily reward runs from the campaign's description, which is the only
+// place Twitch says it ("... watching for one hour each day on six different days ..."). 0 = not said.
+func summaryDays(s string) int {
+	s = strings.ToLower(s)
+	m := reDays.FindStringSubmatch(s)
+	if m == nil || (m[2] == "" && !reDaily.MatchString(s)) {
+		return 0 // "opened within 30 days" is not a daily reward: it must be "on six different days", or said to be daily
+	}
+	if n, err := strconv.Atoi(m[1]); err == nil {
+		return n
+	}
+	for i, w := range []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen"} {
+		if w == m[1] {
+			return i + 1
+		}
+	}
+	return 0
+}
+
+var reDays = regexp.MustCompile(`\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen)\s+(different\s+|separate\s+|unique\s+)?days\b`)
+
+var reDaily = regexp.MustCompile(`\b(each|every|per)\s+day\b|\bdaily\b`)

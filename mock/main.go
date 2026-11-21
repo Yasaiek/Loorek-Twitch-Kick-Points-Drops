@@ -480,6 +480,7 @@ func main() {
 					}
 					list = append(list, map[string]any{"id": "Q1", "name": "Neon Launch Celebration", "brand": "Twitch", "isSitewide": true, "game": nil,
 						"startsAt": ts(time.Now().Add(-time.Hour)), "endsAt": ts(time.Now().Add(48 * time.Hour)), "aboutURL": base + "/about-quest",
+						"summary": "Unlock three Neon badges by watching Neon Coast streamers for two minutes each day on three different days.",
 						"rewardGroups": []any{
 							map[string]any{"id": "QG0", "unlockRequirements": map[string]any{"minuteWatchedGoal": questReq, "subsGoal": 0, "turboSubsGoal": 0, "eventTriggerGoal": 0},
 								"categories": cats, "rewards": []any{reward("qg0", "Ghost Stage")}},

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.3
+- Daily rewards of Twitch's campaigns (the GTA VI badges: an hour a day on six days) show which day is next, how many days are collected (a dot per day), today's minutes with the time the day closes, or "done today" with the time the next day opens.
+- A game whose daily reward is done for today is shown as "Done today" with the next round's time in the queue, not as finished.
+- The journal says when a day is collected and when the next round opens.
+- Fixed: for these rewards Twitch's watching session adds up the minutes of all days (e.g. 1454/60); Loorek took that as finished and kept stopping and restarting the stream every 40 seconds.
+
 ## 0.8.2
 - Fixed: a daily reward of a Twitch campaign that Twitch grants by itself (GTA DVD Chest) was "claimed" again every ten seconds. Such a reward is now shown as done until its next day opens, and nothing is claimed unless Twitch says there is something to claim.
 - Fixed: "drop finished" was written to the journal every minute, and the whole account was re-read every ten seconds, when Twitch counted the minutes on a reward that cannot be earned.

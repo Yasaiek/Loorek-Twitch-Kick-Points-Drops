@@ -117,7 +117,7 @@ func (e *Engine) view() map[string]any {
 		} else if st == "ready" {
 			note = e.drops.gameNote[g.ID]
 		}
-		return map[string]any{"id": g.ID, "slug": g.Slug, "name": g.Name, "art": g.Art, "status": st, "note": note,
+		return map[string]any{"id": g.ID, "slug": g.Slug, "name": g.Name, "art": g.Art, "status": st, "note": note, "next": ms(e.nextRound(g, now)),
 			"farming": farming, "channel": channel, "drops": drops, "camps": gameDetail(g), "link": link, "end": end, "tracked": isTracked(g), "queued": queuePos(g)}
 	}
 
@@ -171,7 +171,7 @@ func (e *Engine) view() map[string]any {
 	list := []map[string]any{}
 	for _, a := range games {
 		row := map[string]any{"id": a.g.ID, "slug": a.g.Slug, "name": a.g.Name, "art": a.g.Art, "camps": a.n, "camp": a.name, "names": strings.Join(a.names, " | "),
-			"end": ms(a.end), "upcoming": now.Before(a.start), "start": ms(a.start), "status": e.gameStatus(a.g, now), "queued": queuePos(a.g), "tracked": isTracked(a.g)}
+			"end": ms(a.end), "upcoming": now.Before(a.start), "start": ms(a.start), "status": e.gameStatus(a.g, now), "queued": queuePos(a.g), "tracked": isTracked(a.g), "next": ms(e.nextRound(a.g, now))}
 		if len(a.quest) > 0 {
 			sort.Slice(a.quest, func(i, j int) bool {
 				if !a.quest[i].End.Equal(a.quest[j].End) {
@@ -189,7 +189,7 @@ func (e *Engine) view() map[string]any {
 				for _, d := range c.Drops {
 					if d.Req > 0 {
 						rewards = append(rewards, map[string]any{"id": d.ID, "name": d.Name, "img": d.Img, "cur": d.Cur, "req": d.Req, "claimed": d.Claimed,
-							"locked": d.Later && !d.finished(), "day": d.Day, "next": ms(d.Next)})
+							"locked": d.Later && !d.finished(), "day": d.Day, "next": ms(d.Next), "days": d.Days, "done": d.Done, "until": ms(d.Until)})
 					}
 				}
 			}
@@ -292,7 +292,7 @@ func (e *Engine) campViews(g GameRef, now time.Time) []map[string]any {
 				left += d.Req - d.Cur
 			}
 			drops = append(drops, map[string]any{"id": d.ID, "name": d.Name, "img": d.Img, "cur": d.Cur, "req": d.Req, "claimed": d.Claimed,
-				"pre": pre, "blocked": (blocked || d.Later) && !d.finished(), "end": ms(d.End), "day": d.Day, "next": ms(d.Next)})
+				"pre": pre, "blocked": (blocked || d.Later) && !d.finished(), "end": ms(d.End), "day": d.Day, "next": ms(d.Next), "days": d.Days, "done": d.Done, "until": ms(d.Until)})
 		}
 		out = append(out, map[string]any{"id": c.ID, "name": c.Name, "start": ms(c.Start), "end": ms(c.End), "active": c.active(now),
 			"linked": c.Linked, "link": c.LinkURL, "channels": names, "channelCount": len(c.Channels), "drops": drops, "left": left, "quest": c.Quest})
