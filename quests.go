@@ -22,10 +22,11 @@ const (
 	qQuests = `query LoorekQuests { rewardCampaignsAvailableToUser { id name brand startsAt endsAt summary externalURL aboutURL isSitewide ` +
 		`game { id displayName slug boxArtURL } image { image1xURL } ` +
 		`rewardGroups { id unlockRequirements { minuteWatchedGoal subsGoal turboSubsGoal eventTriggerGoal } ` +
-		`categories { id displayName slug boxArtURL } rewards { id name thumbnailImage { image1xURL } } } } }`
-	qQuestProgress = `query LoorekQuestProgress { currentUser { inventory { viewerRewardDropCampaignsInProgress { id ` +
+		`categories { id displayName slug boxArtURL } rewards { id name thumbnailImage { image1xURL } } } ` +
+		`rewards { id name thumbnailImage { image1xURL } bannerImage { image1xURL } } } }`
+	qQuestProgress = `query LoorekQuestProgress { currentUser { inventory { viewerRewardDropCampaignsInProgress { id description status ` +
 		`rewardGroups { id name self { status currentMinutesWatched currentSubs grantCount nextEligibleAt currentWindow { expiresAt } } ` +
-		`rewards { id dropDetail { badge { setID version title imageURL } } } } } completedRewardCampaigns { id } } } }`
+		`rewards { id name dropDetail { badge { setID version title imageURL } } } } } completedRewardCampaigns { id } } } }`
 )
 
 type questProgress struct {
@@ -235,3 +236,24 @@ func summaryDays(s string) int {
 var reDays = regexp.MustCompile(`\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen)\s+(different\s+|separate\s+|unique\s+)?days\b`)
 
 var reDaily = regexp.MustCompile(`\b(each|every|per)\s+day\b|\bdaily\b`)
+
+// dumpInventory keeps, next to quests-debug.json, what Twitch's own inventory page gets about rewards: the
+// rewards already granted (gameEventDrops) and the reward campaigns. It is where the badges of a daily
+// reward show up; the drop campaigns in progress are left out (they are in the panel anyway).
+func (e *Engine) dumpInventory(inv any) {
+	m, _ := inv.(map[string]any)
+	if m == nil {
+		return
+	}
+	keep := map[string]any{}
+	for k, v := range m {
+		if k != "dropCampaignsInProgress" {
+			keep[k] = v
+		}
+	}
+	raw, err := json.MarshalIndent(map[string]any{"at": time.Now().Format(time.RFC3339), "inventory": keep}, "", " ")
+	if err != nil || len(raw) > 4<<20 {
+		return
+	}
+	os.WriteFile(filepath.Join(e.dir, "inventory-debug.json"), raw, 0o600)
+}

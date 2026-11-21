@@ -260,7 +260,7 @@ func buildCampaign(inv, det, dash any, claimed map[string]time.Time) *Campaign {
 // fetchDrops reads the account's inventory and every open campaign.
 func (e *Engine) fetchDrops(now time.Time) bool {
 	_, uid, _, _ := e.c.auth()
-	inv, err := e.c.gqlOne("Inventory", map[string]any{"fetchRewardCampaigns": false})
+	inv, err := e.c.gqlOne("Inventory", map[string]any{"fetchRewardCampaigns": true})
 	if err != nil {
 		e.gqlErr("inventory", err)
 		e.setDropsErr(err)
@@ -273,6 +273,7 @@ func (e *Engine) fetchDrops(now time.Time) bool {
 		return false
 	}
 	inventory := dig(inv, "currentUser", "inventory")
+	e.dumpInventory(inventory)
 	claimed := map[string]time.Time{}
 	for _, b := range list(dig(inventory, "gameEventDrops")) {
 		claimed[str(dig(b, "id"))] = parseTime(dig(b, "lastAwardedAt"))

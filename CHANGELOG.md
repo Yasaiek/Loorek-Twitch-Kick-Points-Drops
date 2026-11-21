@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.4
+- Loorek reads from Twitch what its own inventory page shows about reward campaigns (the badges of daily rewards) and keeps it in data/inventory-debug.json, so the real badge pictures can replace the generic reward icon.
+
 ## 0.8.3
 - Daily rewards of Twitch's campaigns (the GTA VI badges: an hour a day on six days) show which day is next, how many days are collected (a dot per day), today's minutes with the time the day closes, or "done today" with the time the next day opens.
 - A game whose daily reward is done for today is shown as "Done today" with the next round's time in the queue, not as finished.
