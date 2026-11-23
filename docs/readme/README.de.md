@@ -40,11 +40,11 @@ Windows warnt eventuell vor einem unbekannten Herausgeber, weil die Datei nicht 
 
 ## Wo deine Daten liegen
 
-Alles, was Loorek speichert, liegt im Ordner `data` neben `Loorek.exe`:
+Alles, was Loorek speichert, liegt in `%LOCALAPPDATA%\Yasaiek\Loorek` (ein anderer Ort lässt sich unter Einstellungen → Datenordner wählen):
 
 | Datei | Was es ist |
 | --- | --- |
-| `settings.json` | Einstellungen, Kanallisten, Warteschlange |
+| `loorek-settings.json` | Einstellungen, Kanallisten, Warteschlange |
 | `auth.json` | deine Twitch- und Kick-Sitzungen – gib diese Datei nie weiter |
 | `login-profile/` | das Profil des Anmeldefensters – ebenfalls nie weitergeben |
 | `log.txt` | das Journal |

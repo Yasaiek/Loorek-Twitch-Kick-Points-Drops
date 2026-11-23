@@ -339,5 +339,18 @@
 "use.hint": "Loorek com sua janela",
 "rpc.st.idle": "Nada acontecendo – o status aparece quando o Loorek farma um drop ou coleta pontos.",
 "set.stats": "Enviar estatísticas anônimas",
-"set.statsHint": "A cada 15 minutos: um número de instalação aleatório, a versão e o uso médio de CPU e RAM – para o contador no site do Loorek. Sem nomes, contas ou canais."
+"set.statsHint": "A cada 15 minutos: um número de instalação aleatório, a versão e o uso médio de CPU e RAM – para o contador no site do Loorek. Sem nomes, contas ou canais.",
+"set.dataDir": "Pasta de dados",
+"set.dataHint": "Configurações, registros e os outros arquivos do programa.",
+"set.dataOpen": "Abrir",
+"set.dataPick": "Alterar…",
+"set.dataReset": "Padrão",
+"set.dataMoveQ": "Mover os dados?",
+"set.dataMoveT": "Os dados irão para %s. O programa será reiniciado.",
+"set.dataMove": "Mover",
+"set.dataBad": "Esta pasta não pode ser usada.",
+"set.dataSame": "Os dados já estão nesta pasta.",
+"L.dataMoving": "Movendo os dados para %s…",
+"L.dataMoved": "Os dados agora estão em %s.",
+"L.dataMoveFail": "Não foi possível reiniciar para mover os dados: %v"
 }

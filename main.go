@@ -25,26 +25,23 @@ func main() {
 	// its keys to a file). The Kick client honours it, and when that file cannot be written every Kick
 	// request fails and then hangs. This program never wants its keys written anywhere.
 	os.Unsetenv("SSLKEYLOGFILE")
-	trayOnly, updated := false, false
+	trayOnly, updated, moved := false, false, false
 	for _, a := range os.Args[1:] {
 		switch a {
 		case "--tray":
 			trayOnly = true
 		case "--updated":
 			updated = true
+		case "--moved": // restarted after the data folder was changed in the settings
+			moved = true
 		}
 	}
 	loadDicts()
-	// everything the program keeps lives in the "data" folder next to the executable
-	dir := os.Getenv("DROPOMAT_DATA")
+	// everything the program keeps lives in %LOCALAPPDATA%\Yasaiek\Loorek, or where the settings say
+	dir, fixed := os.Getenv("DROPOMAT_DATA"), true
 	if dir == "" {
-		exe, err := os.Executable()
-		if err != nil {
-			exe = os.Args[0]
-		}
-		dir = filepath.Join(filepath.Dir(exe), "data")
+		dir, fixed = dataDirIn(dataRoot()), false
 	}
-	os.MkdirAll(dir, 0o700)
 	if n, _ := strconv.Atoi(os.Getenv("DROPOMAT_FAST")); n > 1 {
 		speed = n
 	}
@@ -52,8 +49,14 @@ func main() {
 
 	// already running? ask that copy to show its panel and leave
 	var inst instanceFile
+	found := readJSON(instPath, &inst) == nil
+	if !found && !fixed { // a copy of an older version keeps its files in "data" next to the program
+		if exe, err := os.Executable(); err == nil {
+			found = readJSON(filepath.Join(filepath.Dir(exe), "data", "instance.json"), &inst) == nil
+		}
+	}
 	took, prevGen := false, 0 // took: this start replaces a running copy of another version
-	if readJSON(instPath, &inst) == nil && inst.Port > 0 {
+	if !moved && found && inst.Port > 0 {
 		base := "http://127.0.0.1:" + strconv.Itoa(inst.Port)
 		hc := &http.Client{Timeout: 2 * time.Second}
 		call := func(method, path, body string) (string, bool) {
@@ -79,7 +82,7 @@ func main() {
 			}
 			// a different version is running (this file is an update): ask it to close and take over
 			took, prevGen = true, v.WinGen
-			call("POST", "/api/op", `{"op":"quit"}`)
+			call("POST", "/api/op", `{"op":"quit","on":true}`) // on: handing over, its windows stay open
 			for i := 0; i < 30; i++ {
 				time.Sleep(200 * time.Millisecond)
 				if _, alive := call("GET", "/api/state", ""); !alive {
@@ -106,7 +109,7 @@ func main() {
 	for n, p := range ports {
 		ln, err = net.Listen("tcp", "127.0.0.1:"+strconv.Itoa(p))
 		// the previous version may still be letting go of its port
-		for i := 0; err != nil && n == 0 && (updated || took) && i < 40; i++ {
+		for i := 0; err != nil && n == 0 && (updated || took || moved) && i < 40; i++ {
 			time.Sleep(200 * time.Millisecond)
 			ln, err = net.Listen("tcp", "127.0.0.1:"+strconv.Itoa(p))
 		}
@@ -121,6 +124,11 @@ func main() {
 		fmt.Fprintln(os.Stderr, "cannot open a local port:", err)
 		os.Exit(1)
 	}
+	// the previous copy has let go of the files now: move them if they are somewhere else
+	if !fixed {
+		settleData(dir, legacyData)
+	}
+	os.MkdirAll(dir, 0o700)
 	e := newEngine(dir)
 	srv := &server{e: e, key: randHex(32), port: ln.Addr().(*net.TCPAddr).Port}
 	if took { // an open panel of the replaced version keeps its key and its window number
@@ -140,6 +148,9 @@ func main() {
 		e.upd.Done = time.Now()
 		e.log.OK("L.updDone", version)
 	}
+	if moved {
+		e.log.OK("L.dataMoved", dir)
+	}
 	e.onQuit = func() {
 		os.Remove(instPath)
 		time.AfterFunc(300*time.Millisecond, func() { os.Exit(0) })
@@ -156,6 +167,7 @@ func main() {
 	runTray(e, trayActions{
 		Open:   srv.show,
 		Update: func() { go e.updateCheck(true) },
+		Quit:   func() { go e.quitApp() },
 		Set: func(k string, on bool) {
 			raw, _ := json.Marshal(map[string]any{k: on})
 			srv.handleOp(opReq{Op: "settings", Patch: raw})

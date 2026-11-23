@@ -339,5 +339,18 @@
 "use.hint": "Loorek razem z oknem",
 "rpc.st.idle": "Nic się teraz nie dzieje – status pojawi się, gdy Loorek będzie dropił albo zbierał punkty.",
 "set.stats": "Wysyłaj anonimowe statystyki",
-"set.statsHint": "Co 15 minut: losowy numer instalacji, wersja oraz średnie zużycie CPU i RAM – do licznika na stronie Loorka. Bez nazw, kont i kanałów."
+"set.statsHint": "Co 15 minut: losowy numer instalacji, wersja oraz średnie zużycie CPU i RAM – do licznika na stronie Loorka. Bez nazw, kont i kanałów.",
+"set.dataDir": "Folder danych",
+"set.dataHint": "Ustawienia, logi i inne pliki programu.",
+"set.dataOpen": "Otwórz",
+"set.dataPick": "Zmień…",
+"set.dataReset": "Domyślny",
+"set.dataMoveQ": "Przenieść dane?",
+"set.dataMoveT": "Dane trafią do %s. Program uruchomi się ponownie.",
+"set.dataMove": "Przenieś",
+"set.dataBad": "Tego folderu nie da się użyć.",
+"set.dataSame": "Dane już są w tym folderze.",
+"L.dataMoving": "Przenoszę dane do %s…",
+"L.dataMoved": "Dane są teraz w %s.",
+"L.dataMoveFail": "Nie udało się uruchomić ponownie, by przenieść dane: %v"
 }

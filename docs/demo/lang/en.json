@@ -339,5 +339,18 @@
 "use.hint": "Loorek with its window",
 "rpc.st.idle": "Nothing going on – the status shows up while Loorek farms a drop or collects points.",
 "set.stats": "Send anonymous statistics",
-"set.statsHint": "Every 15 minutes: a random installation number, the version and the average CPU and RAM use – for the counter on Loorek's website. No names, accounts or channels."
+"set.statsHint": "Every 15 minutes: a random installation number, the version and the average CPU and RAM use – for the counter on Loorek's website. No names, accounts or channels.",
+"set.dataDir": "Data folder",
+"set.dataHint": "Settings, logs and the program's other files.",
+"set.dataOpen": "Open",
+"set.dataPick": "Change…",
+"set.dataReset": "Default",
+"set.dataMoveQ": "Move the data?",
+"set.dataMoveT": "The data will go to %s. The program will restart.",
+"set.dataMove": "Move",
+"set.dataBad": "This folder cannot be used.",
+"set.dataSame": "The data is already in this folder.",
+"L.dataMoving": "Moving the data to %s…",
+"L.dataMoved": "Data is now in %s.",
+"L.dataMoveFail": "Could not restart to move the data: %v"
 }

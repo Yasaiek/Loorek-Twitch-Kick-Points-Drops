@@ -2,7 +2,10 @@
 
 package main
 
-import "os"
+import (
+	"os"
+	"os/exec"
+)
 
 // On other systems (used for development and tests) there is no tray: just wait until quit.
 func runTray(e *Engine, a trayActions) { <-e.quit }
@@ -17,3 +20,11 @@ func systemLocale() string {
 	}
 	return ""
 }
+
+func openFolder(dir string) {
+	if os.Getenv("DROPOMAT_NO_WINDOW") == "" {
+		exec.Command("xdg-open", dir).Start()
+	}
+}
+
+func pickFolder(title, start string) string { return "" }

@@ -111,6 +111,8 @@ input[type=number] { width: 70px; text-align: center; }
 .row:first-child { border-top: 0; padding-top: 2px; }
 .row:last-child { padding-bottom: 2px; }
 .row small { display: block; color: var(--sub); font-size: 12px; margin-top: 1px; }
+.row code.path { display: block; margin-top: 4px; font: 11.5px/1.4 Consolas, monospace; color: var(--text); opacity: .8; overflow-wrap: anywhere; }
+.rbtns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
 .num { display: flex; align-items: center; gap: 7px; color: var(--sub); font-size: 12px; }
 
 .slots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -515,6 +517,7 @@ select:focus { border-color: var(--accent); }
       </div>
     </div>
     <div class="card">
+      <div class="row"><span><span data-i="set.dataDir"></span><small><span data-i="set.dataHint"></span><code class="path" id="dataInfo"></code></small></span><span class="rbtns"><button class="btn small" id="dataOpen" data-i="set.dataOpen"></button><button class="btn small" id="dataPick" data-i="set.dataPick"></button><button class="btn small" id="dataReset" data-i="set.dataReset" hidden></button></span></div>
       <div class="row"><span><span data-i="set.bg"></span><small data-i="set.about"></small></span><button class="btn small" id="quit" data-i="quit"></button></div>
     </div>
   </section>
@@ -558,7 +561,7 @@ select:focus { border-color: var(--accent); }
 </div>
 <div id="toast"></div>
 
-<script>window.LOOREK_VERSION = "0.9.2";</script>
+<script>window.LOOREK_VERSION = "0.9.4";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -921,6 +924,7 @@ function renderDetail() {
 function render() {
   const s = S; if (!s) return;
   if (s.winGen > MYGEN && MYGEN) { window.close(); }
+  if (s.closing) { window.close(); return; } // the program is quitting (from the tray too)
   if (VER && s.version !== VER) { location.reload(); return; } VER = s.version;
   if (s.lang !== LANG) { if (!langBusy) { langBusy = true; setLang(s.lang).then(() => { langBusy = false; render(); }); } if (!LANG) return; }
   const a = s.auth;
@@ -933,6 +937,8 @@ function render() {
   const who = $('who'); who.textContent = ''; if (a.state === 'ok') { who.append(tr('who') + ' '); who.append(el('b', '', a.login)); }
   $('accName').textContent = a.state === 'ok' ? a.login : tr('notSigned');
   $('ver').textContent = s.version;
+  $('dataInfo').textContent = s.dataDir || '';
+  $('dataReset').hidden = !s.dataCustom;
 
   const chans = s.points.channels, cur = s.drops.current;
   const watching = chans.filter((c) => c.watching);
@@ -1161,6 +1167,15 @@ mountLang($('langGate'));
 $('updCheck').onclick = () => { op({ op: 'updateCheck' }); };
 $('updInstall').onclick = () => op({ op: 'updateInstall' });
 $('clearLog').onclick = () => op({ op: 'clearLog' });
+// data folder: open it, or move it somewhere else (the program restarts and the panel carries on)
+$('dataOpen').onclick = () => op({ op: 'dataOpen' });
+async function moveData(path, target) {
+  const r = await op({ op: 'dataMove', name: path });
+  if (r && r.ok) toast(tr('L.dataMoving').replace('%s', r.target), 6000);
+  else if (r) toast(tr(r.err === 'same' ? 'set.dataSame' : 'set.dataBad'), 4000);
+}
+$('dataPick').onclick = async () => { const r = await op({ op: 'dataPick' }); if (r && r.ok && r.path) moveData(r.path, r.target); };
+$('dataReset').onclick = () => { if (confirm(tr('set.dataMoveQ') + '\n\n' + tr('set.dataMoveT').replace('%s', S.dataDefault))) moveData('', S.dataDefault); };
 $('quit').onclick = async () => { await op({ op: 'quit' }); window.close(); };
 document.addEventListener('contextmenu', (ev) => { if (!ev.target.closest('.gcard, .qban, input, .log')) ev.preventDefault(); });
 </script>

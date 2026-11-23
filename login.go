@@ -285,6 +285,7 @@ func (e *Engine) openLogin(start string) (*loginWin, error) {
 	if err := cmd.Start(); err != nil {
 		return nil, err
 	}
+	trackProcess(cmd.Process.Pid)
 	lw := &loginWin{cmd: cmd, pages: map[string]string{}, urls: make(chan string, 64), hdrs: make(chan string, 8), closed: make(chan struct{})}
 	exited := make(chan struct{})
 	go func() { cmd.Wait(); close(exited); lw.close() }()

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.4
+- Data now lives in `%LOCALAPPDATA%\Yasaiek\Loorek` (shared Yasaiek folder, each program in its own subfolder). The old `data` folder next to Loorek.exe is moved over on the first start.
+- Settings → Data folder: open it, or pick another place; the data is moved and Loorek restarts.
+- Quitting from the tray (or the panel) now closes Loorek's windows too, the login window included.
+- Loorek only ever looks at its own processes (checked by program name): no other program, game included, is touched.
+
 ## 0.9.3
 - Settings are now kept in data\\loorek-settings.json. With Orbek in the same folder both programs used data\\settings.json, and Orbek's saves wiped Loorek's channels and queue.
 

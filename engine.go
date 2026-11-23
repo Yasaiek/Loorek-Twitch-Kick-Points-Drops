@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
 
-var version = "0.9.3" // a variable so that test builds can override it
+var version = "0.9.4" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -134,9 +136,10 @@ type Engine struct {
 	chat  *chatClient
 	kick  *Kick
 
-	wake   chan struct{}
-	quit   chan struct{}
-	onQuit func()
+	wake    chan struct{}
+	quit    chan struct{}
+	closing bool // quitting: open windows close themselves
+	onQuit  func()
 
 	winGen  int
 	started time.Time
@@ -873,4 +876,43 @@ func (e *Engine) reorderChannels(order []string) {
 	e.saveSettings()
 	e.mu.Unlock()
 	e.poke()
+}
+
+// quitApp: the user closes the program. Its windows go too: an open panel sees "closing" within a
+// second and closes itself, and whatever is still running of what Loorek started is ended.
+func (e *Engine) quitApp() {
+	e.mu.Lock()
+	again := e.closing
+	e.closing = true
+	e.mu.Unlock()
+	if again {
+		return
+	}
+	time.Sleep(1500 * time.Millisecond)
+	closeOurWindows()
+	e.shutdown()
+}
+
+// restartSelf starts this program again (after the data folder was changed); the new copy takes over
+// the port and key, so an open panel carries on.
+func (e *Engine) restartSelf(arg string) error {
+	exe, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	e.mu.Lock()
+	gen := e.winGen
+	e.mu.Unlock()
+	cmd := exec.Command(exe, "--tray", arg)
+	cmd.Env = append(os.Environ(), "DROPOMAT_KEY="+e.apiKey, "DROPOMAT_GEN="+strconv.Itoa(gen), "DROPOMAT_PORT="+strconv.Itoa(e.port))
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	go func() {
+		time.Sleep(300 * time.Millisecond)
+		if e.onQuit != nil {
+			e.onQuit()
+		}
+	}()
+	return nil
 }

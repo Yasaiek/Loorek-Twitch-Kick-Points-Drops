@@ -4,8 +4,8 @@ import "strings"
 
 // trayActions are what the tray menu can do.
 type trayActions struct {
-	Open, Update func()
-	Set          func(key string, on bool) // a switch from the settings
+	Open, Update, Quit func()
+	Set                func(key string, on bool) // a switch from the settings
 }
 
 type trayInfo struct {

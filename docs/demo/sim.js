@@ -139,7 +139,7 @@
     if (S.cur) { const g = GAMES[S.cur.game], d = S.cur.drop; current = { game: g.name, art: g.art, channel: S.cur.camp.ch.name, login: S.cur.camp.ch.login, since: S.cur.since, drop: d.name, cur: Math.floor(d.cur), req: d.req, img: d.img }; }
     const all = (list) => list.reduce((n, c) => n + c.earned, 0);
     return {
-      version: window.LOOREK_VERSION || '0.6', app: 'Loorek', lang: lang(), winGen: 0, usage: USAGE, upSec: Math.floor((Date.now() - START) / 1000) * 20,
+      version: window.LOOREK_VERSION || '0.6', app: 'Loorek', lang: lang(), winGen: 0, usage: USAGE, dataDir: 'C:\\Users\\you\\AppData\\Local\\Yasaiek\\Loorek', dataDefault: '', dataCustom: false, upSec: Math.floor((Date.now() - START) / 1000) * 20,
       update: { state: S.upd.state, latest: '', checked: S.upd.checked, doneAt: 0 },
       auth: S.auth, settings: S.set,
       points: { channels, earned: all(channels), claims: channels.reduce((n, c) => n + c.claims, 0), watching: w.length },

@@ -40,11 +40,11 @@
 
 ## データの保存場所
 
-Loorek が保存するものはすべて `Loorek.exe` の隣の `data` フォルダーにあります。
+Loorek が保存するものはすべて `%LOCALAPPDATA%\Yasaiek\Loorek` にあります（設定 → データフォルダーで別の場所を選べます）。
 
 | ファイル | 内容 |
 | --- | --- |
-| `settings.json` | 設定、チャンネルリスト、順番待ち |
+| `loorek-settings.json` | 設定、チャンネルリスト、順番待ち |
 | `auth.json` | Twitch と Kick のセッション – このファイルは絶対に共有しないでください |
 | `login-profile/` | ログイン用ウィンドウのプロファイル – これも共有しないでください |
 | `log.txt` | ログ |

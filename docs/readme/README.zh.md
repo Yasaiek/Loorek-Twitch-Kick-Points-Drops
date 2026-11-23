@@ -40,11 +40,11 @@
 
 ## 数据存放位置
 
-Loorek 保存的所有内容都在 `Loorek.exe` 旁边的 `data` 文件夹中：
+Loorek 保存的所有内容都在 `%LOCALAPPDATA%\Yasaiek\Loorek` 中（可在 设置 → 数据文件夹 中选择其他位置）：
 
 | 文件 | 内容 |
 | --- | --- |
-| `settings.json` | 设置、频道列表、队列 |
+| `loorek-settings.json` | 设置、频道列表、队列 |
 | `auth.json` | 你的 Twitch 和 Kick 会话 – 切勿分享此文件 |
 | `login-profile/` | 登录窗口的配置文件 – 同样不要分享 |
 | `log.txt` | 日志 |

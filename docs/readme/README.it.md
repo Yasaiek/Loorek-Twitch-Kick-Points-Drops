@@ -40,11 +40,11 @@ Windows può avvisare di un editore sconosciuto perché il file non è firmato. 
 
 ## Dove sono i tuoi dati
 
-Tutto ciò che Loorek salva è nella cartella `data` accanto a `Loorek.exe`:
+Tutto ciò che Loorek salva è in `%LOCALAPPDATA%\Yasaiek\Loorek` (un altro posto si sceglie in Impostazioni → Cartella dati):
 
 | File | Cos'è |
 | --- | --- |
-| `settings.json` | impostazioni, elenchi dei canali, coda |
+| `loorek-settings.json` | impostazioni, elenchi dei canali, coda |
 | `auth.json` | le tue sessioni Twitch e Kick – non condividere mai questo file |
 | `login-profile/` | il profilo della finestra di accesso – non condividere nemmeno questo |
 | `log.txt` | il diario |

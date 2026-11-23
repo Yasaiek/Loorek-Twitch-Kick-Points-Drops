@@ -339,5 +339,18 @@
 "use.hint": "Loorek 及其窗口",
 "rpc.st.idle": "目前没有进行任何操作——Loorek 刷掉宝或收集积分时才会显示状态。",
 "set.stats": "发送匿名统计",
-"set.statsHint": "每 15 分钟发送：随机安装编号、版本以及平均 CPU 和内存占用——用于 Loorek 网站上的计数器。不含名字、账户或频道。"
+"set.statsHint": "每 15 分钟发送：随机安装编号、版本以及平均 CPU 和内存占用——用于 Loorek 网站上的计数器。不含名字、账户或频道。",
+"set.dataDir": "数据文件夹",
+"set.dataHint": "设置、日志和程序的其他文件。",
+"set.dataOpen": "打开",
+"set.dataPick": "更改…",
+"set.dataReset": "默认",
+"set.dataMoveQ": "移动数据？",
+"set.dataMoveT": "数据将移至 %s。程序将重新启动。",
+"set.dataMove": "移动",
+"set.dataBad": "无法使用此文件夹。",
+"set.dataSame": "数据已在此文件夹中。",
+"L.dataMoving": "正在将数据移至 %s…",
+"L.dataMoved": "数据现在位于 %s。",
+"L.dataMoveFail": "无法重新启动以移动数据：%v"
 }

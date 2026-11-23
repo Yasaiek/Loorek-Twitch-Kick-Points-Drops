@@ -40,11 +40,11 @@ Dosya imzalı olmadığı için Windows bilinmeyen yayıncı uyarısı verebilir
 
 ## Verilerin nerede
 
-Loorek'in kaydettiği her şey `Loorek.exe` yanındaki `data` klasöründedir:
+Loorek'in kaydettiği her şey `%LOCALAPPDATA%\Yasaiek\Loorek` içindedir (başka bir yer Ayarlar → Veri klasörü'nden seçilebilir):
 
 | Dosya | Nedir |
 | --- | --- |
-| `settings.json` | ayarlar, kanal listeleri, sıra |
+| `loorek-settings.json` | ayarlar, kanal listeleri, sıra |
 | `auth.json` | Twitch ve Kick oturumların – bu dosyayı asla paylaşma |
 | `login-profile/` | giriş penceresinin profili – bunu da paylaşma |
 | `log.txt` | günlük |

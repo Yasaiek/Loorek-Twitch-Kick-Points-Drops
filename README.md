@@ -40,11 +40,11 @@ Windows may warn about an unknown publisher, because the file is not code-signed
 
 ## Where your data lives
 
-Everything Loorek stores is in the `data` folder next to `Loorek.exe`:
+Everything Loorek stores is in `%LOCALAPPDATA%\Yasaiek\Loorek` (another place can be picked in Settings → Data folder):
 
 | File | What it is |
 | --- | --- |
-| `settings.json` | settings, channel lists, queue |
+| `loorek-settings.json` | settings, channel lists, queue |
 | `auth.json` | your Twitch and Kick sessions – never share this file |
 | `login-profile/` | the profile of the sign-in window – never share it either |
 | `log.txt` | the journal |

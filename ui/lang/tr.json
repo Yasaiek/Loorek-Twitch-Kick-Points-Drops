@@ -339,5 +339,18 @@
 "use.hint": "Loorek ve penceresi",
 "rpc.st.idle": "Şu an bir şey olmuyor – durum, Loorek drop kasarken ya da puan toplarken görünür.",
 "set.stats": "Anonim istatistik gönder",
-"set.statsHint": "Her 15 dakikada: rastgele bir kurulum numarası, sürüm ve ortalama CPU ve RAM kullanımı – Loorek'in sitesindeki sayaç için. İsim, hesap ya da kanal yok."
+"set.statsHint": "Her 15 dakikada: rastgele bir kurulum numarası, sürüm ve ortalama CPU ve RAM kullanımı – Loorek'in sitesindeki sayaç için. İsim, hesap ya da kanal yok.",
+"set.dataDir": "Veri klasörü",
+"set.dataHint": "Ayarlar, günlükler ve programın diğer dosyaları.",
+"set.dataOpen": "Aç",
+"set.dataPick": "Değiştir…",
+"set.dataReset": "Varsayılan",
+"set.dataMoveQ": "Veriler taşınsın mı?",
+"set.dataMoveT": "Veriler %s konumuna gidecek. Program yeniden başlayacak.",
+"set.dataMove": "Taşı",
+"set.dataBad": "Bu klasör kullanılamıyor.",
+"set.dataSame": "Veriler zaten bu klasörde.",
+"L.dataMoving": "Veriler %s konumuna taşınıyor…",
+"L.dataMoved": "Veriler artık %s konumunda.",
+"L.dataMoveFail": "Verileri taşımak için yeniden başlatılamadı: %v"
 }

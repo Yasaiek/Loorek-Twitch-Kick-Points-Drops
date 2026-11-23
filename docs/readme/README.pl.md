@@ -40,11 +40,11 @@ Windows może ostrzec o nieznanym wydawcy, bo plik nie jest podpisany. Każde wy
 
 ## Gdzie są Twoje dane
 
-Wszystko, co Loorek zapisuje, jest w folderze `data` obok `Loorek.exe`:
+Wszystko, co Loorek zapisuje, jest w `%LOCALAPPDATA%\Yasaiek\Loorek` (inne miejsce wybierzesz w Ustawienia → Folder danych):
 
 | Plik | Co to jest |
 | --- | --- |
-| `settings.json` | ustawienia, listy kanałów, kolejka |
+| `loorek-settings.json` | ustawienia, listy kanałów, kolejka |
 | `auth.json` | Twoje sesje Twitcha i Kicka – nikomu nie wysyłaj tego pliku |
 | `login-profile/` | profil okna logowania – jego też nie wysyłaj |
 | `log.txt` | dziennik |

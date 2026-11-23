@@ -7,6 +7,8 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -228,7 +230,7 @@ func (e *Engine) view() map[string]any {
 
 	return map[string]any{
 		"version": version, "usage": currentUsage(), "statsOn": statsURL != "",
-		"app":    appName,
+		"app": appName, "closing": e.closing, "dataDir": e.dir, "dataDefault": dataDirIn(defaultRoot()), "dataCustom": readLocation().Root != "",
 		"lang":   resolveLang(e.set.Lang),
 		"update": map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked), "doneAt": ms(e.upd.Done)},
 		"auth":   map[string]any{"state": e.authState, "login": e.auth.Login, "note": e.authNote, "mode": e.loginMode},
@@ -486,10 +488,38 @@ func (s *server) handleOp(req opReq) map[string]any {
 	case "clearLog":
 		e.log.clear()
 	case "quit":
+		if req.On { // a newer version takes over: the windows stay and carry on with it
+			go func() {
+				time.Sleep(200 * time.Millisecond)
+				e.shutdown()
+			}()
+		} else {
+			go e.quitApp()
+		}
+	case "dataOpen":
+		openFolder(e.dir)
+	case "dataPick": // the system folder picker; the program's own folder is made inside the one picked
+		p := pickFolder(tr("set.dataDir"), filepath.Dir(e.dir))
+		if p == "" {
+			return map[string]any{"ok": false}
+		}
+		return map[string]any{"ok": true, "path": p, "target": dataDirIn(p)}
+	case "dataMove":
+		if os.Getenv("DROPOMAT_DATA") != "" {
+			return map[string]any{"ok": false, "err": "bad"}
+		}
+		dir, err := chooseRoot(req.Name, e.dir)
+		if err != nil {
+			return map[string]any{"ok": false, "err": err.Error()}
+		}
+		e.log.Info("L.dataMoving", dir)
 		go func() {
-			time.Sleep(200 * time.Millisecond)
-			e.shutdown()
+			time.Sleep(400 * time.Millisecond)
+			if err := e.restartSelf("--moved"); err != nil {
+				e.log.Err("L.dataMoveFail", err)
+			}
 		}()
+		return map[string]any{"ok": true, "target": dir}
 	default:
 		out["ok"] = false
 	}

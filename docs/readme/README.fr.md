@@ -40,11 +40,11 @@ Windows peut signaler un éditeur inconnu, car le fichier n'est pas signé. Chaq
 
 ## Où se trouvent vos données
 
-Tout ce que Loorek enregistre se trouve dans le dossier `data` à côté de `Loorek.exe` :
+Tout ce que Loorek enregistre se trouve dans `%LOCALAPPDATA%\Yasaiek\Loorek` (un autre emplacement se choisit dans Réglages → Dossier de données) :
 
 | Fichier | Ce que c'est |
 | --- | --- |
-| `settings.json` | réglages, listes de chaînes, file d'attente |
+| `loorek-settings.json` | réglages, listes de chaînes, file d'attente |
 | `auth.json` | vos sessions Twitch et Kick – ne partagez jamais ce fichier |
 | `login-profile/` | le profil de la fenêtre de connexion – ne le partagez pas non plus |
 | `log.txt` | le journal |

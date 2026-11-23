@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -113,8 +114,8 @@ func runTray(e *Engine, a trayActions) {
 						exec.Command("explorer", filepath.Dir(exe)).Start()
 					}
 				case <-mQuit.ClickedCh:
-					systray.Quit()
-					return
+					a.Quit() // closes the windows too, then the program
+
 				case <-e.quit:
 					systray.Quit()
 					return
@@ -182,4 +183,29 @@ func darkMenus() {
 	if p, err := windows.GetProcAddressByOrdinal(h, 136); err == nil {
 		syscall.SyscallN(p)
 	}
+}
+
+func openFolder(dir string) { exec.Command("explorer", dir).Start() }
+
+// pickFolder shows the system folder picker (through PowerShell, in front of other windows) and returns
+// the folder picked, or "" when cancelled.
+func pickFolder(title, start string) string {
+	q := func(s string) string { return "'" + strings.ReplaceAll(s, "'", "''") + "'" }
+	script := `[Console]::OutputEncoding = [Text.Encoding]::UTF8
+Add-Type -AssemblyName System.Windows.Forms
+$f = New-Object System.Windows.Forms.Form -Property @{TopMost = $true; ShowInTaskbar = $false; Opacity = 0}
+$f.Show(); $f.Activate()
+$d = New-Object System.Windows.Forms.FolderBrowserDialog
+$d.Description = ` + q(title) + `
+$d.ShowNewFolderButton = $true
+$d.SelectedPath = ` + q(start) + `
+if ($d.ShowDialog($f) -eq 'OK') { $d.SelectedPath }
+$f.Close()`
+	cmd := exec.Command("powershell", "-NoProfile", "-STA", "-ExecutionPolicy", "Bypass", "-Command", script)
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true, CreationFlags: 0x08000000} // CREATE_NO_WINDOW
+	out, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(out))
 }
