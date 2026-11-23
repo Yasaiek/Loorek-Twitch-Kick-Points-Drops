@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.3
+- Settings are now kept in data\\loorek-settings.json. With Orbek in the same folder both programs used data\\settings.json, and Orbek's saves wiped Loorek's channels and queue.
+
 ## 0.9.2
 - Smoother CPU and RAM charts: averaged values drawn as a soft curve with a round marker, never cut off at the edges.
 

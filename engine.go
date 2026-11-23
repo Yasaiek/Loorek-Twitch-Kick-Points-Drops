@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -9,7 +11,7 @@ import (
 	"time"
 )
 
-var version = "0.9.2" // a variable so that test builds can override it
+var version = "0.9.3" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -147,7 +149,7 @@ func newEngine(dir string) *Engine {
 		chans: map[string]*chanRT{}, wake: make(chan struct{}, 1), quit: make(chan struct{}), started: time.Now(),
 	}
 	e.drops.init()
-	readJSON(filepath.Join(dir, "settings.json"), &e.set)
+	loadSettings(dir, &e.set)
 	if !e.set.StatsInit {
 		e.set.Stats, e.set.StatsInit = true, true
 	}
@@ -172,8 +174,29 @@ func newEngine(dir string) *Engine {
 	return e
 }
 
-func (e *Engine) saveSettings() { writeJSON(filepath.Join(e.dir, "settings.json"), &e.set) }
-func (e *Engine) saveAuth()     { writeJSON(filepath.Join(e.dir, "auth.json"), &e.auth) }
+func (e *Engine) saveSettings() { writeJSON(filepath.Join(e.dir, settingsFile), &e.set) }
+
+// Up to 0.9.2 the settings were in data\settings.json. Orbek used the very same file when both programs
+// sat in one folder, and its saves wiped Loorek's channels and queue. Loorek now has a file of its own;
+// the old one is taken over once, unless Orbek was the last to write it.
+const settingsFile = "loorek-settings.json"
+
+func loadSettings(dir string, set *Settings) {
+	if readJSON(filepath.Join(dir, settingsFile), set) == nil {
+		return
+	}
+	b, err := os.ReadFile(filepath.Join(dir, "settings.json"))
+	if err != nil {
+		return
+	}
+	var m map[string]any
+	if json.Unmarshal(b, &m) != nil || m["vencordDir"] != nil || m["refreshMin"] != nil {
+		return // Orbek's
+	}
+	json.Unmarshal(b, set)
+	writeJSON(filepath.Join(dir, settingsFile), set)
+}
+func (e *Engine) saveAuth() { writeJSON(filepath.Join(e.dir, "auth.json"), &e.auth) }
 
 func (e *Engine) poke() {
 	select {
