@@ -336,5 +336,6 @@
 "tray.site": "Site de Loorek",
 "tray.folder": "Ouvrir le dossier de Loorek",
 "use.title": "Utilisation du PC",
-"use.hint": "Loorek et sa fenêtre"
+"use.hint": "Loorek et sa fenêtre",
+"rpc.st.idle": "Rien en cours – le statut apparaît quand Loorek farme un drop ou collecte des points."
 }

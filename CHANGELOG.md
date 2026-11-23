@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.6
+- The Discord activity shows only while Loorek is doing something (a drop or channel points) – not while it waits.
+- Colourful tray menu icons; the state and usage lines are no longer greyed out.
+- PC usage shows the lowest and highest since start too.
+
 ## 0.8.5
 - Right-click menu in the tray: what Loorek is watching, PC usage, open the panel, switches for channel points, Twitch Drops and Kick, updates, website, folder, quit – with icons.
 - PC usage (CPU and RAM of Loorek with its window) on the home page and in the tray.

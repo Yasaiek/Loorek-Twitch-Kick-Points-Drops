@@ -336,5 +336,6 @@
 "tray.site": "Loorek 网站",
 "tray.folder": "打开 Loorek 文件夹",
 "use.title": "电脑占用",
-"use.hint": "Loorek 及其窗口"
+"use.hint": "Loorek 及其窗口",
+"rpc.st.idle": "目前没有进行任何操作——Loorek 刷掉宝或收集积分时才会显示状态。"
 }

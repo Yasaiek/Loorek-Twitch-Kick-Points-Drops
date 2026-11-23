@@ -336,5 +336,6 @@
 "tray.site": "Strona Loorka",
 "tray.folder": "Otwórz folder Loorka",
 "use.title": "Zużycie PC",
-"use.hint": "Loorek razem z oknem"
+"use.hint": "Loorek razem z oknem",
+"rpc.st.idle": "Nic się teraz nie dzieje – status pojawi się, gdy Loorek będzie dropił albo zbierał punkty."
 }

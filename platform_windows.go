@@ -28,12 +28,9 @@ func runTray(e *Engine, a trayActions) {
 
 		head := systray.AddMenuItem(appName+" "+version, "")
 		head.SetIcon(iconICO)
-		head.Disable()
 		mState := systray.AddMenuItem("", "")
-		mState.Disable()
 		mUse := systray.AddMenuItem(usageLine(), "")
 		mUse.SetIcon(menuIcon("usage"))
-		mUse.Disable()
 		systray.AddSeparator()
 		mOpen := systray.AddMenuItem(tr("tray.open"), "")
 		mOpen.SetIcon(menuIcon("open"))
@@ -89,6 +86,12 @@ func runTray(e *Engine, a trayActions) {
 			for {
 				select {
 				case <-mOpen.ClickedCh:
+					a.Open()
+				case <-head.ClickedCh:
+					a.Open()
+				case <-mState.ClickedCh:
+					a.Open()
+				case <-mUse.ClickedCh:
 					a.Open()
 				case <-mPoints.ClickedCh:
 					a.Set("pointsOn", !mPoints.Checked())

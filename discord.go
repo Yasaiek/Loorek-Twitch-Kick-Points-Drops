@@ -176,11 +176,8 @@ func (e *Engine) presence(now time.Time) (cfg RPCCfg, id string, act *rpcActivit
 		act.Timestamps = &rpcTimes{Start: e.started.Unix()}
 		act.Assets.SmallImage = rpcPoints
 	default:
-		act.Details = tr("rpc.idle")
-		act.Assets.SmallImage = rpcIdle
-		if len(lists) > 0 {
-			act.State, lists = lists[0], lists[1:]
-		}
+		// Nothing being farmed or collected: Discord shows nothing (no "waiting for a drop" activity).
+		return cfg, id, nil
 	}
 	act.Details, act.State = rpcText(act.Details), rpcText(act.State)
 	act.Assets.LargeText = rpcText(firstNonEmpty(strings.Join(lists, " • "), appName+" "+version))
@@ -382,10 +379,13 @@ func (e *Engine) discordStep(d *discordRPC, now time.Time) string {
 			d.close()
 		}
 		d.retryAt = time.Time{}
-		if cfg.On {
+		switch {
+		case !cfg.On:
+			return "off"
+		case id == "":
 			return "noid"
 		}
-		return "off"
+		return "idle"
 	}
 	if d.conn != nil && d.appID != id {
 		d.set(nil)

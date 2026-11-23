@@ -546,7 +546,7 @@ select:focus { border-color: var(--accent); }
 </div>
 <div id="toast"></div>
 
-<script>window.LOOREK_VERSION = "0.8.5";</script>
+<script>window.LOOREK_VERSION = "0.8.6";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -923,7 +923,7 @@ function render() {
   $('stChat').textContent = chat.state === 'on' ? chat.joined : '–';
   $('stUp').textContent = upTime(s.upSec);
   { const u = s.usage || {}, f = (v) => (v > 0 && v < 0.1 ? '<0.1' : (v || 0).toFixed(1));
-    $('useCpu').textContent = f(u.cpu) + '%'; $('useRam').textContent = 'RAM ' + Math.round(u.ram || 0) + ' MB · ' + f(u.ramPct) + '%';
+    $('useCpu').textContent = f(u.cpu) + '%'; $('useRam').textContent = 'min ' + f(u.cpuMin) + '% · max ' + f(u.cpuMax) + '% · RAM ' + Math.round(u.ram || 0) + ' MB (' + Math.round(u.ramMin || 0) + '–' + Math.round(u.ramMax || 0) + ')';
     $('stUse').title = tr('use.title') + ' – ' + tr('use.hint'); }
   countTo($('stEarned'), 'earned', s.points.earned);
   countTo($('stClaims'), 'claims', s.points.claims);

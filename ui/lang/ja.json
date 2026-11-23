@@ -336,5 +336,6 @@
 "tray.site": "Loorekのサイト",
 "tray.folder": "Loorekのフォルダーを開く",
 "use.title": "PCの使用量",
-"use.hint": "Loorekとそのウィンドウ"
+"use.hint": "Loorekとそのウィンドウ",
+"rpc.st.idle": "現在は何もしていません – Loorekがドロップを集めたりポイントを貯めたりしている間にステータスが表示されます。"
 }

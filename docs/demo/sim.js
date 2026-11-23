@@ -129,7 +129,7 @@
     if (S.cur) { const g = GAMES[S.cur.game], d = S.cur.drop; current = { game: g.name, art: g.art, channel: S.cur.camp.ch.name, login: S.cur.camp.ch.login, since: S.cur.since, drop: d.name, cur: Math.floor(d.cur), req: d.req, img: d.img }; }
     const all = (list) => list.reduce((n, c) => n + c.earned, 0);
     return {
-      version: window.LOOREK_VERSION || '0.6', app: 'Loorek', lang: lang(), winGen: 0, usage: { cpu: +(0.3 + Math.random() * 0.5).toFixed(2), ram: 140 + Math.round(Math.random() * 10), ramPct: 0.9 }, upSec: Math.floor((Date.now() - START) / 1000) * 20,
+      version: window.LOOREK_VERSION || '0.6', app: 'Loorek', lang: lang(), winGen: 0, usage: { cpu: +(0.3 + Math.random() * 0.5).toFixed(2), ram: 140 + Math.round(Math.random() * 10), ramPct: 0.9, cpuMin: 0.1, cpuMax: 1.9, ramMin: 132, ramMax: 158 }, upSec: Math.floor((Date.now() - START) / 1000) * 20,
       update: { state: S.upd.state, latest: '', checked: S.upd.checked, doneAt: 0 },
       auth: S.auth, settings: S.set,
       points: { channels, earned: all(channels), claims: channels.reduce((n, c) => n + c.claims, 0), watching: w.length },

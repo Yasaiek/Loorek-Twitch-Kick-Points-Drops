@@ -336,5 +336,6 @@
 "tray.site": "Loorek'in sitesi",
 "tray.folder": "Loorek klasörünü aç",
 "use.title": "PC kullanımı",
-"use.hint": "Loorek ve penceresi"
+"use.hint": "Loorek ve penceresi",
+"rpc.st.idle": "Şu an bir şey olmuyor – durum, Loorek drop kasarken ya da puan toplarken görünür."
 }

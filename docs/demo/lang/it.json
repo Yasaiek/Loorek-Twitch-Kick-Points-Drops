@@ -336,5 +336,6 @@
 "tray.site": "Sito di Loorek",
 "tray.folder": "Apri la cartella di Loorek",
 "use.title": "Uso del PC",
-"use.hint": "Loorek con la sua finestra"
+"use.hint": "Loorek con la sua finestra",
+"rpc.st.idle": "Ora non succede nulla – lo stato compare quando Loorek farma un drop o raccoglie punti."
 }

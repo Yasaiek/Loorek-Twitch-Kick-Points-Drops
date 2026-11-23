@@ -336,5 +336,6 @@
 "tray.site": "Loorek's website",
 "tray.folder": "Open Loorek's folder",
 "use.title": "PC usage",
-"use.hint": "Loorek with its window"
+"use.hint": "Loorek with its window",
+"rpc.st.idle": "Nothing going on – the status shows up while Loorek farms a drop or collects points."
 }
