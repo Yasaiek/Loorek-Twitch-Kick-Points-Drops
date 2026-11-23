@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0
+- CPU and RAM tiles show a small chart of the last minutes, with min and max chips under it.
+- The home page tiles wrap onto the next row in a narrow window instead of being cut off.
+
 ## 0.8.9
 - Anonymous statistics for the website (on by default, Settings → "Send anonymous statistics"): every 15 minutes a random installation number, the version and the average CPU and RAM use. The site shows how many copies run now and their average use.
 
