@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.9
+- Anonymous statistics for the website (on by default, Settings → "Send anonymous statistics"): every 15 minutes a random installation number, the version and the average CPU and RAM use. The site shows how many copies run now and their average use.
+
 ## 0.8.8
 - CPU and RAM have their own tiles on the home page: now, lowest and highest since start, with a range bar.
 
