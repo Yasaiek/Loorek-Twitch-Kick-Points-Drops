@@ -125,10 +125,16 @@ input[type=number] { width: 70px; text-align: center; }
 .eq i { width: 3px; border-radius: 2px; background: var(--accent); animation: eq 1s ease-in-out infinite; }
 .eq i:nth-child(2) { animation-delay: -.35s; } .eq i:nth-child(3) { animation-delay: -.7s; }
 @keyframes eq { 0%, 100% { height: 4px; } 50% { height: 14px; } }
-.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-@media (max-width: 980px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+.stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+@media (max-width: 1100px) { .stats { grid-template-columns: repeat(3, 1fr); } }
 .stat.use { border-color: rgba(62,207,142,.25); background: linear-gradient(160deg, rgba(62,207,142,.09), transparent), var(--card); }
-.stat.use b small { font-size: 12px; font-weight: 600; color: var(--sub); } .stat.use b span { font: inherit; color: inherit; }
+.stat.use b small { font-size: 12px; font-weight: 600; color: var(--sub); }
+.stat.use { --m1: #ffcc4d; --m2: #ff8a3d; } .stat.use.ram { --m1: #29d3b4; --m2: #3a8bff; border-color: rgba(41,211,180,.26); background: linear-gradient(160deg, rgba(41,211,180,.1), transparent), var(--card); }
+.stat .mm { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.stat .mbar { position: relative; height: 5px; border-radius: 4px; background: rgba(255,255,255,.08); }
+.stat .mbar i { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: linear-gradient(90deg, var(--m1), var(--m2)); opacity: .55; }
+.stat .mbar b { position: absolute; top: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--m2), 0 0 8px var(--m2); transition: left .6s; }
+.stat .mrow { display: flex; gap: 4px; font-size: 11.5px; color: var(--sub); white-space: nowrap; font-variant-numeric: tabular-nums; } .stat .mrow strong { color: var(--text); font-weight: 600; } .stat.use b span { font: inherit; color: inherit; }
 .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
 .stat b { display: block; font: 600 22px/1.2 var(--display); font-variant-numeric: tabular-nums; }
 .stat span { font-size: 12px; color: var(--sub); }
@@ -373,7 +379,8 @@ select:focus { border-color: var(--accent); }
       <div class="stat"><b id="stClaims">0</b><span data-i="st.claims"></span></div>
       <div class="stat"><b id="stChat">–</b><span data-i="st.chats"></span></div>
       <div class="stat"><b id="stUp">–</b><span data-i="st.up"></span></div>
-      <div class="stat use" id="stUse"><b><span id="useCpu">–</span> <small>CPU</small></b><span id="useRam">–</span></div>
+      <div class="stat use" id="stUse"><b><span id="useCpu">–</span> <small>CPU</small></b><div class="mm" id="useCpuMM"></div></div>
+      <div class="stat use ram" id="stRam"><b><span id="useRamV">–</span> <small>RAM</small></b><div class="mm" id="useRamMM"></div></div>
     </div>
     <div class="card"><div class="card-head"><h2 data-i="home.recent"></h2><a href="#" id="toLog" data-i="home.allLog"></a></div><div class="log" id="logShort"></div></div>
   </section>
@@ -920,8 +927,17 @@ function render() {
   $('stChat').textContent = chat.state === 'on' ? chat.joined : '–';
   $('stUp').textContent = upTime(s.upSec);
   { const u = s.usage || {}, f = (v) => (v > 0 && v < 0.1 ? '<0.1' : (v || 0).toFixed(1));
-    $('useCpu').textContent = f(u.cpu) + '%'; $('useRam').textContent = 'min ' + f(u.cpuMin) + '% · max ' + f(u.cpuMax) + '% · RAM ' + Math.round(u.ram || 0) + ' MB (' + Math.round(u.ramMin || 0) + '–' + Math.round(u.ramMax || 0) + ')';
-    $('stUse').title = tr('use.title') + ' – ' + tr('use.hint'); }
+    const mb = (v) => Math.round(v || 0) + ' MB';
+    const mm = (box, lo, hi, cur, fmt) => {
+      box.textContent = '';
+      const bar = el('div', 'mbar'), fill = el('i'), pin = el('b'), span = Math.max(hi, cur, 0.0001), a = Math.min(lo, cur) / span * 100, z = Math.max(hi, cur) / span * 100;
+      fill.style.left = a + '%'; fill.style.width = Math.max(2, z - a) + '%'; pin.style.left = (cur / span * 100) + '%'; bar.append(fill, pin);
+      const row = el('div', 'mrow'); row.append(el('span', '', 'min'), el('strong', '', fmt(lo)), el('span', '', '· max'), el('strong', '', fmt(hi)));
+      box.append(bar, row);
+    };
+    $('useCpu').textContent = f(u.cpu) + '%'; mm($('useCpuMM'), u.cpuMin || 0, u.cpuMax || 0, u.cpu || 0, (v) => f(v) + '%');
+    $('useRamV').textContent = mb(u.ram); mm($('useRamMM'), u.ramMin || 0, u.ramMax || 0, u.ram || 0, mb);
+    $('stUse').title = $('stRam').title = tr('use.title') + ' – ' + tr('use.hint') + ' · RAM ' + f(u.ramPct) + '% PC'; }
   countTo($('stEarned'), 'earned', s.points.earned);
   countTo($('stClaims'), 'claims', s.points.claims);
 

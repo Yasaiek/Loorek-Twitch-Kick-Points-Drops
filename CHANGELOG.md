@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.8
+- CPU and RAM have their own tiles on the home page: now, lowest and highest since start, with a range bar.
+
 ## 0.8.7
 - The tray menu is dark (with the colourful icons), also when Windows uses the light theme.
 
