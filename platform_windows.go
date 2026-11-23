@@ -4,6 +4,7 @@ package main
 
 import (
 	"embed"
+	"golang.org/x/sys/windows"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +21,7 @@ var iconICO []byte
 
 // runTray puts the icon next to the clock and blocks until the user quits.
 func runTray(e *Engine, a trayActions) {
+	darkMenus()
 	systray.Run(func() {
 		systray.SetIcon(iconICO)
 		systray.SetTitle(appName)
@@ -164,4 +166,20 @@ func setAutostart(on bool) error {
 		return err
 	}
 	return k.SetStringValue(appName, `"`+exe+`" --tray`)
+}
+
+// darkMenus makes the program's menus (the tray menu) dark, whatever the Windows theme. It uses the same
+// switch Windows' own apps use (uxtheme ordinals 135 SetPreferredAppMode and 136 FlushMenuThemes, Windows 10
+// 1903 and newer); on older Windows the call does nothing harmful.
+func darkMenus() {
+	h, err := windows.LoadLibrary("uxtheme.dll")
+	if err != nil {
+		return
+	}
+	if p, err := windows.GetProcAddressByOrdinal(h, 135); err == nil {
+		syscall.SyscallN(p, 2) // ForceDark
+	}
+	if p, err := windows.GetProcAddressByOrdinal(h, 136); err == nil {
+		syscall.SyscallN(p)
+	}
 }

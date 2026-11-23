@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.7
+- The tray menu is dark (with the colourful icons), also when Windows uses the light theme.
+
 ## 0.8.6
 - The Discord activity shows only while Loorek is doing something (a drop or channel points) – not while it waits.
 - Colourful tray menu icons; the state and usage lines are no longer greyed out.
