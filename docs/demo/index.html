@@ -498,6 +498,7 @@ select:focus { border-color: var(--accent); }
     <div class="card">
       <div class="row"><span>Loorek <span id="ver"></span><small id="updNote">–</small></span><span style="display:flex;gap:8px"><button class="btn small primary" id="updInstall" hidden data-i="upd.install"></button><button class="btn small" id="updCheck" data-i="upd.check"></button></span></div>
       <label class="row"><span><span data-i="upd.auto"></span><small data-i="upd.autoHint"></small></span><input type="checkbox" class="sw" data-set="autoUpdate"></label>
+      <label class="row" id="statsRow" hidden><span><span data-i="set.stats"></span><small data-i="set.statsHint"></small></span><input type="checkbox" class="sw" data-set="stats"></label>
     </div>
     <div class="card" id="rpcCard">
       <label class="row"><span><i class="svc" data-svc="discord"></i><span data-i="set.rpc"></span><small id="rpcNote"></small></span><input type="checkbox" class="sw" data-set="rpcOn"></label>
@@ -921,6 +922,7 @@ function render() {
   }
   if (!pending) document.querySelectorAll('[data-set]').forEach((inp) => { const v = s.settings[inp.dataset.set]; if (inp.type === 'checkbox') inp.checked = !!v; else if (document.activeElement !== inp) inp.value = v; });
   if (changed('langPref', [s.settings.lang, LANG])) syncLang();
+  $('statsRow').hidden = !s.statsOn;
   const u = s.update || {};
   $('updNote').textContent = u.state === 'downloading' ? tr('upd.downloading', { v: u.latest }) : u.state === 'available' ? tr('upd.avail', { v: u.latest }) : u.state === 'checking' ? tr('upd.checking') : u.state === 'failed' ? tr('upd.failed') : u.state === 'current' ? tr('upd.current') : u.doneAt ? tr('upd.done', { v: s.version }) : tr('upd.never');
   if (u.doneAt && Date.now() - u.doneAt < 180000 && !doneShown) { doneShown = true; toast(tr('upd.done', { v: s.version }), 7000); }

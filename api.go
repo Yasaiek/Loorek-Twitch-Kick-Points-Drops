@@ -227,14 +227,14 @@ func (e *Engine) view() map[string]any {
 	}
 
 	return map[string]any{
-		"version": version, "usage": currentUsage(),
+		"version": version, "usage": currentUsage(), "statsOn": statsURL != "",
 		"app":    appName,
 		"lang":   resolveLang(e.set.Lang),
 		"update": map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked), "doneAt": ms(e.upd.Done)},
 		"auth":   map[string]any{"state": e.authState, "login": e.auth.Login, "note": e.authNote, "mode": e.loginMode},
 		"settings": map[string]any{"pointsOn": e.set.PointsOn, "chatOn": e.set.ChatOn, "dropsOn": e.set.DropsOn, "autoClaim": e.set.AutoClaim,
 			"rotateMin": e.set.RotateMin, "stallMin": e.set.StallMin, "autostart": e.set.Autostart, "openOnStart": e.set.OpenOnStart,
-			"kickOn": e.set.KickOn, "kickMax": e.set.KickMax, "autoUpdate": e.set.AutoUpdate, "lang": e.set.Lang,
+			"kickOn": e.set.KickOn, "kickMax": e.set.KickMax, "autoUpdate": e.set.AutoUpdate, "stats": e.set.Stats, "lang": e.set.Lang,
 			"rpcOn": e.set.Discord.On, "rpcDrop": e.set.Discord.Drop, "rpcQueue": e.set.Discord.Queue, "rpcTracked": e.set.Discord.Tracked,
 			"rpcPoints": e.set.Discord.Points, "rpcBtn": e.set.Discord.Button},
 		"rpc":    map[string]any{"state": e.rpcState, "ready": firstNonEmpty(e.set.Discord.AppID, discordAppID) != ""},
@@ -451,6 +451,8 @@ func (s *server) handleOp(req opReq) map[string]any {
 				e.set.Discord.Button = boolean(v)
 			case "autoUpdate":
 				e.set.AutoUpdate = boolean(v)
+			case "stats":
+				e.set.Stats = boolean(v)
 			case "lang":
 				e.set.Lang = "auto"
 				for _, c := range langCodes {

@@ -337,5 +337,7 @@
 "tray.folder": "打开 Loorek 文件夹",
 "use.title": "电脑占用",
 "use.hint": "Loorek 及其窗口",
-"rpc.st.idle": "目前没有进行任何操作——Loorek 刷掉宝或收集积分时才会显示状态。"
+"rpc.st.idle": "目前没有进行任何操作——Loorek 刷掉宝或收集积分时才会显示状态。",
+"set.stats": "发送匿名统计",
+"set.statsHint": "每 15 分钟发送：随机安装编号、版本以及平均 CPU 和内存占用——用于 Loorek 网站上的计数器。不含名字、账户或频道。"
 }

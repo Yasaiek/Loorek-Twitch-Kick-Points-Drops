@@ -337,5 +337,7 @@
 "tray.folder": "Abrir a pasta do Loorek",
 "use.title": "Uso do PC",
 "use.hint": "Loorek com sua janela",
-"rpc.st.idle": "Nada acontecendo – o status aparece quando o Loorek farma um drop ou coleta pontos."
+"rpc.st.idle": "Nada acontecendo – o status aparece quando o Loorek farma um drop ou coleta pontos.",
+"set.stats": "Enviar estatísticas anônimas",
+"set.statsHint": "A cada 15 minutos: um número de instalação aleatório, a versão e o uso médio de CPU e RAM – para o contador no site do Loorek. Sem nomes, contas ou canais."
 }

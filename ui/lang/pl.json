@@ -337,5 +337,7 @@
 "tray.folder": "Otwórz folder Loorka",
 "use.title": "Zużycie PC",
 "use.hint": "Loorek razem z oknem",
-"rpc.st.idle": "Nic się teraz nie dzieje – status pojawi się, gdy Loorek będzie dropił albo zbierał punkty."
+"rpc.st.idle": "Nic się teraz nie dzieje – status pojawi się, gdy Loorek będzie dropił albo zbierał punkty.",
+"set.stats": "Wysyłaj anonimowe statystyki",
+"set.statsHint": "Co 15 minut: losowy numer instalacji, wersja oraz średnie zużycie CPU i RAM – do licznika na stronie Loorka. Bez nazw, kont i kanałów."
 }

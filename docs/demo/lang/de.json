@@ -337,5 +337,7 @@
 "tray.folder": "Looreks Ordner öffnen",
 "use.title": "PC-Auslastung",
 "use.hint": "Loorek samt Fenster",
-"rpc.st.idle": "Gerade passiert nichts – der Status erscheint, sobald Loorek einen Drop farmt oder Punkte sammelt."
+"rpc.st.idle": "Gerade passiert nichts – der Status erscheint, sobald Loorek einen Drop farmt oder Punkte sammelt.",
+"set.stats": "Anonyme Statistiken senden",
+"set.statsHint": "Alle 15 Minuten: eine zufällige Installationsnummer, die Version und die durchschnittliche CPU- und RAM-Nutzung – für den Zähler auf Looreks Website. Keine Namen, Konten oder Kanäle."
 }

@@ -48,6 +48,8 @@ type Settings struct {
 	Autostart    bool      `json:"autostart"`
 	OpenOnStart  bool      `json:"openOnStart"`
 	AutoUpdate   bool      `json:"autoUpdate"`
+	Stats        bool      `json:"stats"` // anonymous statistics for the website (on unless switched off)
+	StatsInit    bool      `json:"statsInit"`
 	Discord      RPCCfg    `json:"discord"`
 }
 
@@ -146,6 +148,9 @@ func newEngine(dir string) *Engine {
 	}
 	e.drops.init()
 	readJSON(filepath.Join(dir, "settings.json"), &e.set)
+	if !e.set.StatsInit {
+		e.set.Stats, e.set.StatsInit = true, true
+	}
 	if e.set.StallMin < 5 {
 		e.set.StallMin = 15
 	}
@@ -186,6 +191,7 @@ func (e *Engine) run() {
 	go e.kick.run()
 	go e.updateLoop()
 	go usageLoop(e.quit)
+	go e.statsLoop("loorek")
 	go e.discordLoop()
 	t := time.NewTicker(iv(time.Second))
 	defer t.Stop()

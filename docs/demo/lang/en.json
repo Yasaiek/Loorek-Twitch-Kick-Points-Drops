@@ -337,5 +337,7 @@
 "tray.folder": "Open Loorek's folder",
 "use.title": "PC usage",
 "use.hint": "Loorek with its window",
-"rpc.st.idle": "Nothing going on – the status shows up while Loorek farms a drop or collects points."
+"rpc.st.idle": "Nothing going on – the status shows up while Loorek farms a drop or collects points.",
+"set.stats": "Send anonymous statistics",
+"set.statsHint": "Every 15 minutes: a random installation number, the version and the average CPU and RAM use – for the counter on Loorek's website. No names, accounts or channels."
 }

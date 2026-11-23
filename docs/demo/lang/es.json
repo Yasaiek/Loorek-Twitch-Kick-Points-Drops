@@ -337,5 +337,7 @@
 "tray.folder": "Abrir la carpeta de Loorek",
 "use.title": "Uso del PC",
 "use.hint": "Loorek con su ventana",
-"rpc.st.idle": "No pasa nada ahora – el estado aparece cuando Loorek consigue un drop o recoge puntos."
+"rpc.st.idle": "No pasa nada ahora – el estado aparece cuando Loorek consigue un drop o recoge puntos.",
+"set.stats": "Enviar estadísticas anónimas",
+"set.statsHint": "Cada 15 minutos: un número de instalación aleatorio, la versión y el uso medio de CPU y RAM – para el contador de la web de Loorek. Sin nombres, cuentas ni canales."
 }
