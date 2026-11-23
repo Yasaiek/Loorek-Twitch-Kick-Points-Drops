@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var version = "0.9.0" // a variable so that test builds can override it
+var version = "0.9.1" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).

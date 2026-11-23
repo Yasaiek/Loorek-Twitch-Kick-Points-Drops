@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.1
+- Home page tiles in two even rows in a narrow window; fresh screenshots in the README.
+
 ## 0.9.0
 - CPU and RAM tiles show a small chart of the last minutes, with min and max chips under it.
 - The home page tiles wrap onto the next row in a narrow window instead of being cut off.
