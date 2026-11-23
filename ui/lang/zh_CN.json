@@ -328,5 +328,13 @@
 "L.updFound": "发现新版本 %s – 正在下载。",
 "L.updRestart": "版本 %s 已下载 – 正在重启。",
 "L.updFail": "更新失败: %v",
-"L.updDone": "已更新到版本 %s。"
+"L.updDone": "已更新到版本 %s。",
+"tray.points": "频道积分",
+"tray.drops": "Twitch 掉宝",
+"tray.kick": "Kick",
+"tray.update": "检查更新",
+"tray.site": "Loorek 网站",
+"tray.folder": "打开 Loorek 文件夹",
+"use.title": "电脑占用",
+"use.hint": "Loorek 及其窗口"
 }

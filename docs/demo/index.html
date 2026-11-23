@@ -126,7 +126,10 @@ input[type=number] { width: 70px; text-align: center; }
 .eq i { width: 3px; border-radius: 2px; background: var(--accent); animation: eq 1s ease-in-out infinite; }
 .eq i:nth-child(2) { animation-delay: -.35s; } .eq i:nth-child(3) { animation-delay: -.7s; }
 @keyframes eq { 0%, 100% { height: 4px; } 50% { height: 14px; } }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+@media (max-width: 980px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+.stat.use { border-color: rgba(62,207,142,.25); background: linear-gradient(160deg, rgba(62,207,142,.09), transparent), var(--card); }
+.stat.use b small { font-size: 12px; font-weight: 600; color: var(--sub); } .stat.use b span { font: inherit; color: inherit; }
 .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
 .stat b { display: block; font: 600 22px/1.2 var(--display); font-variant-numeric: tabular-nums; }
 .stat span { font-size: 12px; color: var(--sub); }
@@ -371,6 +374,7 @@ select:focus { border-color: var(--accent); }
       <div class="stat"><b id="stClaims">0</b><span data-i="st.claims"></span></div>
       <div class="stat"><b id="stChat">–</b><span data-i="st.chats"></span></div>
       <div class="stat"><b id="stUp">–</b><span data-i="st.up"></span></div>
+      <div class="stat use" id="stUse"><b><span id="useCpu">–</span> <small>CPU</small></b><span id="useRam">–</span></div>
     </div>
     <div class="card"><div class="card-head"><h2 data-i="home.recent"></h2><a href="#" id="toLog" data-i="home.allLog"></a></div><div class="log" id="logShort"></div></div>
   </section>
@@ -542,7 +546,7 @@ select:focus { border-color: var(--accent); }
 </div>
 <div id="toast"></div>
 
-<script>window.LOOREK_VERSION = "0.8.4";</script>
+<script>window.LOOREK_VERSION = "0.8.5";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -918,6 +922,9 @@ function render() {
   $('chatNote').textContent = chat.state === 'denied' ? tr('chat.denied') : chat.state === 'on' ? tr('chat.on', { n: chat.joined }) : tr('chat.hint');
   $('stChat').textContent = chat.state === 'on' ? chat.joined : '–';
   $('stUp').textContent = upTime(s.upSec);
+  { const u = s.usage || {}, f = (v) => (v > 0 && v < 0.1 ? '<0.1' : (v || 0).toFixed(1));
+    $('useCpu').textContent = f(u.cpu) + '%'; $('useRam').textContent = 'RAM ' + Math.round(u.ram || 0) + ' MB · ' + f(u.ramPct) + '%';
+    $('stUse').title = tr('use.title') + ' – ' + tr('use.hint'); }
   countTo($('stEarned'), 'earned', s.points.earned);
   countTo($('stClaims'), 'claims', s.points.claims);
 

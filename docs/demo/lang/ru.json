@@ -328,5 +328,13 @@
 "L.updFound": "Найдена новая версия %s – скачиваю.",
 "L.updRestart": "Версия %s скачана – перезапускаюсь.",
 "L.updFail": "Обновление не удалось: %v",
-"L.updDone": "Обновлено до версии %s."
+"L.updDone": "Обновлено до версии %s.",
+"tray.points": "Баллы канала",
+"tray.drops": "Дропы Twitch",
+"tray.kick": "Kick",
+"tray.update": "Проверить обновления",
+"tray.site": "Сайт Loorek",
+"tray.folder": "Открыть папку Loorek",
+"use.title": "Нагрузка на ПК",
+"use.hint": "Loorek вместе с окном"
 }

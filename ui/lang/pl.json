@@ -328,5 +328,13 @@
 "L.updFound": "Jest nowa wersja %s – pobieram.",
 "L.updRestart": "Wersja %s pobrana – uruchamiam ponownie.",
 "L.updFail": "Aktualizacja się nie udała: %v",
-"L.updDone": "Zaktualizowano do wersji %s."
+"L.updDone": "Zaktualizowano do wersji %s.",
+"tray.points": "Punkty kanałów",
+"tray.drops": "Dropy Twitcha",
+"tray.kick": "Kick",
+"tray.update": "Sprawdź aktualizacje",
+"tray.site": "Strona Loorka",
+"tray.folder": "Otwórz folder Loorka",
+"use.title": "Zużycie PC",
+"use.hint": "Loorek razem z oknem"
 }

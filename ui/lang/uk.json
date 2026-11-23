@@ -328,5 +328,13 @@
 "L.updFound": "Знайдено нову версію %s – завантажую.",
 "L.updRestart": "Версію %s завантажено – перезапускаюся.",
 "L.updFail": "Оновлення не вдалося: %v",
-"L.updDone": "Оновлено до версії %s."
+"L.updDone": "Оновлено до версії %s.",
+"tray.points": "Бали каналу",
+"tray.drops": "Дропи Twitch",
+"tray.kick": "Kick",
+"tray.update": "Перевірити оновлення",
+"tray.site": "Сайт Loorek",
+"tray.folder": "Відкрити теку Loorek",
+"use.title": "Навантаження на ПК",
+"use.hint": "Loorek разом із вікном"
 }

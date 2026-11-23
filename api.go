@@ -227,11 +227,11 @@ func (e *Engine) view() map[string]any {
 	}
 
 	return map[string]any{
-		"version": version,
-		"app":     appName,
-		"lang":    resolveLang(e.set.Lang),
-		"update":  map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked), "doneAt": ms(e.upd.Done)},
-		"auth":    map[string]any{"state": e.authState, "login": e.auth.Login, "note": e.authNote, "mode": e.loginMode},
+		"version": version, "usage": currentUsage(),
+		"app":    appName,
+		"lang":   resolveLang(e.set.Lang),
+		"update": map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked), "doneAt": ms(e.upd.Done)},
+		"auth":   map[string]any{"state": e.authState, "login": e.auth.Login, "note": e.authNote, "mode": e.loginMode},
 		"settings": map[string]any{"pointsOn": e.set.PointsOn, "chatOn": e.set.ChatOn, "dropsOn": e.set.DropsOn, "autoClaim": e.set.AutoClaim,
 			"rotateMin": e.set.RotateMin, "stallMin": e.set.StallMin, "autostart": e.set.Autostart, "openOnStart": e.set.OpenOnStart,
 			"kickOn": e.set.KickOn, "kickMax": e.set.KickMax, "autoUpdate": e.set.AutoUpdate, "lang": e.set.Lang,

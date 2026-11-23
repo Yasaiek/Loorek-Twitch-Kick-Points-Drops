@@ -328,5 +328,13 @@
 "L.updFound": "新しいバージョン %s が見つかりました – ダウンロードします。",
 "L.updRestart": "バージョン %s をダウンロードしました – 再起動します。",
 "L.updFail": "更新に失敗しました: %v",
-"L.updDone": "バージョン %s に更新しました。"
+"L.updDone": "バージョン %s に更新しました。",
+"tray.points": "チャンネルポイント",
+"tray.drops": "Twitchドロップ",
+"tray.kick": "Kick",
+"tray.update": "アップデートを確認",
+"tray.site": "Loorekのサイト",
+"tray.folder": "Loorekのフォルダーを開く",
+"use.title": "PCの使用量",
+"use.hint": "Loorekとそのウィンドウ"
 }

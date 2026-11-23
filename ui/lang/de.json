@@ -328,5 +328,13 @@
 "L.updFound": "Neue Version %s gefunden – lade herunter.",
 "L.updRestart": "Version %s heruntergeladen – starte neu.",
 "L.updFail": "Das Update ist fehlgeschlagen: %v",
-"L.updDone": "Auf Version %s aktualisiert."
+"L.updDone": "Auf Version %s aktualisiert.",
+"tray.points": "Kanalpunkte",
+"tray.drops": "Twitch Drops",
+"tray.kick": "Kick",
+"tray.update": "Nach Updates suchen",
+"tray.site": "Looreks Website",
+"tray.folder": "Looreks Ordner öffnen",
+"use.title": "PC-Auslastung",
+"use.hint": "Loorek samt Fenster"
 }

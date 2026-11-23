@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var version = "0.8.4" // a variable so that test builds can override it
+var version = "0.8.5" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -185,6 +185,7 @@ func (e *Engine) run() {
 	go e.chat.run()
 	go e.kick.run()
 	go e.updateLoop()
+	go usageLoop(e.quit)
 	go e.discordLoop()
 	t := time.NewTicker(iv(time.Second))
 	defer t.Stop()

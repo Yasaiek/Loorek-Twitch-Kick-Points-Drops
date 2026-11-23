@@ -328,5 +328,13 @@
 "L.updFound": "Yeni sürüm %s bulundu – indiriyorum.",
 "L.updRestart": "%s sürümü indirildi – yeniden başlatıyorum.",
 "L.updFail": "Güncelleme başarısız oldu: %v",
-"L.updDone": "%s sürümüne güncellendi."
+"L.updDone": "%s sürümüne güncellendi.",
+"tray.points": "Kanal puanları",
+"tray.drops": "Twitch Drops",
+"tray.kick": "Kick",
+"tray.update": "Güncellemeleri denetle",
+"tray.site": "Loorek'in sitesi",
+"tray.folder": "Loorek klasörünü aç",
+"use.title": "PC kullanımı",
+"use.hint": "Loorek ve penceresi"
 }

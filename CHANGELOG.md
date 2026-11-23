@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.5
+- Right-click menu in the tray: what Loorek is watching, PC usage, open the panel, switches for channel points, Twitch Drops and Kick, updates, website, folder, quit – with icons.
+- PC usage (CPU and RAM of Loorek with its window) on the home page and in the tray.
+
 ## 0.8.4
 - Loorek reads from Twitch what its own inventory page shows about reward campaigns (the badges of daily rewards) and keeps it in data/inventory-debug.json, so the real badge pictures can replace the generic reward icon.
 

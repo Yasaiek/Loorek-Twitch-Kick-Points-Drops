@@ -328,5 +328,13 @@
 "L.updFound": "Trovata la nuova versione %s – la scarico.",
 "L.updRestart": "Versione %s scaricata – riavvio.",
 "L.updFail": "Aggiornamento non riuscito: %v",
-"L.updDone": "Aggiornato alla versione %s."
+"L.updDone": "Aggiornato alla versione %s.",
+"tray.points": "Punti canale",
+"tray.drops": "Drop di Twitch",
+"tray.kick": "Kick",
+"tray.update": "Cerca aggiornamenti",
+"tray.site": "Sito di Loorek",
+"tray.folder": "Apri la cartella di Loorek",
+"use.title": "Uso del PC",
+"use.hint": "Loorek con la sua finestra"
 }

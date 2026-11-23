@@ -153,7 +153,14 @@ func main() {
 	if open && os.Getenv("DROPOMAT_NO_WINDOW") == "" {
 		srv.show()
 	}
-	runTray(e, srv.show)
+	runTray(e, trayActions{
+		Open:   srv.show,
+		Update: func() { go e.updateCheck(true) },
+		Set: func(k string, on bool) {
+			raw, _ := json.Marshal(map[string]any{k: on})
+			srv.handleOp(opReq{Op: "settings", Patch: raw})
+		},
+	})
 	e.shutdown()
 	time.Sleep(400 * time.Millisecond)
 }
