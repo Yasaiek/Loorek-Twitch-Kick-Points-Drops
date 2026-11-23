@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.2
+- Smoother CPU and RAM charts: averaged values drawn as a soft curve with a round marker, never cut off at the edges.
+
 ## 0.9.1
 - Home page tiles in two even rows in a narrow window; fresh screenshots in the README.
 

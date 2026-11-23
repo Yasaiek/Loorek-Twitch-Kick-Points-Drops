@@ -3,6 +3,16 @@
 // This script stands in for the program: it answers the panel's /api/ requests from made-up data
 // kept in the page. Nothing here talks to Twitch or Kick, and nothing is saved.
 (() => {
+  // PC usage: a slow random walk every 2 s, with its history (like the program keeps)
+  const USAGE = { cpu: 0.5, ram: 142, ramPct: 0.9, cpuMin: 0.5, cpuMax: 0.5, ramMin: 142, ramMax: 142, histCpu: Array.from({ length: 60 }, (_, i) => +(0.5 + Math.sin(i / 9) * 0.2 + Math.sin(i / 3.3) * 0.05).toFixed(2)), histRam: Array.from({ length: 60 }, (_, i) => +(140 + Math.sin(i / 13) * 4 + i / 25).toFixed(1)) };
+  setInterval(() => {
+    const u = USAGE;
+    u.cpu = +Math.max(0.1, Math.min(2.5, u.cpu * 0.85 + 0.5 * 0.15 + (Math.random() - 0.5) * 0.1)).toFixed(2);
+    u.ram = +Math.max(130, Math.min(160, u.ram + (Math.random() - 0.5) * 1.6)).toFixed(1);
+    u.histCpu = [...u.histCpu, u.cpu].slice(-150); u.histRam = [...u.histRam, u.ram].slice(-150);
+    u.cpuMin = Math.min(...u.histCpu); u.cpuMax = Math.max(...u.histCpu); u.ramMin = Math.min(...u.histRam); u.ramMax = Math.max(...u.histRam);
+  }, 2000);
+
   const params = new URLSearchParams(location.search);
   const LANGS = ['en', 'pl', 'de', 'fr', 'es', 'it', 'pt_BR', 'ru', 'uk', 'tr', 'ja', 'zh_CN'];
   let siteLang = LANGS.includes(params.get('lang')) ? params.get('lang') : 'en';
@@ -129,7 +139,7 @@
     if (S.cur) { const g = GAMES[S.cur.game], d = S.cur.drop; current = { game: g.name, art: g.art, channel: S.cur.camp.ch.name, login: S.cur.camp.ch.login, since: S.cur.since, drop: d.name, cur: Math.floor(d.cur), req: d.req, img: d.img }; }
     const all = (list) => list.reduce((n, c) => n + c.earned, 0);
     return {
-      version: window.LOOREK_VERSION || '0.6', app: 'Loorek', lang: lang(), winGen: 0, usage: { cpu: +(0.3 + Math.random() * 0.5).toFixed(2), ram: 140 + Math.round(Math.random() * 10), ramPct: 0.9, cpuMin: 0.1, cpuMax: 1.9, ramMin: 132, ramMax: 158, histCpu: Array.from({ length: 60 }, (_, i) => +(0.3 + Math.abs(Math.sin(i / 6)) * 0.8).toFixed(2)), histRam: Array.from({ length: 60 }, (_, i) => 140 + Math.round(Math.sin(i / 9) * 8)) }, upSec: Math.floor((Date.now() - START) / 1000) * 20,
+      version: window.LOOREK_VERSION || '0.6', app: 'Loorek', lang: lang(), winGen: 0, usage: USAGE, upSec: Math.floor((Date.now() - START) / 1000) * 20,
       update: { state: S.upd.state, latest: '', checked: S.upd.checked, doneAt: 0 },
       auth: S.auth, settings: S.set,
       points: { channels, earned: all(channels), claims: channels.reduce((n, c) => n + c.claims, 0), watching: w.length },

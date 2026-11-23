@@ -133,7 +133,9 @@ input[type=number] { width: 70px; text-align: center; }
 .stat.use { --m1: #ffcc4d; --m2: #ff8a3d; } .stat.use.ram { --m1: #29d3b4; --m2: #3a8bff; border-color: rgba(41,211,180,.26); background: linear-gradient(160deg, rgba(41,211,180,.1), transparent), var(--card); }
 .stat.use b span { font: inherit; color: inherit; }
 .stat .mm { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; min-width: 0; }
-.stat .spk { display: block; width: 100%; height: 34px; overflow: visible; }
+.spkw { position: relative; height: 34px; }
+.spkw .spk { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.spkw .spkdot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--m2), 0 0 10px var(--m2); transition: top .6s ease; }
 .stat .mrow { display: flex; flex-wrap: wrap; gap: 4px; font-size: 11px; color: var(--sub); font-variant-numeric: tabular-nums; }
 .stat .mc { display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: 6px; background: rgba(255,255,255,.06); white-space: nowrap; }
 .stat .mc i { font-style: normal; font-size: 8px; color: var(--m2); } .stat .mc strong { color: var(--text); font-weight: 650; }
@@ -642,6 +644,30 @@ async function api(path, body) {
 }
 async function op(o) { pending++; try { const r = await api('/api/op', o); await load(); return r; } catch (e) { toast(tr(fails >= 3 ? 'noconn.hint' : 'toast.noconn'), fails >= 3 ? 3600000 : 0); } finally { pending--; } }
 let toastT;
+// a smooth sparkline: values averaged over a few points, drawn as a curve (monotone, so it never overshoots)
+function sparkSvg(hist, cls) {
+  const raw = hist.length ? hist : [0];
+  const k = raw.length > 30 ? 4 : raw.length > 10 ? 2 : 0; // moving average over 2k+1 points
+  const pts = raw.map((_, i) => { let s = 0, n = 0; for (let j = Math.max(0, i - k); j <= Math.min(raw.length - 1, i + k); j++) { s += raw[j]; n++; } return s / n; });
+  const W = 200, H = 46, mx = Math.max(...pts), mn = Math.min(...pts), pad = (mx - mn) * 0.2 || Math.max(mx * 0.2, 0.05);
+  const top = mx + pad, bot = Math.max(0, mn - pad);
+  const X = (i) => pts.length < 2 ? W : (i / (pts.length - 1)) * W, Y = (v) => H - 4 - ((v - bot) / (top - bot || 1)) * (H - 10);
+  const P = pts.map((v, i) => [X(i), Y(v)]);
+  // monotone cubic (Fritsch–Carlson) tangents
+  const n = P.length, d = [], m = [];
+  for (let i = 0; i < n - 1; i++) d.push((P[i + 1][1] - P[i][1]) / ((P[i + 1][0] - P[i][0]) || 1));
+  for (let i = 0; i < n; i++) m.push(i === 0 ? d[0] || 0 : i === n - 1 ? d[n - 2] || 0 : d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2);
+  let line = 'M' + P[0][0].toFixed(1) + ' ' + P[0][1].toFixed(1);
+  for (let i = 0; i < n - 1; i++) {
+    const h = (P[i + 1][0] - P[i][0]) / 3;
+    line += ` C${(P[i][0] + h).toFixed(1)} ${(P[i][1] + m[i] * h).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)} ${(P[i + 1][1] - m[i + 1] * h).toFixed(1)} ${P[i + 1][0].toFixed(1)} ${P[i + 1][1].toFixed(1)}`;
+  }
+  if (n === 1) line += ` L${W} ${P[0][1].toFixed(1)}`;
+  const last = P[n - 1], id = 'sg' + cls;
+  return `<div class="spkw"><svg class="spk" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" shape-rendering="geometricPrecision"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--m2)" stop-opacity=".42"/><stop offset="1" stop-color="var(--m2)" stop-opacity="0"/></linearGradient></defs>`
+    + `<path d="${line} L${W} ${H} L0 ${H} Z" fill="url(#${id})"/><path d="${line}" fill="none" stroke="var(--m2)" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`
+    + `<i class="spkdot" style="left:${(last[0] / W * 100).toFixed(2)}%;top:${(last[1] / H * 100).toFixed(2)}%"></i></div>`;
+}
 function toast(msg, ms) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms || 2600); }
 
 // Service icons come straight from the services' own sites; nothing is bundled.
@@ -933,11 +959,7 @@ function render() {
   { const u = s.usage || {}, f = (v) => (v > 0 && v < 0.1 ? '<0.1' : (v || 0).toFixed(1));
     const mb = (v) => Math.round(v || 0) + ' MB';
     const spark = (box, hist, fmt, lo, hi, cls) => {
-      const W = 200, H = 40, pts = hist.length ? hist : [0], mx = Math.max(...pts, 0.0001), mn = Math.min(...pts);
-      const top = mx + (mx - mn) * 0.15 || 1, bot = Math.max(0, mn - (mx - mn) * 0.15);
-      const x = (i) => pts.length < 2 ? W : (i / (pts.length - 1)) * W, y = (v) => H - 3 - ((v - bot) / (top - bot || 1)) * (H - 8);
-      const line = pts.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
-      box.innerHTML = `<svg class="spk" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="lg${cls}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--m2)" stop-opacity=".45"/><stop offset="1" stop-color="var(--m2)" stop-opacity="0"/></linearGradient></defs><path d="${line} L${W} ${H} L0 ${H} Z" fill="url(#lg${cls})"/><path d="${line}" fill="none" stroke="var(--m2)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/><circle cx="${x(pts.length - 1)}" cy="${y(pts[pts.length - 1])}" r="3" fill="#fff" stroke="var(--m2)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
+      box.innerHTML = sparkSvg(hist, cls)
         + `<div class="mrow"><span class="mc"><i>▼</i>min <strong>${fmt(lo)}</strong></span><span class="mc"><i>▲</i>max <strong>${fmt(hi)}</strong></span></div>`;
     };
     $('useCpu').textContent = f(u.cpu) + '%'; spark($('useCpuMM'), u.histCpu || [], (v) => f(v) + '%', u.cpuMin || 0, u.cpuMax || 0, 'c');
