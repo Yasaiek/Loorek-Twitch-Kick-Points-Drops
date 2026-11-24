@@ -352,5 +352,12 @@
 "set.dataSame": "Dane już są w tym folderze.",
 "L.dataMoving": "Przenoszę dane do %s…",
 "L.dataMoved": "Dane są teraz w %s.",
-"L.dataMoveFail": "Nie udało się uruchomić ponownie, by przenieść dane: %v"
+"L.dataMoveFail": "Nie udało się uruchomić ponownie, by przenieść dane: %v",
+"upd.screenT": "Aktualizacja Loorka",
+"upd.stepDl": "Pobieranie… {a} z {b}",
+"upd.stepDl0": "Pobieranie…",
+"upd.stepRestart": "Instaluję i uruchamiam ponownie…",
+"upd.newT": "Loorek zaktualizowany do v{v}",
+"upd.newSub": "Co się zmieniło od v{v}:",
+"upd.ok": "Super!"
 }

@@ -352,5 +352,12 @@
 "set.dataSame": "Die Daten liegen bereits in diesem Ordner.",
 "L.dataMoving": "Verschiebe die Daten nach %s…",
 "L.dataMoved": "Die Daten liegen jetzt in %s.",
-"L.dataMoveFail": "Neustart zum Verschieben der Daten fehlgeschlagen: %v"
+"L.dataMoveFail": "Neustart zum Verschieben der Daten fehlgeschlagen: %v",
+"upd.screenT": "Loorek wird aktualisiert",
+"upd.stepDl": "Lade… {a} von {b}",
+"upd.stepDl0": "Lade…",
+"upd.stepRestart": "Installiere und starte neu…",
+"upd.newT": "Loorek auf v{v} aktualisiert",
+"upd.newSub": "Was sich seit v{v} geändert hat:",
+"upd.ok": "Super!"
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.5
+- Update screen like Orbek's: while Loorek downloads a new version the panel shows the versions, a progress bar with megabytes, and "installing and restarting".
+- After an update a "What's new" window lists the changes since the version you had.
+- During the restart the panel no longer shows the "no connection" hint.
+
 ## 0.9.4
 - Data now lives in `%LOCALAPPDATA%\Yasaiek\Loorek` (shared Yasaiek folder, each program in its own subfolder). The old `data` folder next to Loorek.exe is moved over on the first start.
 - Settings → Data folder: open it, or pick another place; the data is moved and Loorek restarts.
@@ -7,7 +12,7 @@
 - Loorek only ever looks at its own processes (checked by program name): no other program, game included, is touched.
 
 ## 0.9.3
-- Settings are now kept in data\\loorek-settings.json. With Orbek in the same folder both programs used data\\settings.json, and Orbek's saves wiped Loorek's channels and queue.
+- Settings are now kept in `data\loorek-settings.json`. With Orbek in the same folder both programs used `data\settings.json`, and Orbek's saves wiped Loorek's channels and queue.
 
 ## 0.9.2
 - Smoother CPU and RAM charts: averaged values drawn as a soft curve with a round marker, never cut off at the edges.

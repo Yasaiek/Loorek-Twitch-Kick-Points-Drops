@@ -352,5 +352,12 @@
 "set.dataSame": "Veriler zaten bu klasörde.",
 "L.dataMoving": "Veriler %s konumuna taşınıyor…",
 "L.dataMoved": "Veriler artık %s konumunda.",
-"L.dataMoveFail": "Verileri taşımak için yeniden başlatılamadı: %v"
+"L.dataMoveFail": "Verileri taşımak için yeniden başlatılamadı: %v",
+"upd.screenT": "Loorek güncelleniyor",
+"upd.stepDl": "İndiriliyor… {a} / {b}",
+"upd.stepDl0": "İndiriliyor…",
+"upd.stepRestart": "Kuruluyor ve yeniden başlatılıyor…",
+"upd.newT": "Loorek v{v} sürümüne güncellendi",
+"upd.newSub": "v{v} sürümünden bu yana değişenler:",
+"upd.ok": "Harika!"
 }

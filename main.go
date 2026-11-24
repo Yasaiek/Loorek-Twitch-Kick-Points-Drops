@@ -146,6 +146,7 @@ func main() {
 	cleanupUpdate()
 	if updated {
 		e.upd.Done = time.Now()
+		e.upd.From = os.Getenv("DROPOMAT_FROM")
 		e.log.OK("L.updDone", version)
 	}
 	if moved {

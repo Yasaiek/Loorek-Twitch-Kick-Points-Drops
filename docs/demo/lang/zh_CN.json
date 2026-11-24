@@ -352,5 +352,12 @@
 "set.dataSame": "数据已在此文件夹中。",
 "L.dataMoving": "正在将数据移至 %s…",
 "L.dataMoved": "数据现在位于 %s。",
-"L.dataMoveFail": "无法重新启动以移动数据：%v"
+"L.dataMoveFail": "无法重新启动以移动数据：%v",
+"upd.screenT": "正在更新 Loorek",
+"upd.stepDl": "下载中… {a} / {b}",
+"upd.stepDl0": "下载中…",
+"upd.stepRestart": "正在安装并重启…",
+"upd.newT": "Loorek 已更新到 v{v}",
+"upd.newSub": "自 v{v} 以来的变化：",
+"upd.ok": "好的！"
 }

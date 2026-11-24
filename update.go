@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/sha256"
+	_ "embed"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -14,6 +15,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
@@ -33,10 +35,11 @@ type updInfo struct {
 }
 
 type updState struct {
-	State   string // "" | checking | current | available | downloading | failed
+	State   string // "" | checking | current | available | downloading | restarting | failed
 	Latest  string
 	Checked time.Time
 	Done    time.Time // when this copy started as a freshly installed update
+	From    string    // the version it was updated from
 	info    updInfo
 	busy    bool
 }
@@ -208,7 +211,9 @@ func (e *Engine) updateInstall(info updInfo) error {
 		return err
 	}
 	h := sha256.New()
-	n, err := io.Copy(io.MultiWriter(f, h), io.LimitReader(res.Body, 300<<20))
+	updSize.Store(info.Size)
+	updGot.Store(0)
+	n, err := io.Copy(io.MultiWriter(f, h, countWriter{}), io.LimitReader(res.Body, 300<<20))
 	f.Close()
 	if err == nil && info.Size > 0 && n != info.Size {
 		err = fmt.Errorf("size %d, expected %d", n, info.Size)
@@ -233,10 +238,12 @@ func (e *Engine) updateInstall(info updInfo) error {
 	}
 	e.mu.Lock()
 	gen := e.winGen
+	e.upd.State = "restarting"
 	e.mu.Unlock()
+	time.Sleep(700 * time.Millisecond) // an open panel shows "installing and restarting" before the switch
 	// the new copy takes over this one's port and key, so that an open panel keeps working and reloads itself
 	cmd := exec.Command(exe, "--tray", "--updated")
-	cmd.Env = append(os.Environ(), "DROPOMAT_KEY="+e.apiKey, "DROPOMAT_GEN="+strconv.Itoa(gen), "DROPOMAT_PORT="+strconv.Itoa(e.port))
+	cmd.Env = append(os.Environ(), "DROPOMAT_FROM="+version, "DROPOMAT_KEY="+e.apiKey, "DROPOMAT_GEN="+strconv.Itoa(gen), "DROPOMAT_PORT="+strconv.Itoa(e.port))
 	if err := cmd.Start(); err != nil {
 		os.Remove(exe)
 		os.Rename(old, exe)
@@ -269,3 +276,15 @@ func cleanupUpdate() {
 		}
 	}()
 }
+
+// download progress, for the update screen of the panel
+var updGot, updSize atomic.Int64
+
+type countWriter struct{}
+
+func (countWriter) Write(p []byte) (int, error) { updGot.Add(int64(len(p))); return len(p), nil }
+
+// what changed, for the panel's "what's new" after an update
+//
+//go:embed CHANGELOG.md
+var changelog []byte

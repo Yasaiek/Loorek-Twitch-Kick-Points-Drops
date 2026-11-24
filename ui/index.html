@@ -362,6 +362,32 @@ select:focus { border-color: var(--accent); }
 }
 @media (max-width: 560px) { .slots { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+/* update screen while Loorek downloads and restarts, and "what's new" once it is back */
+.updscr { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, rgba(96,205,255,.2), rgba(6,6,8,.93) 60%); backdrop-filter: blur(10px); animation: ufade .3s ease; }
+.updscr[hidden] { display: none; }
+@keyframes ufade { from { opacity: 0; } }
+.updscr .ubox { width: min(440px, 90vw); text-align: center; padding: 34px 30px 28px; border-radius: 22px; background: linear-gradient(180deg, rgba(30,32,38,.96), rgba(17,18,21,.96)); border: 1px solid rgba(96,205,255,.28); box-shadow: 0 30px 80px -20px rgba(40,140,220,.55); }
+.updscr .ulogo { width: 88px; height: 88px; border-radius: 22px; animation: ufloat 3s ease-in-out infinite; filter: drop-shadow(0 12px 28px rgba(96,205,255,.45)); }
+@keyframes ufloat { 50% { transform: translateY(-8px) rotate(-3deg); } }
+.updscr h2 { margin: 14px 0 6px; font: 700 22px var(--display); }
+.updscr .uver { display: inline-flex; align-items: center; gap: 8px; color: var(--sub); font: 600 14px var(--display); margin-bottom: 18px; }
+.updscr .uver b { color: var(--on-accent); padding: 2px 10px; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--violet)); }
+.updscr .ubar { position: relative; height: 10px; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,.08); }
+.updscr .ubar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 6px; background: linear-gradient(90deg, #60cdff, #8f7bff, #60cdff); background-size: 200% 100%; animation: ushine 1.6s linear infinite; transition: width .4s var(--ease); }
+.updscr .ubar.ind i { width: 40% !important; animation: ushine 1.6s linear infinite, uind 1.2s ease-in-out infinite; }
+@keyframes ushine { to { background-position: -200% 0; } }
+@keyframes uind { 0% { left: -40%; } 100% { left: 100%; } }
+.updscr p { margin: 14px 0 0; color: var(--sub); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.wnew { position: fixed; inset: 0; z-index: 290; display: grid; place-items: center; background: rgba(0,0,0,.55); backdrop-filter: blur(6px); animation: ufade .25s ease; }
+.wnew .box { width: min(520px, 92vw); max-height: 80vh; display: flex; flex-direction: column; padding: 24px 24px 18px; border-radius: 18px; background: var(--card); border: 1px solid var(--line-2); box-shadow: 0 30px 70px -20px rgba(0,0,0,.8); }
+.wnew h3 { margin: 0 0 4px; font: 700 19px var(--display); display: flex; gap: 10px; align-items: center; }
+.wnew .sub { margin: 0 0 12px; color: var(--sub); font-size: 13px; }
+.wnew .wlist { overflow: auto; padding-right: 4px; }
+.wnew .wv { padding: 10px 12px; border-radius: 12px; background: var(--card-2); border: 1px solid var(--line); margin-bottom: 8px; }
+.wnew .wv b { display: inline-block; font: 700 12px var(--display); color: var(--on-accent); background: var(--accent); padding: 1px 8px; border-radius: 999px; }
+.wnew ul { margin: 8px 0 0; padding-left: 18px; color: var(--text); font-size: 13px; line-height: 1.5; }
+.wnew li { margin: 3px 0; }
+.wnew .acts { display: flex; justify-content: flex-end; margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -559,6 +585,15 @@ select:focus { border-color: var(--accent); }
   </div>
 </div>
 <div id="toast"></div>
+<div class="updscr" id="updScr" hidden>
+  <div class="ubox">
+    <img class="ulogo" src="icon.png" alt="">
+    <h2 data-i="upd.screenT"></h2>
+    <div class="uver"><span id="uFrom"></span><span>→</span><b id="uTo"></b></div>
+    <div class="ubar"><i id="uFill"></i></div>
+    <p id="uStep"></p>
+  </div>
+</div>
 
 <script>
 const KEY = '__KEY__';
@@ -956,7 +991,7 @@ function render() {
   $('statsRow').hidden = !s.statsOn;
   const u = s.update || {};
   $('updNote').textContent = u.state === 'downloading' ? tr('upd.downloading', { v: u.latest }) : u.state === 'available' ? tr('upd.avail', { v: u.latest }) : u.state === 'checking' ? tr('upd.checking') : u.state === 'failed' ? tr('upd.failed') : u.state === 'current' ? tr('upd.current') : u.doneAt ? tr('upd.done', { v: s.version }) : tr('upd.never');
-  if (u.doneAt && Date.now() - u.doneAt < 180000 && !doneShown) { doneShown = true; toast(tr('upd.done', { v: s.version }), 7000); }
+  if (u.doneAt && Date.now() - u.doneAt < 180000 && !doneShown) { doneShown = true; whatsNew().then((shown) => { if (!shown) toast(tr('upd.done', { v: s.version }), 7000); }); }
   $('updInstall').hidden = u.state !== 'available';
   const chat = s.chat;
   $('chatNote').textContent = chat.state === 'denied' ? tr('chat.denied') : chat.state === 'on' ? tr('chat.on', { n: chat.joined }) : tr('chat.hint');
@@ -1128,10 +1163,61 @@ function render() {
   renderDetail();
 }
 
+// the update screen while Loorek downloads and restarts, and "what's new" once it is back
+const vnum = (v) => String(v || '').split('.').reduce((n, x) => n * 1000 + (parseInt(x, 10) || 0), 0);
+let updLost = 0, updTo = '';
+function renderUpdate() {
+  const u = (S && S.update) || {}, scr = $('updScr');
+  if (!scr) return;
+  const busy = u.state === 'downloading' || u.state === 'restarting';
+  if (busy) { updLost = Date.now(); updTo = u.latest || updTo; }
+  scr.hidden = !busy && !(updLost && Date.now() - updLost < 20000);
+  if (scr.hidden) return;
+  $('uFrom').textContent = 'v' + ((S && S.version) || '?'); $('uTo').textContent = 'v' + (u.latest || updTo || '?');
+  const bar = $('uFill').parentElement, mb = (n) => (n / 1048576).toFixed(1) + ' MB';
+  if (u.state === 'downloading' && u.size > 0) {
+    bar.classList.remove('ind'); $('uFill').style.width = Math.min(100, u.got / u.size * 100) + '%';
+    $('uStep').textContent = tr('upd.stepDl', { a: mb(u.got || 0), b: mb(u.size) });
+  } else {
+    bar.classList.add('ind'); $('uStep').textContent = u.state === 'downloading' ? tr('upd.stepDl0') : tr('upd.stepRestart');
+  }
+}
+async function whatsNew() {
+  const u = S.update || {}; let seen = '';
+  try { seen = localStorage.getItem('loorek.seenVer') || ''; } catch (e) {}
+  if (seen === S.version) return false;
+  try { localStorage.setItem('loorek.seenVer', S.version); } catch (e) {}
+  const from = u.from || seen;
+  if (!from || !u.doneAt) return false; // a first start: nothing to tell
+  let md = '';
+  try { md = await fetch('changelog.md', { cache: 'no-store' }).then((r) => r.text()); } catch (e) { return false; }
+  const vers = []; let cur = null;
+  for (const line of md.split(/\r?\n/)) {
+    const h = /^##\s+v?([0-9][^\s]*)/.exec(line); if (h) { cur = { v: h[1], items: [] }; vers.push(cur); continue; }
+    const b = /^\s*[-*]\s+(.*)/.exec(line); if (b && cur) cur.items.push(b[1].replace(/`/g, ''));
+  }
+  const list = vers.filter((x) => vnum(x.v) > vnum(from) && vnum(x.v) <= vnum(S.version));
+  if (!list.length) return false;
+  const d = el('div', 'wnew'), box = el('div', 'box'), h = el('h3');
+  h.append(el('span', '', '🎉'), el('span', '', tr('upd.newT', { v: S.version })));
+  const wl = el('div', 'wlist');
+  for (const x of list) { const w = el('div', 'wv'); w.append(el('b', '', 'v' + x.v)); const ul = el('ul'); for (const it of x.items) ul.append(el('li', '', it)); w.append(ul); wl.append(w); }
+  const acts = el('div', 'acts'), ok = el('button', 'btn primary', tr('upd.ok'));
+  const shut = () => { d.remove(); document.removeEventListener('keydown', key); }, key = (e) => { if (e.key === 'Escape' || e.key === 'Enter') shut(); };
+  ok.onclick = shut; acts.append(ok); document.addEventListener('keydown', key);
+  box.append(h, el('p', 'sub', tr('upd.newSub', { v: from })), wl, acts); d.append(box); d.onclick = (e) => { if (e.target === d) shut(); };
+  document.body.append(d);
+  return true;
+}
+
 // The app restarts itself after an update, so a short break is normal; a longer one gets a hint what to do.
 async function load() {
-  try { S = await api('/api/state'); if (fails >= 3) $('toast').classList.remove('show'); fails = 0; render(); }
-  catch (e) { fails++; $('pill').className = 'pill bad'; $('pill').textContent = T['pill.noconn'] || '…'; if (fails >= 3 && T['noconn.hint']) toast(T['noconn.hint'], 3600000); }
+  try { S = await api('/api/state'); if (fails >= 3) $('toast').classList.remove('show'); fails = 0; render(); renderUpdate(); }
+  catch (e) {
+    fails++; $('pill').className = 'pill bad'; $('pill').textContent = T['pill.noconn'] || '…';
+    renderUpdate(); // during an update the break is expected: the update screen stays instead of the hint
+    if (fails >= 3 && T['noconn.hint'] && !(updLost && Date.now() - updLost < 20000)) toast(T['noconn.hint'], 3600000);
+  }
 }
 setInterval(() => { if (!document.hidden && !pending) { load(); if (detailId) loadDetail(); } }, 1500);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });

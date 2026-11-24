@@ -352,5 +352,12 @@
 "set.dataSame": "データはすでにこのフォルダーにあります。",
 "L.dataMoving": "データを %s に移動しています…",
 "L.dataMoved": "データは %s にあります。",
-"L.dataMoveFail": "データ移動のための再起動に失敗しました: %v"
+"L.dataMoveFail": "データ移動のための再起動に失敗しました: %v",
+"upd.screenT": "Loorekを更新中",
+"upd.stepDl": "ダウンロード中… {a} / {b}",
+"upd.stepDl0": "ダウンロード中…",
+"upd.stepRestart": "インストールして再起動中…",
+"upd.newT": "Loorekをv{v}に更新しました",
+"upd.newSub": "v{v}からの変更点：",
+"upd.ok": "OK！"
 }

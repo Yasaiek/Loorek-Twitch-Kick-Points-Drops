@@ -352,5 +352,12 @@
 "set.dataSame": "The data is already in this folder.",
 "L.dataMoving": "Moving the data to %s…",
 "L.dataMoved": "Data is now in %s.",
-"L.dataMoveFail": "Could not restart to move the data: %v"
+"L.dataMoveFail": "Could not restart to move the data: %v",
+"upd.screenT": "Updating Loorek",
+"upd.stepDl": "Downloading… {a} of {b}",
+"upd.stepDl0": "Downloading…",
+"upd.stepRestart": "Installing and restarting…",
+"upd.newT": "Loorek updated to v{v}",
+"upd.newSub": "What changed since v{v}:",
+"upd.ok": "Great!"
 }

@@ -352,5 +352,12 @@
 "set.dataSame": "Les données sont déjà dans ce dossier.",
 "L.dataMoving": "Déplacement des données vers %s…",
 "L.dataMoved": "Les données sont maintenant dans %s.",
-"L.dataMoveFail": "Impossible de redémarrer pour déplacer les données : %v"
+"L.dataMoveFail": "Impossible de redémarrer pour déplacer les données : %v",
+"upd.screenT": "Mise à jour de Loorek",
+"upd.stepDl": "Téléchargement… {a} sur {b}",
+"upd.stepDl0": "Téléchargement…",
+"upd.stepRestart": "Installation et redémarrage…",
+"upd.newT": "Loorek mis à jour en v{v}",
+"upd.newSub": "Ce qui a changé depuis la v{v} :",
+"upd.ok": "Super !"
 }

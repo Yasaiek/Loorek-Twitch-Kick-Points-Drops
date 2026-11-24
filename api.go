@@ -232,7 +232,7 @@ func (e *Engine) view() map[string]any {
 		"version": version, "usage": currentUsage(), "statsOn": statsURL != "",
 		"app": appName, "closing": e.closing, "dataDir": e.dir, "dataDefault": dataDirIn(defaultRoot()), "dataCustom": readLocation().Root != "",
 		"lang":   resolveLang(e.set.Lang),
-		"update": map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked), "doneAt": ms(e.upd.Done)},
+		"update": map[string]any{"state": e.upd.State, "latest": e.upd.Latest, "checked": ms(e.upd.Checked), "doneAt": ms(e.upd.Done), "from": e.upd.From, "got": updGot.Load(), "size": updSize.Load()},
 		"auth":   map[string]any{"state": e.authState, "login": e.auth.Login, "note": e.authNote, "mode": e.loginMode},
 		"settings": map[string]any{"pointsOn": e.set.PointsOn, "chatOn": e.set.ChatOn, "dropsOn": e.set.DropsOn, "autoClaim": e.set.AutoClaim,
 			"rotateMin": e.set.RotateMin, "stallMin": e.set.StallMin, "autostart": e.set.Autostart, "openOnStart": e.set.OpenOnStart,
@@ -615,6 +615,11 @@ func (s *server) routes() http.Handler {
 		}
 		s.show()
 		fmt.Fprint(w, "ok")
+	})
+	mux.HandleFunc("/changelog.md", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Write(changelog)
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		host := r.Host

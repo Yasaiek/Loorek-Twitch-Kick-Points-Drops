@@ -352,5 +352,12 @@
 "set.dataSame": "Los datos ya están en esta carpeta.",
 "L.dataMoving": "Moviendo los datos a %s…",
 "L.dataMoved": "Los datos están ahora en %s.",
-"L.dataMoveFail": "No se pudo reiniciar para mover los datos: %v"
+"L.dataMoveFail": "No se pudo reiniciar para mover los datos: %v",
+"upd.screenT": "Actualizando Loorek",
+"upd.stepDl": "Descargando… {a} de {b}",
+"upd.stepDl0": "Descargando…",
+"upd.stepRestart": "Instalando y reiniciando…",
+"upd.newT": "Loorek actualizado a v{v}",
+"upd.newSub": "Qué cambió desde la v{v}:",
+"upd.ok": "¡Genial!"
 }
