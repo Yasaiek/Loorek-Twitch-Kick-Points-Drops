@@ -359,5 +359,9 @@
 "upd.stepRestart": "Встановлюю і перезапускаю…",
 "upd.newT": "Loorek оновлено до v{v}",
 "upd.newSub": "Що змінилося з v{v}:",
-"upd.ok": "Чудово!"
+"upd.ok": "Чудово!",
+"brand.sub": "Бали й дропи Twitch і Kick",
+"upd.okNow": "✓ Остання версія",
+"upd.failShort": "Не вдалося",
+"upd.checkedAt": "перевірено о {t}"
 }

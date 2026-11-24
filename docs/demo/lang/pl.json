@@ -359,5 +359,9 @@
 "upd.stepRestart": "Instaluję i uruchamiam ponownie…",
 "upd.newT": "Loorek zaktualizowany do v{v}",
 "upd.newSub": "Co się zmieniło od v{v}:",
-"upd.ok": "Super!"
+"upd.ok": "Super!",
+"brand.sub": "Punkty i dropy z Twitcha i Kicka",
+"upd.okNow": "✓ Masz najnowszą",
+"upd.failShort": "Nie udało się",
+"upd.checkedAt": "sprawdzono {t}"
 }

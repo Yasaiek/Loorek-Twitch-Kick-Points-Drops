@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.6
+- New look in the family of Orbek: navy glass background, gradient accents, larger rounded cards, tinted tiles with icons and labels on top, Orbek-style buttons, tabs and switches.
+- Smoother CPU and RAM charts: values are averaged and softened, drawn as a rounded curve, and the curve glides to each new shape instead of jumping.
+- "Check now" for updates shows that it is checking and what came out ("✓ Up to date"), and the update line says when it last checked.
+
 ## 0.9.5
 - Update screen like Orbek's: while Loorek downloads a new version the panel shows the versions, a progress bar with megabytes, and "installing and restarting".
 - After an update a "What's new" window lists the changes since the version you had.

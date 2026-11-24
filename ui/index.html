@@ -137,7 +137,9 @@ input[type=number] { width: 70px; text-align: center; }
 .stat .mm { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; min-width: 0; }
 .spkw { position: relative; height: 34px; }
 .spkw .spk { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.spkw .spkdot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--m2), 0 0 10px var(--m2); transition: top .6s ease; }
+.spkw .spkdot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--m2), 0 0 10px var(--m2); transition: top 1s ease-in-out; animation: spkBeat 2s ease-in-out infinite; }
+.spkw.glide .sa, .spkw.glide .sl { transition: d 1s ease-in-out; }
+@keyframes spkBeat { 50% { box-shadow: 0 0 0 2px var(--m2), 0 0 16px 3px var(--m2); } }
 .stat .mrow { display: flex; flex-wrap: wrap; gap: 4px; font-size: 11px; color: var(--sub); font-variant-numeric: tabular-nums; }
 .stat .mc { display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: 6px; background: rgba(255,255,255,.06); white-space: nowrap; }
 .stat .mc i { font-style: normal; font-size: 8px; color: var(--m2); } .stat .mc strong { color: var(--text); font-weight: 650; }
@@ -362,6 +364,74 @@ select:focus { border-color: var(--accent); }
 }
 @media (max-width: 560px) { .slots { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+/* ===== Orbek look: the same family as Orbek (navy glass, gradient accents, larger rounded cards) ===== */
+:root {
+  --bg: #0a0b12; --card: #131622; --card-2: #191d2c; --card-3: #212638;
+  --line: rgba(255,255,255,.065); --line-2: rgba(255,255,255,.11);
+  --text: #eef1fb; --sub: #a3a9c2; --dim: #6c7290;
+  --accent: #4cc3ff; --violet: #9b6bff; --grad: linear-gradient(135deg, #36b3ff, #8a63ff); --r: 14px;
+}
+body { background: radial-gradient(900px 500px at 15% -10%, rgba(54,179,255,.14), transparent 60%), radial-gradient(700px 500px at 105% 110%, rgba(138,99,255,.12), transparent 60%), var(--bg); grid-template-columns: 224px minmax(0, 1fr); }
+body::before { opacity: .55; }
+aside { background: rgba(15,17,28,.82); backdrop-filter: blur(18px); padding: 18px 12px 12px; }
+.brand { padding: 2px 8px 20px; }
+.brand img { width: 36px; height: 36px; border-radius: 10px; filter: drop-shadow(0 4px 14px rgba(76,195,255,.4)); }
+.brand strong { display: block; font: 700 20px/1.15 var(--display); letter-spacing: -.01em; }
+.brand small { display: block; font: 500 11px/1.3 var(--display); color: var(--dim); letter-spacing: .02em; }
+.nav { padding: 9px 12px; border-radius: 9px; }
+.nav.on { background: linear-gradient(90deg, rgba(54,179,255,.2), rgba(138,99,255,.08)); font-weight: 600; }
+.nav::before { left: 0; top: 8px; bottom: 8px; height: auto; margin: 0; background: var(--grad); transform: scaleY(0); }
+.nav b { color: #dff3ff; background: rgba(54,179,255,.28); border-radius: 9px; }
+main { padding: 26px 30px 44px; }
+.tab { gap: 14px; max-width: 1500px; }
+h1 { font: 650 27px/1.2 var(--display); letter-spacing: -.015em; }
+h2 { font: 650 15.5px/1.3 var(--display); }
+.head p { margin: 4px 0 0; color: var(--sub); font-size: 14px; }
+.card { border-radius: 16px; padding: 16px 18px; background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.008)), var(--card); }
+/* the live channels: tinted like Orbek's tiles */
+.slot { border-radius: 16px; padding: 16px 18px; background: linear-gradient(160deg, rgba(145,70,255,.12), rgba(145,70,255,.03)), var(--card); border-color: rgba(145,70,255,.2); }
+.slot.live { border-color: rgba(145,70,255,.4); }
+.slot.live::before { background: radial-gradient(circle at 100% 0, rgba(145,70,255,.3), transparent 45%); }
+.slot .lbl { font-size: 11.5px; font-weight: 600; letter-spacing: .05em; color: var(--sub); display: flex; align-items: center; }
+.slot .name { font: 700 20px/1.25 var(--display); }
+.slot .eq i { background: #b58cff; }
+#kickHome { border-color: rgba(83,252,24,.22); background: linear-gradient(160deg, rgba(83,252,24,.08), rgba(83,252,24,.015)), var(--card); }
+/* the numbers row: label above, big number below, each tile its own tint */
+.stats { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.stats > .stat { grid-column: span 3; } .stats > .stat.use { grid-column: span 6; } /* four counters in a row, CPU and RAM under them */
+@media (max-width: 620px) { .stats > .stat, .stats > .stat.use { grid-column: span 6; } }
+.stat { position: relative; overflow: hidden; border-radius: 16px; padding: 14px 16px 13px; --t: 76,195,255; border: 1px solid rgba(var(--t), .24); background: linear-gradient(160deg, rgba(var(--t), .14), rgba(var(--t), .03)), var(--card); }
+.stat::after { content: ""; position: absolute; right: -30px; top: -30px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(var(--t), .25), transparent 70%); pointer-events: none; }
+.stat.k-pts { --t: 155,107,255; } .stat.k-bonus { --t: 67,209,124; } .stat.k-chat { --t: 76,195,255; } .stat.k-up { --t: 240,178,50; }
+.stat.use { --t: 255,138,61; } .stat.use.ram { --t: 41,211,180; }
+.stat .kh { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--sub); overflow-wrap: anywhere; }
+.stat .kh .ki { width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: rgb(var(--t)); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.stat > b { display: block; margin: 6px 0 2px; font: 700 26px/1.15 var(--display); }
+.stat.use > b { margin-bottom: 4px; }
+/* buttons, tabs, inputs, switches: Orbek's */
+.btn { border-radius: 11px; padding: 8px 15px; font: 600 13px var(--display); border: 1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)) border-box; box-shadow: inset 0 1px 0 rgba(255,255,255,.06); transition: transform .15s var(--ease), background .15s, border-color .15s, box-shadow .15s, filter .15s; }
+.btn:hover { background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05)); border-color: rgba(255,255,255,.2); transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(.97); }
+.btn:focus { outline: none; } .btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(10,10,20,.9), 0 0 0 4px rgba(76,195,255,.7); }
+.btn.primary { color: #fff; border-color: transparent; background: linear-gradient(135deg, #2fa8ff 0%, #5b7cff 55%, #8a63ff 100%) border-box; box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 10px 26px -12px rgba(80,140,255,.95); }
+.btn.primary:hover { background: linear-gradient(135deg, #2fa8ff 0%, #5b7cff 55%, #8a63ff 100%) border-box; filter: brightness(1.08) saturate(1.1); }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 5px 11px; font-size: 12px; border-radius: 9px; }
+.btn[disabled] { opacity: .5; pointer-events: none; }
+.btn.done { opacity: 1; color: #d2f9e5; border-color: rgba(62,207,142,.45); background: linear-gradient(135deg, rgba(62,207,142,.22), rgba(24,160,201,.12)); }
+.seg { border-radius: 12px; padding: 4px; gap: 2px; background: var(--card); }
+.seg button { border-radius: 9px; padding: 7px 14px; transition: all .18s var(--ease); }
+.seg button.on { background: var(--grad); color: #fff; box-shadow: 0 6px 18px -8px rgba(54,179,255,.8); }
+.seg button.on b { color: #fff; background: rgba(255,255,255,.18); }
+input[type=text], input[type=number], .lang-btn { background: #0e101a; border-radius: 10px; }
+.sw:checked { background: var(--grad); border-color: transparent; }
+.sw:checked::after { background: #fff; }
+.item { border-radius: 11px; }
+.gcard { border-radius: 14px; }
+.qban { border-radius: 16px; }
+.pill { border-radius: 10px; font-weight: 600; }
+.pos { background: var(--grad); color: #fff; }
+.ib.add:hover, .ib.add.on { background: var(--grad); color: #fff; border-color: transparent; }
 /* update screen while Loorek downloads and restarts, and "what's new" once it is back */
 .updscr { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, rgba(96,205,255,.2), rgba(6,6,8,.93) 60%); backdrop-filter: blur(10px); animation: ufade .3s ease; }
 .updscr[hidden] { display: none; }
@@ -392,7 +462,7 @@ select:focus { border-color: var(--accent); }
 </head>
 <body>
 <aside>
-  <div class="brand"><img src="icon.png" alt=""><strong>Loorek</strong></div>
+  <div class="brand"><img src="icon.png" alt=""><div><strong>Loorek</strong><small data-i="brand.sub"></small></div></div>
   <button class="nav on" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span data-i="nav.home"></span></button>
   <button class="nav" data-tab="drops"><svg viewBox="0 0 24 24"><path d="M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM3 7h18v4H3zM12 7v14M12 7c-1.5-4-6-4-6-1.5S9 7 12 7zm0 0c1.5-4 6-4 6-1.5S15 7 12 7z"/></svg><span data-i="nav.drops"></span><b id="nQueue" hidden></b></button>
   <button class="nav" data-tab="points"><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg><span data-i="nav.points"></span><b id="nPts" hidden></b></button>
@@ -407,12 +477,12 @@ select:focus { border-color: var(--accent); }
     <div class="card farm" id="farmHome" hidden></div>
     <div class="card" id="kickHome" hidden></div>
     <div class="stats">
-      <div class="stat"><b id="stEarned">0</b><span data-i="st.earned"></span></div>
-      <div class="stat"><b id="stClaims">0</b><span data-i="st.claims"></span></div>
-      <div class="stat"><b id="stChat">–</b><span data-i="st.chats"></span></div>
-      <div class="stat"><b id="stUp">–</b><span data-i="st.up"></span></div>
-      <div class="stat use" id="stUse"><b><span id="useCpu">–</span> <small>CPU</small></b><div class="mm" id="useCpuMM"></div></div>
-      <div class="stat use ram" id="stRam"><b><span id="useRamV">–</span> <small>RAM</small></b><div class="mm" id="useRamMM"></div></div>
+      <div class="stat k-pts"><div class="kh"><svg class="ki" viewBox="0 0 24 24"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg><span data-i="st.earned"></span></div><b id="stEarned">0</b></div>
+      <div class="stat k-bonus"><div class="kh"><svg class="ki" viewBox="0 0 24 24"><path d="M4 11h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM3 7h18v4H3zM12 7v14M12 7c-1.5-4-6-4-6-1.5S9 7 12 7zm0 0c1.5-4 6-4 6-1.5S15 7 12 7z"/></svg><span data-i="st.claims"></span></div><b id="stClaims">0</b></div>
+      <div class="stat k-chat"><div class="kh"><svg class="ki" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span data-i="st.chats"></span></div><b id="stChat">–</b></div>
+      <div class="stat k-up"><div class="kh"><svg class="ki" viewBox="0 0 24 24"><path d="M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg><span data-i="st.up"></span></div><b id="stUp">–</b></div>
+      <div class="stat use" id="stUse"><div class="kh"><svg class="ki" viewBox="0 0 24 24"><path d="M9 9h6v6H9zM5 5h14v14H5zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg><span>CPU</span></div><b><span id="useCpu">–</span></b><div class="mm" id="useCpuMM"></div></div>
+      <div class="stat use ram" id="stRam"><div class="kh"><svg class="ki" viewBox="0 0 24 24"><path d="M3 8h18v8H3zM7 8v8M11 8v8M15 8v8M6 16v3M18 16v3"/></svg><span>RAM</span></div><b><span id="useRamV">–</span></b><div class="mm" id="useRamMM"></div></div>
     </div>
     <div class="card"><div class="card-head"><h2 data-i="home.recent"></h2><a href="#" id="toLog" data-i="home.allLog"></a></div><div class="log" id="logShort"></div></div>
   </section>
@@ -683,28 +753,40 @@ async function api(path, body) {
 async function op(o) { pending++; try { const r = await api('/api/op', o); await load(); return r; } catch (e) { toast(tr(fails >= 3 ? 'noconn.hint' : 'toast.noconn'), fails >= 3 ? 3600000 : 0); } finally { pending--; } }
 let toastT;
 // a smooth sparkline: values averaged over a few points, drawn as a curve (monotone, so it never overshoots)
-function sparkSvg(hist, cls) {
-  const raw = hist.length ? hist : [0];
-  const k = raw.length > 30 ? 4 : raw.length > 10 ? 2 : 0; // moving average over 2k+1 points
-  const pts = raw.map((_, i) => { let s = 0, n = 0; for (let j = Math.max(0, i - k); j <= Math.min(raw.length - 1, i + k); j++) { s += raw[j]; n++; } return s / n; });
-  const W = 200, H = 46, mx = Math.max(...pts), mn = Math.min(...pts), pad = (mx - mn) * 0.2 || Math.max(mx * 0.2, 0.05);
+// a smooth chart of the last minutes: the values are averaged into 40 steps, softened, and drawn as a
+// rounded curve; when new values come the curve glides to its new shape instead of jumping
+function sparkPath(hist) {
+  const raw = hist.length ? hist : [0], N = 40;
+  let pts = [];
+  if (raw.length > N) { for (let b = 0; b < N; b++) { const a = Math.floor(b * raw.length / N), z = Math.max(a + 1, Math.floor((b + 1) * raw.length / N)); let s = 0; for (let j = a; j < z; j++) s += raw[j]; pts.push(s / (z - a)); } }
+  else pts = raw.slice();
+  for (let pass = 0; pass < 2; pass++) pts = pts.map((v, i) => (pts[Math.max(0, i - 1)] + 2 * v + pts[Math.min(pts.length - 1, i + 1)]) / 4);
+  if (pts.length === 1) pts.push(pts[0]);
+  const W = 200, H = 46, mx = Math.max(...pts), mn = Math.min(...pts), pad = (mx - mn) * 0.25 || Math.max(mx * 0.25, 0.05);
   const top = mx + pad, bot = Math.max(0, mn - pad);
-  const X = (i) => pts.length < 2 ? W : (i / (pts.length - 1)) * W, Y = (v) => H - 4 - ((v - bot) / (top - bot || 1)) * (H - 10);
-  const P = pts.map((v, i) => [X(i), Y(v)]);
-  // monotone cubic (Fritsch–Carlson) tangents
-  const n = P.length, d = [], m = [];
-  for (let i = 0; i < n - 1; i++) d.push((P[i + 1][1] - P[i][1]) / ((P[i + 1][0] - P[i][0]) || 1));
-  for (let i = 0; i < n; i++) m.push(i === 0 ? d[0] || 0 : i === n - 1 ? d[n - 2] || 0 : d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2);
-  let line = 'M' + P[0][0].toFixed(1) + ' ' + P[0][1].toFixed(1);
-  for (let i = 0; i < n - 1; i++) {
-    const h = (P[i + 1][0] - P[i][0]) / 3;
-    line += ` C${(P[i][0] + h).toFixed(1)} ${(P[i][1] + m[i] * h).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)} ${(P[i + 1][1] - m[i + 1] * h).toFixed(1)} ${P[i + 1][0].toFixed(1)} ${P[i + 1][1].toFixed(1)}`;
+  const P = pts.map((v, i) => [(i / (pts.length - 1)) * W, H - 5 - ((v - bot) / (top - bot || 1)) * (H - 12)]);
+  const c = (v) => Math.min(H - 2, Math.max(2, v)).toFixed(2);
+  let d = 'M' + P[0][0].toFixed(2) + ' ' + P[0][1].toFixed(2);
+  for (let i = 0; i < P.length - 1; i++) { // Catmull-Rom → Bézier: rounded through every point
+    const p0 = P[Math.max(0, i - 1)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(P.length - 1, i + 2)];
+    d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(2)} ${c(p1[1] + (p2[1] - p0[1]) / 6)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(2)} ${c(p2[1] - (p3[1] - p1[1]) / 6)} ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
   }
-  if (n === 1) line += ` L${W} ${P[0][1].toFixed(1)}`;
-  const last = P[n - 1], id = 'sg' + cls;
-  return `<div class="spkw"><svg class="spk" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" shape-rendering="geometricPrecision"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--m2)" stop-opacity=".42"/><stop offset="1" stop-color="var(--m2)" stop-opacity="0"/></linearGradient></defs>`
-    + `<path d="${line} L${W} ${H} L0 ${H} Z" fill="url(#${id})"/><path d="${line}" fill="none" stroke="var(--m2)" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`
-    + `<i class="spkdot" style="left:${(last[0] / W * 100).toFixed(2)}%;top:${(last[1] / H * 100).toFixed(2)}%"></i></div>`;
+  const last = P[P.length - 1];
+  return { line: d, area: d + ` L${W} ${H} L0 ${H} Z`, x: last[0] / W * 100, y: last[1] / H * 100, n: P.length };
+}
+function sparkDraw(box, hist, cls) {
+  let w = box.querySelector('.spkw');
+  if (!w) {
+    const id = 'sg' + cls;
+    box.insertAdjacentHTML('afterbegin', `<div class="spkw"><svg class="spk" viewBox="0 0 200 46" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--m2)" stop-opacity=".42"/><stop offset="1" stop-color="var(--m2)" stop-opacity="0"/></linearGradient></defs>`
+      + `<path class="sa" fill="url(#${id})"/><path class="sl" fill="none" stroke="var(--m2)" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg><i class="spkdot"></i></div>`);
+    w = box.querySelector('.spkw');
+  }
+  const p = sparkPath(hist), a = w.querySelector('.sa'), l = w.querySelector('.sl'), dot = w.querySelector('.spkdot');
+  const glide = w.dataset.n === String(p.n); // same number of steps: the shape can glide to the new one
+  w.classList.toggle('glide', glide); w.dataset.n = p.n;
+  a.style.d = `path("${p.area}")`; l.style.d = `path("${p.line}")`;
+  dot.style.left = p.x.toFixed(2) + '%'; dot.style.top = p.y.toFixed(2) + '%';
 }
 function toast(msg, ms) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms || 2600); }
 
@@ -991,6 +1073,7 @@ function render() {
   $('statsRow').hidden = !s.statsOn;
   const u = s.update || {};
   $('updNote').textContent = u.state === 'downloading' ? tr('upd.downloading', { v: u.latest }) : u.state === 'available' ? tr('upd.avail', { v: u.latest }) : u.state === 'checking' ? tr('upd.checking') : u.state === 'failed' ? tr('upd.failed') : u.state === 'current' ? tr('upd.current') : u.doneAt ? tr('upd.done', { v: s.version }) : tr('upd.never');
+  if (u.checked && u.state !== 'checking') $('updNote').textContent += ' · ' + tr('upd.checkedAt', { t: new Date(u.checked).toLocaleTimeString(LOC, { hour: '2-digit', minute: '2-digit' }) });
   if (u.doneAt && Date.now() - u.doneAt < 180000 && !doneShown) { doneShown = true; whatsNew().then((shown) => { if (!shown) toast(tr('upd.done', { v: s.version }), 7000); }); }
   $('updInstall').hidden = u.state !== 'available';
   const chat = s.chat;
@@ -1000,8 +1083,9 @@ function render() {
   { const u = s.usage || {}, f = (v) => (v > 0 && v < 0.1 ? '<0.1' : (v || 0).toFixed(1));
     const mb = (v) => Math.round(v || 0) + ' MB';
     const spark = (box, hist, fmt, lo, hi, cls) => {
-      box.innerHTML = sparkSvg(hist, cls)
-        + `<div class="mrow"><span class="mc"><i>▼</i>min <strong>${fmt(lo)}</strong></span><span class="mc"><i>▲</i>max <strong>${fmt(hi)}</strong></span></div>`;
+      sparkDraw(box, hist, cls);
+      let row = box.querySelector('.mrow'); if (!row) { row = el('div', 'mrow'); box.append(row); }
+      row.innerHTML = `<span class="mc"><i>▼</i>min <strong>${fmt(lo)}</strong></span><span class="mc"><i>▲</i>max <strong>${fmt(hi)}</strong></span>`;
     };
     $('useCpu').textContent = f(u.cpu) + '%'; spark($('useCpuMM'), u.histCpu || [], (v) => f(v) + '%', u.cpuMin || 0, u.cpuMax || 0, 'c');
     $('useRamV').textContent = mb(u.ram); spark($('useRamMM'), u.histRam || [], mb, u.ramMin || 0, u.ramMax || 0, 'r');
@@ -1247,7 +1331,18 @@ $('tokenForm').onsubmit = async (ev) => { ev.preventDefault(); const v = $('toke
 $('logout').onclick = () => op({ op: 'logout' });
 mountLang($('langSet'));
 mountLang($('langGate'));
-$('updCheck').onclick = () => { op({ op: 'updateCheck' }); };
+// "Check now": the check takes a moment; the button shows that it runs and what came out
+$('updCheck').onclick = async () => {
+  const b = $('updCheck'), t0 = Date.now(), key = 'upd.check', wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  b.disabled = true; b.dataset.i = 'upd.checking'; b.textContent = tr('upd.checking');
+  await op({ op: 'updateCheck' });
+  while (Date.now() - t0 < 35000) { const u = (S && S.update) || {}; if (u.state !== 'checking' && u.checked >= t0 - 1500) break; await wait(300); }
+  if (Date.now() - t0 < 900) await wait(900 - (Date.now() - t0));
+  const st = ((S && S.update) || {}).state;
+  b.dataset.i = st === 'current' ? 'upd.okNow' : st === 'failed' ? 'upd.failShort' : st === 'available' ? 'upd.check' : key; b.textContent = tr(b.dataset.i);
+  b.classList.toggle('done', st === 'current');
+  setTimeout(() => { b.disabled = false; b.dataset.i = key; b.textContent = tr(key); b.classList.remove('done'); }, 3500);
+};
 $('updInstall').onclick = () => op({ op: 'updateInstall' });
 $('clearLog').onclick = () => op({ op: 'clearLog' });
 // data folder: open it, or move it somewhere else (the program restarts and the panel carries on)

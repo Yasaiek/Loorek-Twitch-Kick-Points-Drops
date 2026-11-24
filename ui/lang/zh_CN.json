@@ -359,5 +359,9 @@
 "upd.stepRestart": "正在安装并重启…",
 "upd.newT": "Loorek 已更新到 v{v}",
 "upd.newSub": "自 v{v} 以来的变化：",
-"upd.ok": "好的！"
+"upd.ok": "好的！",
+"brand.sub": "Twitch 和 Kick 的积分与掉宝",
+"upd.okNow": "✓ 已是最新",
+"upd.failShort": "检查失败",
+"upd.checkedAt": "检查于 {t}"
 }

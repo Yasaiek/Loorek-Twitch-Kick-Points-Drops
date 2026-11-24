@@ -359,5 +359,9 @@
 "upd.stepRestart": "Kuruluyor ve yeniden başlatılıyor…",
 "upd.newT": "Loorek v{v} sürümüne güncellendi",
 "upd.newSub": "v{v} sürümünden bu yana değişenler:",
-"upd.ok": "Harika!"
+"upd.ok": "Harika!",
+"brand.sub": "Twitch ve Kick puanları ve dropları",
+"upd.okNow": "✓ Güncel",
+"upd.failShort": "Başarısız",
+"upd.checkedAt": "kontrol: {t}"
 }

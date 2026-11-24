@@ -359,5 +359,9 @@
 "upd.stepRestart": "インストールして再起動中…",
 "upd.newT": "Loorekをv{v}に更新しました",
 "upd.newSub": "v{v}からの変更点：",
-"upd.ok": "OK！"
+"upd.ok": "OK！",
+"brand.sub": "Twitch と Kick のポイントとドロップ",
+"upd.okNow": "✓ 最新です",
+"upd.failShort": "失敗しました",
+"upd.checkedAt": "確認: {t}"
 }

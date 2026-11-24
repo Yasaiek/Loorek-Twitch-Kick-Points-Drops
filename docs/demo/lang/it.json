@@ -359,5 +359,9 @@
 "upd.stepRestart": "Installo e riavvio…",
 "upd.newT": "Loorek aggiornato alla v{v}",
 "upd.newSub": "Cosa è cambiato dalla v{v}:",
-"upd.ok": "Ottimo!"
+"upd.ok": "Ottimo!",
+"brand.sub": "Punti e drop di Twitch e Kick",
+"upd.okNow": "✓ Aggiornato",
+"upd.failShort": "Non riuscito",
+"upd.checkedAt": "controllato {t}"
 }
