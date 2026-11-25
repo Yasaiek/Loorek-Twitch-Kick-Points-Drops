@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.8
+- Settings: a "Test" button for the Discord status shows a test status in Discord for 30 seconds, whatever Loorek is doing, and says what came out (works / Discord not running / Discord refused it, with Discord's reason).
+- The status line also tells what went wrong last time.
+
 ## 0.9.7
 - The "Now dropping" card (overview and Drops) shows the reward being earned right now with its picture, and under it the whole campaign: every drop with its picture, progress and state (claimed, being earned, waiting, to claim), and how many are claimed.
 - Works the same whether the game came from the queue or from the tracked games.
