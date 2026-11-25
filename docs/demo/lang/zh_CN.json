@@ -363,5 +363,7 @@
 "brand.sub": "Twitch 和 Kick 的积分与掉宝",
 "upd.okNow": "✓ 已是最新",
 "upd.failShort": "检查失败",
-"upd.checkedAt": "检查于 {t}"
+"upd.checkedAt": "检查于 {t}",
+"farm.earning": "正在获取",
+"farm.got": "已领取 {a}/{b}"
 }

@@ -363,5 +363,7 @@
 "brand.sub": "Баллы и дропы Twitch и Kick",
 "upd.okNow": "✓ Последняя версия",
 "upd.failShort": "Не удалось",
-"upd.checkedAt": "проверено в {t}"
+"upd.checkedAt": "проверено в {t}",
+"farm.earning": "Сейчас",
+"farm.got": "получено {a} из {b}"
 }

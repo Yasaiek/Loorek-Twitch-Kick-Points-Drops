@@ -363,5 +363,7 @@
 "brand.sub": "Twitch と Kick のポイントとドロップ",
 "upd.okNow": "✓ 最新です",
 "upd.failShort": "失敗しました",
-"upd.checkedAt": "確認: {t}"
+"upd.checkedAt": "確認: {t}",
+"farm.earning": "獲得中",
+"farm.got": "{b} 個中 {a} 個受け取り済み"
 }

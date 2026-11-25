@@ -432,6 +432,17 @@ input[type=text], input[type=number], .lang-btn { background: #0e101a; border-ra
 .pill { border-radius: 10px; font-weight: 600; }
 .pos { background: var(--grad); color: #fff; }
 .ib.add:hover, .ib.add.on { background: var(--grad); color: #fff; border-color: transparent; }
+/* the drop being earned now, and the whole campaign under it */
+.farm .nowdrop { display: flex; align-items: center; gap: 10px; margin-left: auto; padding: 6px 12px 6px 6px; border-radius: 12px; background: rgba(76,195,255,.08); border: 1px solid rgba(76,195,255,.22); max-width: 46%; }
+.farm .nowdrop .dimg { width: 52px; height: 52px; border-radius: 10px; flex-shrink: 0; display: grid; place-items: center; overflow: hidden; background: var(--card-3); font-size: 24px; }
+.farm .nowdrop .dimg img { width: 100%; height: 100%; object-fit: contain; }
+.farm .nowdrop .ntx { display: flex; flex-direction: column; min-width: 0; }
+.farm .nowdrop .ntx span { font-size: 11px; color: var(--sub); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+.farm .nowdrop .ntx b { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.farm .farmcamp { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.farm .fch { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.farm .fch b { font: 650 14px var(--display); }
+.farm .fch .sub { margin-left: auto; }
 /* update screen while Loorek downloads and restarts, and "what's new" once it is back */
 .updscr { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, rgba(96,205,255,.2), rgba(6,6,8,.93) 60%); backdrop-filter: blur(10px); animation: ufade .3s ease; }
 .updscr[hidden] { display: none; }
@@ -974,10 +985,24 @@ function farmCard(node, cur) {
   node.textContent = '';
   const head = el('div', 'top'); const t = el('div', 'txt');
   t.append(el('div', 'sub', tr('farm.now')), el('div', 'big', cur.game), el('div', 'sub', tr('farm.watching', { login: cur.login })));
-  const eq = el('div', 'eq'); eq.append(el('i'), el('i'), el('i')); head.append(art(cur.art, true), t, eq); node.append(head);
+  const eq = el('div', 'eq'); eq.append(el('i'), el('i'), el('i'));
+  head.append(art(cur.art, true), t);
+  if (cur.drop) { // the reward being earned right now, with its picture
+    const nd = el('div', 'nowdrop'), im = el('div', 'dimg');
+    if (cur.img) { const i = el('img'); i.src = cur.img; i.alt = ''; i.onerror = () => { i.remove(); im.textContent = '🎁'; }; im.append(i); } else im.textContent = '🎁';
+    const nt = el('div', 'ntx'); nt.append(el('span', '', tr('farm.earning')), el('b', '', cur.drop)); nd.append(im, nt); head.append(nd);
+  }
+  head.append(eq); node.append(head);
   const bar = el('div', 'bar live'), fill = el('div'); bar.append(fill); node.append(bar);
   const info = el('div', 'barinfo'); info.append(el('span', '', cur.drop ? tr('farm.reward', { name: cur.drop }) : tr('farm.waitRead')), el('span', '', cur.req ? tr('drop.of', { a: mins(cur.cur), b: mins(cur.req) }) : '')); node.append(info);
   requestAnimationFrame(() => { fill.style.width = (cur.req ? Math.min(100, cur.cur / cur.req * 100) : 3) + '%'; });
+  for (const c of cur.camps || []) { // the whole campaign: every drop, its picture and state
+    const sec = el('div', 'farmcamp'), h = el('div', 'fch');
+    const got = c.drops.filter((d) => d.claimed).length;
+    h.append(el('b', '', c.name || tr('camp.default')), el('span', 'pill', left(c.end)), el('span', 'sub', tr('farm.got', { a: got, b: c.drops.length })));
+    const g = el('div', 'dgrid'); for (const d of c.drops) g.append(dropCard(d, d.id === cur.dropId));
+    sec.append(h, g); node.append(sec);
+  }
 }
 function chanList(list, sig, chans, seenSet, toggleOp, removeOp, emptyText) {
   if (dragging || !changed(sig, chans)) return;

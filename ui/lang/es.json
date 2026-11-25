@@ -363,5 +363,7 @@
 "brand.sub": "Puntos y drops de Twitch y Kick",
 "upd.okNow": "✓ Al día",
 "upd.failShort": "Ha fallado",
-"upd.checkedAt": "comprobado {t}"
+"upd.checkedAt": "comprobado {t}",
+"farm.earning": "Ganando ahora",
+"farm.got": "{a} de {b} reclamados"
 }

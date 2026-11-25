@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.7
+- The "Now dropping" card (overview and Drops) shows the reward being earned right now with its picture, and under it the whole campaign: every drop with its picture, progress and state (claimed, being earned, waiting, to claim), and how many are claimed.
+- Works the same whether the game came from the queue or from the tracked games.
+
 ## 0.9.6
 - New look in the family of Orbek: navy glass background, gradient accents, larger rounded cards, tinted tiles with icons and labels on top, Orbek-style buttons, tabs and switches.
 - Smoother CPU and RAM charts: values are averaged and softened, drawn as a rounded curve, and the curve glides to each new shape instead of jumping.

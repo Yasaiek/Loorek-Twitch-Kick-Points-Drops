@@ -136,7 +136,7 @@
     const games = Object.values(GAMES).filter((g) => campsOf(g.id).length).map((g) => { const cs = campsOf(g.id); return { id: g.id, slug: g.slug, name: g.name, art: g.art, camps: cs.length, camp: cs[0].name,
       end: Math.min(...cs.map((c) => c.end)), upcoming: false, start: cs[0].start, status: status(g.id), queued: queuePos(g.id), tracked: S.tracked.includes(g.id) }; }).sort((a, b) => a.name.localeCompare(b.name));
     let current = null;
-    if (S.cur) { const g = GAMES[S.cur.game], d = S.cur.drop; current = { game: g.name, art: g.art, channel: S.cur.camp.ch.name, login: S.cur.camp.ch.login, since: S.cur.since, drop: d.name, cur: Math.floor(d.cur), req: d.req, img: d.img }; }
+    if (S.cur) { const g = GAMES[S.cur.game], d = S.cur.drop; current = { game: g.name, art: g.art, channel: S.cur.camp.ch.name, login: S.cur.camp.ch.login, since: S.cur.since, drop: d.name, cur: Math.floor(d.cur), req: d.req, img: d.img, dropId: d.id, camps: [campView(S.cur.camp)] }; }
     const all = (list) => list.reduce((n, c) => n + c.earned, 0);
     return {
       version: window.LOOREK_VERSION || '0.6', app: 'Loorek', lang: lang(), winGen: 0, usage: USAGE, dataDir: 'C:\\Users\\you\\AppData\\Local\\Yasaiek\\Loorek', dataDefault: '', dataCustom: false, upSec: Math.floor((Date.now() - START) / 1000) * 20,

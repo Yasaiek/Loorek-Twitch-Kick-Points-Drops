@@ -363,5 +363,7 @@
 "brand.sub": "Бали й дропи Twitch і Kick",
 "upd.okNow": "✓ Остання версія",
 "upd.failShort": "Не вдалося",
-"upd.checkedAt": "перевірено о {t}"
+"upd.checkedAt": "перевірено о {t}",
+"farm.earning": "Зараз",
+"farm.got": "отримано {a} з {b}"
 }

@@ -363,5 +363,7 @@
 "brand.sub": "Twitch ve Kick puanları ve dropları",
 "upd.okNow": "✓ Güncel",
 "upd.failShort": "Başarısız",
-"upd.checkedAt": "kontrol: {t}"
+"upd.checkedAt": "kontrol: {t}",
+"farm.earning": "Şu an kazanılan",
+"farm.got": "{b} içinden {a} alındı"
 }

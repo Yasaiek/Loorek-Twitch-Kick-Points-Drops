@@ -225,6 +225,15 @@ func (e *Engine) view() map[string]any {
 				cur["drop"], cur["cur"], cur["req"], cur["img"] = d.Name, d.Cur, d.Req, d.Img
 			}
 		}
+		// the whole campaign of the game being watched: every drop with its picture and state, so the
+		// overview shows it too (whether the game came from the queue or from the tracked games)
+		var camps []map[string]any
+		for _, c := range e.campViews(f.game, now) {
+			if c["active"] == true {
+				camps = append(camps, c)
+			}
+		}
+		cur["camps"] = camps
 		current = cur
 	}
 

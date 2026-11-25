@@ -363,5 +363,7 @@
 "brand.sub": "Points et drops Twitch & Kick",
 "upd.okNow": "✓ À jour",
 "upd.failShort": "Échec",
-"upd.checkedAt": "vérifié à {t}"
+"upd.checkedAt": "vérifié à {t}",
+"farm.earning": "En cours",
+"farm.got": "{a} sur {b} récupérés"
 }
