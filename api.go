@@ -248,7 +248,7 @@ func (e *Engine) view() map[string]any {
 			"kickOn": e.set.KickOn, "kickMax": e.set.KickMax, "autoUpdate": e.set.AutoUpdate, "stats": e.set.Stats, "lang": e.set.Lang,
 			"rpcOn": e.set.Discord.On, "rpcDrop": e.set.Discord.Drop, "rpcQueue": e.set.Discord.Queue, "rpcTracked": e.set.Discord.Tracked,
 			"rpcPoints": e.set.Discord.Points, "rpcBtn": e.set.Discord.Button},
-		"rpc":    map[string]any{"state": e.rpcState, "ready": firstNonEmpty(e.set.Discord.AppID, discordAppID) != "", "err": e.rpcErr, "test": max(0, time.Until(e.rpcTestUntil).Milliseconds())},
+		"rpc":    map[string]any{"state": e.rpcState, "ready": firstNonEmpty(e.set.Discord.AppID, discordAppID) != "", "err": e.rpcErr},
 		"points": map[string]any{"channels": chans, "earned": earned, "claims": claims, "watching": watching},
 		"chat":   map[string]any{"state": chatState, "joined": chatJoined},
 		"kick":   kickView,
@@ -505,11 +505,6 @@ func (s *server) handleOp(req opReq) map[string]any {
 		} else {
 			go e.quitApp()
 		}
-	case "rpcTest": // show a test status in Discord for 30 seconds
-		e.mu.Lock()
-		e.rpcTestUntil = time.Now().Add(30 * time.Second)
-		e.mu.Unlock()
-		e.log.Info("L.rpcTest")
 	case "dataOpen":
 		openFolder(e.dir)
 	case "dataPick": // the system folder picker; the program's own folder is made inside the one picked

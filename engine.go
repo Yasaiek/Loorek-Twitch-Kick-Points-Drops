@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var version = "0.9.8" // a variable so that test builds can override it
+var version = "0.9.9" // a variable so that test builds can override it
 const appName = "Loorek"
 
 // speed > 1 shortens every waiting time (tests only: DROPOMAT_FAST).
@@ -126,9 +126,8 @@ type Engine struct {
 	chans map[string]*chanRT
 	slots []*chanRT
 
-	rpcState     string    // Discord Rich Presence: off | noid | nodiscord | badid | refused | ok
-	rpcTestUntil time.Time // "Test" in the settings: a test status is shown until then
-	rpcErr       string    // what went wrong the last time, for the settings
+	rpcState string // Discord Rich Presence: off | noid | nodiscord | badid | refused | ok
+	rpcErr   string // what went wrong the last time, for the settings
 
 	nextOnline   time.Time
 	nextBalances time.Time

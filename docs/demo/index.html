@@ -615,7 +615,6 @@ input[type=text], input[type=number], .lang-btn { background: #0e101a; border-ra
     </div>
     <div class="card" id="rpcCard">
       <label class="row"><span><i class="svc" data-svc="discord"></i><span data-i="set.rpc"></span><small id="rpcNote"></small></span><input type="checkbox" class="sw" data-set="rpcOn"></label>
-      <div class="row"><span><span data-i="rpc.test"></span><small data-i="rpc.testHint"></small><small id="rpcRes" hidden></small></span><button class="btn small" id="rpcTest" type="button"></button></div>
       <div id="rpcMore">
         <label class="row"><span><span data-i="set.rpcDrop"></span><small data-i="set.rpcDropHint"></small></span><input type="checkbox" class="sw" data-set="rpcDrop"></label>
         <label class="row"><span data-i="set.rpcQueue"></span><input type="checkbox" class="sw" data-set="rpcQueue"></label>
@@ -678,7 +677,7 @@ input[type=text], input[type=number], .lang-btn { background: #0e101a; border-ra
   </div>
 </div>
 
-<script>window.LOOREK_VERSION = "0.9.8";</script>
+<script>window.LOOREK_VERSION = "0.9.9";</script>
 <script src="sim.js"></script>
 <script>
 const KEY = '__KEY__';
@@ -1093,7 +1092,6 @@ function render() {
   { // Discord status: what is shown, and whether Discord took it
     const rpc = s.rpc || {}, on = !!s.settings.rpcOn, note = $('rpcNote');
     note.textContent = on && rpc.state && rpc.state !== 'off' ? tr('rpc.st.' + rpc.state) + (rpc.err && (rpc.state === 'refused' || rpc.state === 'badid') ? ' – ' + rpc.err : '') : tr('set.rpcHint');
-    rpcTestView(rpc);
     note.className = !on ? '' : rpc.state === 'ok' ? 'ok' : 'bad';
     $('rpcMore').classList.toggle('off', !on);
     $('rpcCard').hidden = !rpc.ready; // a build without Loorek's Discord application has nothing to show
@@ -1375,16 +1373,6 @@ $('updCheck').onclick = async () => {
 };
 $('updInstall').onclick = () => op({ op: 'updateInstall' });
 $('clearLog').onclick = () => op({ op: 'clearLog' });
-// "Test": a status shown in Discord for 30 seconds; what came out stays under the button
-let rpcTestRes = '';
-function rpcTestView(r) {
-  const b = $('rpcTest'), res = $('rpcRes'), testing = r.test > 0;
-  if (testing) rpcTestRes = r.state === 'ok' ? 'ok' : (r.state || 'nodiscord') + (r.err && (r.state === 'refused' || r.state === 'badid') ? ' – ' + r.err : ''); // Discord's own words only where they add something
-  b.disabled = testing; b.textContent = testing ? tr('rpc.testing', { s: Math.ceil(r.test / 1000) }) : tr('rpc.testBtn');
-  res.hidden = !rpcTestRes;
-  if (rpcTestRes) { const ok = rpcTestRes === 'ok', st = rpcTestRes.split(' – '); res.className = ok ? 'ok' : 'bad'; res.textContent = ok ? tr('rpc.testOk') : tr('rpc.testBad', { e: tr('rpc.st.' + st[0]) + (st.length > 1 ? ' – ' + st.slice(1).join(' – ') : '') }); }
-}
-$('rpcTest').onclick = () => { rpcTestRes = ''; op({ op: 'rpcTest' }); };
 // data folder: open it, or move it somewhere else (the program restarts and the panel carries on)
 $('dataOpen').onclick = () => op({ op: 'dataOpen' });
 async function moveData(path, target) {

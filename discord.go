@@ -114,9 +114,6 @@ func (e *Engine) presence(now time.Time) (cfg RPCCfg, id string, act *rpcActivit
 	defer e.mu.Unlock()
 	cfg = e.set.Discord
 	id = firstNonEmpty(strings.TrimSpace(cfg.AppID), discordAppID)
-	if now.Before(e.rpcTestUntil) {
-		return cfg, id, rpcTestActivity(e.rpcTestUntil)
-	}
 	if !cfg.On || id == "" {
 		return cfg, id, nil
 	}
@@ -444,12 +441,4 @@ func (e *Engine) rpcStateNow() string {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	return e.rpcState
-}
-
-// rpcTestActivity: what "Test" in the settings shows for 30 seconds, whatever the program is doing.
-func rpcTestActivity(until time.Time) *rpcActivity {
-	return &rpcActivity{Type: 0, Details: rpcText(tr("rpc.testD")), State: rpcText(tr("rpc.testS")),
-		Timestamps: &rpcTimes{Start: until.Add(-30 * time.Second).Unix()},
-		Assets:     &rpcAssets{LargeImage: rpcLogo, LargeText: rpcText(appName + " " + version)},
-		Buttons:    []rpcButton{{Label: rpcText(tr("rpc.btn")), URL: siteURL}, {Label: "GitHub", URL: repoURL}}}
 }

@@ -365,14 +365,5 @@
 "upd.failShort": "检查失败",
 "upd.checkedAt": "检查于 {t}",
 "farm.earning": "正在获取",
-"farm.got": "已领取 {a}/{b}",
-"rpc.test": "Discord 状态测试",
-"rpc.testHint": "显示 30 秒测试状态，检查 Discord 是否接受。",
-"rpc.testBtn": "测试",
-"rpc.testing": "测试中… {s} 秒",
-"rpc.testOk": "✓ 正常——Discord 已接受状态。如果个人资料上看不到，请在 Discord 中开启：设置 → 活动隐私 → 分享检测到的活动。",
-"rpc.testBad": "✗ 不可用：{e}",
-"rpc.testD": "状态测试",
-"rpc.testS": "看到这个就说明正常 ✓",
-"L.rpcTest": "Discord 状态测试（30 秒）"
+"farm.got": "已领取 {a}/{b}"
 }

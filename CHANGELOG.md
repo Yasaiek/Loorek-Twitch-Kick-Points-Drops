@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.9
+- The Discord status test button is gone again (the status works); the status line still says what went wrong, if anything.
+
 ## 0.9.8
 - Settings: a "Test" button for the Discord status shows a test status in Discord for 30 seconds, whatever Loorek is doing, and says what came out (works / Discord not running / Discord refused it, with Discord's reason).
 - The status line also tells what went wrong last time.
